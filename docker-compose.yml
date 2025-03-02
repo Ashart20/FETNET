@@ -5,8 +5,8 @@ services:
         restart: unless-stopped
         working_dir: /var/www
         volumes:
-            - .:/var/www
-            - ./watcher:/var/www/watcher
+        - /home/asepsugi/FETNET/watcher:/var/www/watcher
+
 
         networks:
             - fetnet_laravel_net

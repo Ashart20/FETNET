@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 use App\Events\ScheduleUpdated;
 use Illuminate\Support\Facades\Log;
 
-
 class WatchXmlFiles extends Command
 {
     protected $signature = 'watch:xml';
@@ -26,40 +25,39 @@ class WatchXmlFiles extends Command
             $folders = glob($watchDir . '/*', GLOB_ONLYDIR);
 
             foreach ($folders as $folder) {
+                if (!is_dir($folder)) continue;
+
                 $this->info("📂 Checking folder: $folder");
                 Log::info("📂 Checking folder: $folder");
 
-                // Ambil daftar semua file dalam folder
-                $allFiles = scandir($folder);
-                foreach ($allFiles as $file) {
-                    if (str_ends_with($file, '.fet')) {
-                        $filePath = $folder . '/' . $file;
-                        $this->info("✅ File ditemukan: $filePath");
-                        Log::info("✅ File ditemukan: $filePath");
-                        $this->importXml($filePath);
-                    }
+                // Ambil file .fet di dalam folder utama
+                $files = glob($folder . '/*.fet');
+                foreach ($files as $file) {
+                    $this->info("✅ File ditemukan: $file");
+                    Log::info("✅ File ditemukan: $file");
+                    $this->importXml($file);
                 }
 
-                // Cek juga dalam subfolder
+                // Cek subfolder
                 $subFolders = glob($folder . '/*', GLOB_ONLYDIR);
                 foreach ($subFolders as $subFolder) {
+                    if (!is_dir($subFolder)) continue;
+
                     $this->info("➡️ Masuk ke subfolder: $subFolder");
                     Log::info("➡️ Masuk ke subfolder: $subFolder");
 
-                    $subFiles = scandir($subFolder);
+                    $subFiles = glob($subFolder . '/*.fet');
                     foreach ($subFiles as $file) {
-                        if (str_ends_with($file, '.fet')) {
-                            $filePath = $subFolder . '/' . $file;
-                            $this->info("✅ File ditemukan di subfolder: $filePath");
-                            Log::info("✅ File ditemukan di subfolder: $filePath");
-                            $this->importXml($filePath);
-                        }
+                        $this->info("✅ File ditemukan di subfolder: $file");
+                        Log::info("✅ File ditemukan di subfolder: $file");
+                        $this->importXml($file);
                     }
-                    // Hapus folder setelah semua file di dalamnya diproses
-                    // if (count(glob($folder . '/*')) === 0) {
-                    //     rmdir($folder);
-                    //    $this->info("Deleted empty folder: $folder");
+                }
 
+                // Hapus folder jika kosong
+                if (count(glob($folder . '/*')) === 0) {
+                    rmdir($folder);
+                    $this->info("Deleted empty folder: $folder");
                 }
             }
             sleep(5); // Cek setiap 5 detik
@@ -68,31 +66,40 @@ class WatchXmlFiles extends Command
 
     private function importXml($filePath)
     {
+        Log::info("📂 Memproses file: $filePath");
+
+        if (!file_exists($filePath)) {
+            Log::error("❌ File tidak ditemukan: $filePath");
+            return;
+        }
 
         $xmlContent = file_get_contents($filePath);
-// Coba parsing sebagai XML
+
         try {
             $xml = new SimpleXMLElement($xmlContent);
         } catch (\Exception $e) {
-            $this->error("Failed to parse XML from: $filePath");
+            Log::error("❌ Gagal membaca XML dari: $filePath - " . $e->getMessage());
             return;
         }
-        event(new ScheduleUpdated());
 
-        // Cek apakah ada bagian "Activities_List"
-        if (isset($xml->Activities_List->Activity)) {
-            foreach ($xml->Activities_List->Activity as $entry) {
-                Schedule::create([
-                    'course' => (string)$entry->Subject,
-                    'lecturer' => (string)$entry->Teacher,
-                    'room' => (string)$entry->Room,
-                    'time_slot' => (string)$entry->Day . ' ' . $entry->Time,
-                ]);
-            }
+        Log::info("✅ Berhasil membaca XML dari: $filePath");
 
-            $this->info("✅ Data jadwal berhasil diimpor dari: $filePath");
-        } else {
+        if (!isset($xml->Activities_List->Activity)) {
+            Log::error("⚠️ Struktur XML tidak valid atau kosong: $filePath");
             $this->error("⚠️ Tidak ditemukan elemen jadwal dalam XML: $filePath");
+            return;
         }
+
+        foreach ($xml->Activities_List->Activity as $entry) {
+            Schedule::create([
+                'course' => (string)$entry->Subject,
+                'lecturer' => (string)$entry->Teacher,
+                'room' => (string)$entry->Room,
+                'time_slot' => (string)$entry->Day . ' ' . $entry->Time,
+            ]);
+        }
+
+        $this->info("✅ Data jadwal berhasil diimpor dari: $filePath");
+        event(new ScheduleUpdated());
     }
 }
