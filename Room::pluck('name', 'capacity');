@@ -1,0 +1,125 @@
+[90m= [39m[34;4mIlluminate\Database\Eloquent\Collection[39;24m {#5736
+    [34mall[39m: [
+      [34;4mApp\Models\TimeSlot[39;24m {#6733
+        [34mday[39m: "[32mSelasa[39m",
+        [34mstart_time[39m: "[32m08:30:00[39m",
+        [34mend_time[39m: "[32m10:45:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6734
+        [34mday[39m: "[32mSabtu[39m",
+        [34mstart_time[39m: "[32m13:00:00[39m",
+        [34mend_time[39m: "[32m15:15:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6735
+        [34mday[39m: "[32mSenin[39m",
+        [34mstart_time[39m: "[32m13:00:00[39m",
+        [34mend_time[39m: "[32m15:15:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6736
+        [34mday[39m: "[32mSabtu[39m",
+        [34mstart_time[39m: "[32m15:15:00[39m",
+        [34mend_time[39m: "[32m16:45:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6737
+        [34mday[39m: "[32mSabtu[39m",
+        [34mstart_time[39m: "[32m08:30:00[39m",
+        [34mend_time[39m: "[32m10:00:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6738
+        [34mday[39m: "[32mJumat[39m",
+        [34mstart_time[39m: "[32m16:00:00[39m",
+        [34mend_time[39m: "[32m17:30:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6739
+        [34mday[39m: "[32mRabu[39m",
+        [34mstart_time[39m: "[32m09:15:00[39m",
+        [34mend_time[39m: "[32m10:45:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6740
+        [34mday[39m: "[32mSenin[39m",
+        [34mstart_time[39m: "[32m13:00:00[39m",
+        [34mend_time[39m: "[32m14:30:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6741
+        [34mday[39m: "[32mSelasa[39m",
+        [34mstart_time[39m: "[32m10:00:00[39m",
+        [34mend_time[39m: "[32m11:30:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6742
+        [34mday[39m: "[32mRabu[39m",
+        [34mstart_time[39m: "[32m10:45:00[39m",
+        [34mend_time[39m: "[32m12:15:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6743
+        [34mday[39m: "[32mSabtu[39m",
+        [34mstart_time[39m: "[32m14:30:00[39m",
+        [34mend_time[39m: "[32m16:00:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6744
+        [34mday[39m: "[32mSenin[39m",
+        [34mstart_time[39m: "[32m07:00:00[39m",
+        [34mend_time[39m: "[32m08:30:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6745
+        [34mday[39m: "[32mSelasa[39m",
+        [34mstart_time[39m: "[32m13:45:00[39m",
+        [34mend_time[39m: "[32m15:15:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6746
+        [34mday[39m: "[32mKamis[39m",
+        [34mstart_time[39m: "[32m10:00:00[39m",
+        [34mend_time[39m: "[32m11:30:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6747
+        [34mday[39m: "[32mKamis[39m",
+        [34mstart_time[39m: "[32m14:30:00[39m",
+        [34mend_time[39m: "[32m16:45:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6748
+        [34mday[39m: "[32mSelasa[39m",
+        [34mstart_time[39m: "[32m07:45:00[39m",
+        [34mend_time[39m: "[32m10:00:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6749
+        [34mday[39m: "[32mSenin[39m",
+        [34mstart_time[39m: "[32m16:00:00[39m",
+        [34mend_time[39m: "[32m17:30:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6750
+        [34mday[39m: "[32mSenin[39m",
+        [34mstart_time[39m: "[32m08:30:00[39m",
+        [34mend_time[39m: "[32m10:00:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6751
+        [34mday[39m: "[32mSabtu[39m",
+        [34mstart_time[39m: "[32m16:00:00[39m",
+        [34mend_time[39m: "[32m17:30:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6752
+        [34mday[39m: "[32mSelasa[39m",
+        [34mstart_time[39m: "[32m10:00:00[39m",
+        [34mend_time[39m: "[32m12:15:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6753
+        [34mday[39m: "[32mJumat[39m",
+        [34mstart_time[39m: "[32m10:00:00[39m",
+        [34mend_time[39m: "[32m11:30:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6754
+        [34mday[39m: "[32mSabtu[39m",
+        [34mstart_time[39m: "[32m09:15:00[39m",
+        [34mend_time[39m: "[32m10:45:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6755
+        [34mday[39m: "[32mSabtu[39m",
+        [34mstart_time[39m: "[32m10:45:00[39m",
+        [34mend_time[39m: "[32m12:15:00[39m",
+      },
+      [34;4mApp\Models\TimeSlot[39;24m {#6756
+        [34mday[39m: "[32mKamis[39m",
+        [34mstart_time[39m: "[32m15:15:00[39m",
+        [34mend_time[39m: "[32m16:45:00[39m",
+      },
+    ],
+  }
+

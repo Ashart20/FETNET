@@ -1,24 +1,21 @@
-<div wire:poll.5s>
-    <h1 class="text-xl font-bold mb-4">Jadwal Perkuliahan</h1>
-
-    <table class="w-full border-collapse border border-gray-300">
+<div class="bg-white rounded-xl soft-shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold">Jadwal Terkini</h2>
+        <button class="gradient-bg text-white px-4 py-2 rounded-lg hover:opacity-90">
+            <i class="fas fa-plus mr-2"></i> Tambah Jadwal
+        </button>
+    </div>
+    <table class="w-full">
         <thead>
-        <tr class="bg-gray-200">
-            <th class="border p-2">Mata Kuliah</th>
-            <th class="border p-2">Dosen</th>
-            <th class="border p-2">Ruangan</th>
-            <th class="border p-2">Waktu</th>
+        <tr class="text-left text-gray-500 border-b">
+            <th class="pb-3">Mata Kuliah</th>
+            <th class="pb-3">Dosen</th>
+            <th class="pb-3">Waktu</th>
+            <th class="pb-3">Status</th>
         </tr>
         </thead>
-        <tbody>
-        @foreach ($schedules as $schedule)
-            <tr>
-                <td class="border p-2">{{ $schedule->course }}</td>
-                <td class="border p-2">{{ $schedule->lecturer }}</td>
-                <td class="border p-2">{{ $schedule->room }}</td>
-                <td class="border p-2">{{ $schedule->time_slot }}</td>
-            </tr>
-        @endforeach
+        <tbody class="divide-y">
+        <!-- Table rows di-generate dari database -->
         </tbody>
     </table>
 </div>

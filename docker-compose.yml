@@ -1,15 +1,19 @@
+version: '3.8'
+
 services:
     app:
         container_name: laravel_app
         restart: unless-stopped
         working_dir: /var/www/html
+        build:
+            context: .
+            dockerfile: Dockerfile
         volumes:
-            -  .:/var/www/html    
-            -   type: bind
-                source: /mnt/c/Users/Nadia/fet-results/timetables
-                target: /var/www/html/storage/app/fet-results
-                bind:
-                    create_host_path: true
+            - .:/var/www/html
+            - /c/Users/LENOVO/fet-results/timetables:/var/www/html/storage/fet-xml
+            - type: bind
+              source: /mnt/c/Users/LENOVO/fet-results/timetables
+              target: /var/www/html/storage/app/fet-results
         environment:
             - WWWUSER=${UID:-1000}
         networks:
@@ -17,9 +21,11 @@ services:
         depends_on:
             mysql:
                 condition: service_healthy
-        build:
-            context: .
-            dockerfile: Dockerfile
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 512M
 
     mysql:
         image: mysql:8.0
@@ -30,22 +36,23 @@ services:
             MYSQL_DATABASE: fetnet
             MYSQL_USER: laravel
             MYSQL_PASSWORD: laravel
-            TZ: Asia/Jakarta
-        command:
-            --default-authentication-plugin=mysql_native_password
-            --skip-mysqlx
-            --default-time-zone=Asia/Jakarta
         ports:
             - "3307:3306"
         volumes:
             - mysql_data:/var/lib/mysql
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-            interval: 5s
-            timeout: 10s
-            retries: 10
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
         networks:
             - fetnet_laravel_net
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.30'
+                    memory: 512M
 
     nginx:
         image: nginx:latest
@@ -54,15 +61,21 @@ services:
         ports:
             - "8080:80"
         volumes:
-            - .:/var/www
+            - .:/var/www/html
             - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
         depends_on:
             - app
         networks:
             - fetnet_laravel_net
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.20'
+                    memory: 256M
 
 networks:
     fetnet_laravel_net:
+        driver: bridge
 
 volumes:
     mysql_data:
@@ -71,4 +84,4 @@ volumes:
         driver_opts:
             type: none
             o: bind
-            device: /mnt/c/Users/Nadia/fet-results/timetables
+            device: /mnt/c/Users/LENOVO/fet-results/timetables

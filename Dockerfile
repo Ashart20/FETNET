@@ -8,9 +8,9 @@ ln -sf /mnt/fet-results /var/www/watcher/fet-results \n\
 exec php-fpm" > /usr/local/bin/startup
 RUN chmod +x /usr/local/bin/startup
 
-ENTRYPOINT ["startup"]
+ENTRYPOINT ["/usr/local/bin/startup"]
 
-# Install dependensi yang diperlukan
+# Install dependensi sistem
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libonig-dev \
@@ -20,15 +20,27 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    && docker-php-ext-install pdo pdo_mysql mbstring xml zip
+    gnupg \
+    ca-certificates \
+    sudo
+
+# Install PHP extension
+RUN docker-php-ext-install pdo pdo_mysql mbstring xml zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory ke /var/www
+# Install Node.js LTS (misal versi 20.x)
+# Tambahkan setelah baris RUN apt-get update ...
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
+
+
+# Set working directory
 WORKDIR /var/www/html
 COPY . .
-# Berikan permission agar storage dan bootstrap/cache bisa diakses Laravel
+
+# Permission Laravel
 RUN mkdir -p /var/www/storage /var/www/bootstrap/cache \
     && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
@@ -36,10 +48,11 @@ RUN mkdir -p /var/www/html/storage/app/fet-results && \
     chown -R www-data:www-data /var/www/html/storage/app/fet-results && \
     chmod -R 775 /var/www/html/storage/app/fet-results
 
-# Set permission untuk www-data
+# Set user untuk Laravel
 RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
-# Expose port untuk Nginx
+# Expose port untuk FPM
 EXPOSE 9000
 
+# Jalankan php-fpm
 CMD ["php-fpm"]

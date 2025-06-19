@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
-    protected $fillable = ['name', 'capacity'];
+    protected $fillable = ['name'];
+
 
     // Relasi ke Schedule
     public function schedules(): HasMany
