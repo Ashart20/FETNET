@@ -9,6 +9,8 @@ export default {
         './vendor/laravel/jetstream/**/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
+        // Tambahkan baris ini untuk memindai file Livewire PHP
+        './app/Livewire/**/*.php',
     ],
 
     theme: {

@@ -10,7 +10,7 @@ use App\Livewire\Dashboard;
 use App\Livewire\UserIndex;
 use App\Livewire\Guide;
 use App\Livewire\FET\GeneratedSchedule;
-
+use App\Livewire\ScheduleConflictDetector;
 
 // ========================
 // Halaman Login
@@ -60,3 +60,4 @@ Route::middleware(['auth'])->group(function () {
 // Routes auth dari Breeze atau Jetstream
 require __DIR__.'/auth.php';
 Route::get('/hasil-fet', \App\Livewire\FetScheduleViewer::class)->name('hasil.fet');
+Route::get('/test-conflict-detector', ScheduleConflictDetector::class);

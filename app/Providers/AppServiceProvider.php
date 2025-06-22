@@ -18,6 +18,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(FetWatchService::class, function () {
+            return new FetWatchService();
+        });
         //
     }
 

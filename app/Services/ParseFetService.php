@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Services;
 
-use Illuminate\Console\Command;
 use App\Models\Room;
 use App\Models\Schedule;
 use App\Models\TimeSlot;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
-class ParseFet extends Command
+class ParseFetService
 {
     protected $signature = 'fet:parse {file}';
     protected $description = 'Parse a .fet file and insert data into schedules table';
@@ -21,6 +20,7 @@ class ParseFet extends Command
         // HAPUS DATA LAMA
         Schedule::query()->delete();
         TimeSlot::query()->delete();
+        Room::query()->delete();
         if (!file_exists($file)) {
             $this->error("❌ File tidak ditemukan: $file");
             return;
@@ -115,7 +115,7 @@ class ParseFet extends Command
             $detail = $activityMap[$id] ?? null;
             if (!$detail) continue;
             $roomName = (string) ($xml->Space_Constraints_List->xpath("ConstraintActivityPreferredRoom[Activity_Id='$id']/Room") [0] ?? 'TBD');
-            $roomName = trim($roomName);
+
             $room = Room::where('name', $roomName)->first() ?? Room::where('name', 'TBD')->first();
             $rawDay = $constraint['day'] ?? null;
             $day = $dayMap[$rawDay] ?? null;
@@ -141,11 +141,11 @@ class ParseFet extends Command
 
             Schedule::create([
                 'activity_id' => $id,
-                'kode_mk' => trim($subjectMap[$detail['subject']]) ?? null,
-                'subject' => trim($detail['subject']),
-                'kode_dosen' => trim($teacherMap[$detail['teacher']]) ?? null,
-                'teacher' => trim($detail['teacher']),
-                'kelas' => trim($detail['students']),
+                'kode_mk' => $subjectMap[$detail['subject']] ?? null,
+                'subject' => $detail['subject'],
+                'kode_dosen' => $teacherMap[$detail['teacher']] ?? null,
+                'teacher' => $detail['teacher'],
+                'kelas' => $detail['students'],
                 'sks' => $detail['duration'],
                 'room_id' => $room?->id,
                 'time_slot_id' => $slot->id,
@@ -155,10 +155,5 @@ class ParseFet extends Command
         }
 
         $this->info("✅ Inserted $count schedules.");
-        event(new \App\Events\ScheduleDataUpdated());
-        $this->info("✅ Event ScheduleDataUpdated dipancarkan.");
-
-
-
     }
 }
