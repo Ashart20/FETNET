@@ -1,89 +1,125 @@
-<div class="p-4">
-    @livewire('schedule-conflict-detector')
+<div>
+    <div class="p-4 sm:p-6 lg:p-8">
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Jadwal Perkuliahan</h1>
 
-    <hr class="my-6">
+        {{-- Filter & Tombol --}}
+        @php
+            // Definisikan kelas styling di sini agar mudah diubah dan konsisten
+            $selectClasses = 'w-full text-sm rounded-lg transition
+                            bg-white border border-gray-300 text-gray-900 placeholder-gray-500
+                            focus:outline-none focus:ring-2 focus:ring-blue-500
+                            dark:bg-slate-800 dark:border-slate-700 dark:text-gray-300 dark:placeholder-gray-400';
 
-    {{-- Filter & Tombol --}}
-    <div class="flex flex-wrap items-end gap-4 mb-6 p-4 bg-white shadow-sm rounded-lg">
-        {{-- Grup Filter --}}
-        <div class="flex flex-wrap gap-x-6 gap-y-4">
-            {{-- Loop sekarang mengiterasi properti filtersConfig dari komponen --}}
-            @foreach ($this->filtersConfig as $filter)
-                <div class="flex flex-col">
-                    <label for="{{ $filter['model'] }}" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ $filter['label'] }}
-                    </label>
-                    <select wire:model.defer="{{ $filter['model'] }}"
-                            id="{{ $filter['model'] }}"
-                            class="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
-                        <option value="">-- Semua --</option>
-                        {{-- Akses daftar item melalui $filter['data_list'] --}}
-                        @foreach ($filter['data_list'] as $item)
-                            <option value="{{ $item }}">{{ $item }}</option>
-                        @endforeach
+            // Warna label kini beradaptasi dengan tema
+            $labelClasses = 'block text-xs font-medium mb-1
+                           text-gray-700
+                           dark:text-gray-200';
+        @endphp
+
+        {{-- Grid untuk menata filter dan tombol --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {{-- Filter Hari --}}
+            <div>
+                <label for="filterHari" class="{{ $labelClasses }}">Hari</label>
+                <select wire:model.live="filterHari" id="filterHari" class="{{ $selectClasses }}">
+                    <option value="">Semua Hari</option>
+                    @foreach ($daftarHari as $item) <option value="{{ $item }}">{{ $item }}</option> @endforeach
+                </select>
+            </div>
+
+            {{-- Filter Dosen --}}
+            <div>
+                <label for="filterDosen" class="{{ $labelClasses }}">Dosen</label>
+                <select wire:model.live="filterDosen" id="filterDosen" class="{{ $selectClasses }}">
+                    <option value="">Semua Dosen</option>
+                    @foreach ($daftarDosen as $item) <option value="{{ $item }}">{{ $item }}</option> @endforeach
+                </select>
+            </div>
+
+            {{-- Filter Mata Kuliah --}}
+            <div>
+                <label for="filterMatkul" class="{{ $labelClasses }}">Mata Kuliah</label>
+                <select wire:model.live="filterMatkul" id="filterMatkul" class="{{ $selectClasses }}">
+                    <option value="">Semua Matkul</option>
+                    @foreach ($daftarMatkul as $item) <option value="{{ $item }}">{{ $item }}</option> @endforeach
+                </select>
+            </div>
+
+            {{-- Filter Kelas --}}
+            <div>
+                <label for="filterKelas" class="{{ $labelClasses }}">Kelas</label>
+                <select wire:model.live="filterKelas" id="filterKelas" class="{{ $selectClasses }}">
+                    <option value="">Semua Kelas</option>
+                    @foreach ($daftarKelas as $item) <option value="{{ $item }}">{{ $item }}</option> @endforeach
+                </select>
+            </div>
+
+            {{-- PERBAIKAN: Mengelompokkan Filter Ruangan dan Tombol Reset --}}
+            <div class="flex items-end gap-x-8">
+                {{-- Filter Ruangan --}}
+                <div class="flex-grow">
+                    <label for="filterRuangan" class="{{ $labelClasses }}">Ruangan</label>
+                    <select wire:model.live="filterRuangan" id="filterRuangan" class="{{ $selectClasses }}">
+                        <option value="">Semua Ruangan</option>
+                        @foreach ($daftarRuangan as $item) <option value="{{ $item }}">{{ $item }}</option> @endforeach
                     </select>
                 </div>
-            @endforeach
-        </div>
+                {{-- Tombol Reset --}}
+                <div class="flex-shrink-0">
+                    <button wire:click="resetFilters" title="Reset Semua Filter" class="{{ $selectClasses }} h-full inline-flex items-center justify-center gap-x-2 px-4 hover:bg-slate-700">
+                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.664 0l3.18-3.185m-4.992-2.686a3.75 3.75 0 01-5.304 0L9 15.121m-2.12-2.828a3.75 3.75 0 015.304 0L15 9.348" /></svg>
+                    </button>
+                </div>
+            </div>
 
-        {{-- Tombol --}}
-        <div class="flex items-end gap-2">
-            <button wire:click="applyFilter"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01.293.707V19a1 1 0 01-1 1H4a1 1 0 01-1-1V6.586a1 1 0 01.293-.707L3 4zm7 10a2 2 0 100-4 2 2 0 000 4z"></path></svg>
-                Terapkan
-            </button>
-
-            <button wire:click="resetFilter"
-                    title="Reset Filter"
-                    class="inline-flex items-center p-2 border border-gray-300 rounded-md shadow-sm text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition ease-in-out duration-150">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004 13V4m7 7v9h1.347a.75.75 0 00.582-.294l-.134-.132a.75.75 0 00-.582-.294H11V11m-4 0h4m-4 4h4m-4 4h4"></path></svg>
-            </button>
         </div>
     </div>
 
-    <div class="overflow-x-auto rounded-lg shadow-md mt-6">
-        <table class="min-w-full text-sm bg-white">
-            <thead class="bg-gray-100 border-b border-gray-200">
-            <tr>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">Kode MK</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">Mata Kuliah</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">SKS</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">Kode Dosen</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">Nama Dosen</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">Kelas</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">Hari</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">Jam</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700">Ruangan</th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-            @forelse ($jadwal as $item)
-                <tr class="hover:bg-gray-50 transition duration-150 ease-in-out">
-                    <td class="px-4 py-3 whitespace-nowrap">{{ $item->kode_mk ?? '-' }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">{{ $item->subject ?? '-' }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">{{ $item->sks ?? '-' }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">{{ $item->kode_dosen ?? '-' }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">{{ $item->teacher ?? '-' }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">{{ $item->kelas ?? '-' }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">{{ ucfirst(optional($item->timeSlot)->day ?? '-') }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        {{ optional($item->timeSlot)?->start_time ? \Carbon\Carbon::parse($item->timeSlot->start_time)->format('H:i') : '-' }}
-                        -
-                        {{ optional($item->timeSlot)?->end_time ? \Carbon\Carbon::parse($item->timeSlot->end_time)->format('H:i') : '-' }}
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap">{{ optional($item->room)->name ?? '-' }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="9" class="text-center py-4 text-gray-500">Tidak ada data ditemukan.</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-    </div>
-    {{-- Pagination --}}
-    <div class="mt-4 p-4 bg-white rounded-lg shadow-sm flex justify-center">
-        {{ $jadwal->links() }}
+        {{-- Tabel Data Jadwal --}}
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 dark:bg-gray-900/50 text-xs text-gray-500 dark:text-gray-300 uppercase">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 font-medium">Mata Kuliah</th>
+                        <th scope="col" class="px-6 py-3 font-medium">SKS</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Dosen</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Kelas</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Hari</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Jam</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Ruangan</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @forelse ($jadwal as $item)
+                        <tr wire:key="{{ $item->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white font-medium">
+                                {{ $item->activity->subject->nama_matkul ?? 'N/A' }}
+                                <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $item->activity->subject->kode_matkul ?? '' }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">{{ $item->activity->subject->sks ?? '-' }}</td>
+                            <td class="px-6 py-4 text-gray-900 dark:text-white">
+                                {!! $item->activity->teachers->pluck('nama_dosen')->implode('<br>') !!}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">{{ $item->activity->studentGroup->nama_kelompok ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">{{ $item->day->name ?? '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">{{ optional($item->timeSlot)->start_time ? \Carbon\Carbon::parse($item->timeSlot->start_time)->format('H:i') : '-' }} - {{ optional($item->timeSlot)->end_time ? \Carbon\Carbon::parse($item->timeSlot->end_time)->format('H:i') : '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{{ $item->room->nama_ruangan ?? '-' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-6 text-gray-500 dark:text-gray-400">Tidak ada data jadwal ditemukan yang sesuai dengan filter.</td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if ($jadwal->hasPages())
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                {{ $jadwal->links() }}
+            </div>
+        @endif
     </div>
 </div>

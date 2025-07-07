@@ -1,63 +1,86 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SettingsController;
-use App\Livewire\FetScheduleViewer;
-use App\Livewire\ScheduleTable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Dashboard;
-use App\Livewire\UserIndex;
+use App\Http\Controllers\ProfileController;
+
+// Livewire Components
+use App\Livewire\FetScheduleViewer;
 use App\Livewire\Guide;
-use App\Livewire\FET\GeneratedSchedule;
-use App\Livewire\ScheduleConflictDetector;
+use App\Livewire\Fakultas\Dashboard as FakultasDashboard;
+use App\Livewire\Fakultas\ManageProdi;
+use App\Livewire\Fakultas\ManageProdiUsers;
+use App\Livewire\Fakultas\ManageRooms;
+use App\Livewire\Fakultas\ManageRoomConstraints;
+use App\Livewire\Prodi\Dashboard as ProdiDashboard;
+use App\Livewire\Prodi\ManageTeachers;
+use App\Livewire\Prodi\ManageSubjects;
+use App\Livewire\Prodi\ManageStudentGroups;
+use App\Livewire\Prodi\ManageActivities;
+use App\Livewire\Prodi\ManageTeacherConstraints;
+use App\Livewire\Prodi\ManageStudentGroupConstraints;
+use App\Livewire\Mahasiswa\Dashboard as MahasiswaDashboard;
+use App\Http\Controllers\Prodi\JadwalGenerationController;
 
-// ========================
-// Halaman Login
-// ========================
-// routes/web.php
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
-// ========================
-// Landing Page
-// ========================
+// Halaman Landing Page (Publik)
 Route::get('/', function () {
-    $resources = [
-        [
-            'title' => 'Panduan Penggunaan',
-            'description' => 'Dokumentasi lengkap penggunaan FetNet.',
-            'link' => 'https://fetnet.example.com/docs',
-        ],
-        [
-            'title' => 'Masuk ke dashboard',
-            'description' => 'Lihat dan kelola jadwal perkuliahan Anda.',
-            'link' => route('dashboard'),
-        ],
-    ];
-    return view('welcome', compact('resources'));
+    return view('welcome');
+})->name('home');
+
+// Halaman Jadwal Utama (Bisa dilihat siapa saja yang sudah login)
+Route::middleware('auth')->get('/guide', Guide::class)->name('guide');
+Route::middleware('auth')->get('/user.index', Guide::class)->name('user.index');
+
+Route::middleware(['auth', 'role:prodi|mahasiswa'])->get('/hasil-fet', FetScheduleViewer::class)->name('hasil.fet');
+// ==========================================================
+// GRUP RUTE UNTUK FAKULTAS
+// ==========================================================
+Route::middleware(['auth', 'role:fakultas'])->prefix('fakultas')->name('fakultas.')->group(function () {
+    Route::get('/dashboard', FakultasDashboard::class)->name('dashboard');
+    Route::get('/prodi', ManageProdi::class)->name('prodi');
+    Route::get('/users', ManageProdiUsers::class)->name('users');
+    Route::get('/ruangan', ManageRooms::class)->name('rooms');
+    Route::get('/batasan-ruangan', ManageRoomConstraints::class)->name('room-constraints');
 });
 
-// ========================
-// Halaman Dashboard dan Autentikasi
-// ========================
-Route::middleware(['auth'])->group(function () {
-
-    Route::get('/dashboard', Dashboard::class)->name('dashboard');
-    Route::get('/users', UserIndex::class)->name('user.index');
-    Route::get('/guide', Guide::class)->name('guide');
-    Route::get('/generated', GeneratedSchedule::class)->name('generated.schedule');
-
-    // Profil User
-    Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
-        Route::patch('/', [ProfileController::class, 'update'])->name('update');
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
-    });
+// ==========================================================
+// GRUP RUTE UNTUK PRODI
+// ==========================================================
+Route::middleware(['auth', 'role:prodi'])->prefix('prodi')->name('prodi.')->group(function () {
+    Route::get('/dashboard', ProdiDashboard::class)->name('dashboard');
+    Route::get('/dosen', ManageTeachers::class)->name('teachers');
+    Route::get('/matakuliah', ManageSubjects::class)->name('subjects');
+    Route::get('/kelompok-mahasiswa', ManageStudentGroups::class)->name('student-groups');
+    Route::get('/aktivitas', ManageActivities::class)->name('activities');
+    Route::get('/batasan-dosen', ManageTeacherConstraints::class)->name('teacher-constraints');
+    Route::get('/batasan-mahasiswa', ManageStudentGroupConstraints::class)->name('student-group-constraints');
+    Route::post('/generate', [JadwalGenerationController::class, 'generate'])->name('generate');
 });
 
-// Routes auth dari Breeze atau Jetstream
+// ==========================================================
+// GRUP RUTE UNTUK MAHASISWA
+// ==========================================================
+Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    // Ganti 'ProdiDashboard' dengan Dasbor Mahasiswa jika sudah dibuat
+    Route::get('/dashboard', MahasiswaDashboard::class)->name('dashboard');
+    // Contoh: Route::get('/jadwal-saya', LihatJadwalMahasiswa::class)->name('jadwal.saya');
+});
+
+
+// ==========================================================
+// RUTE BAWAAN LARAVEL (PROFIL, DLL)
+// ==========================================================
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+
+// Route authentication dari Breeze (login, register, dll.)
 require __DIR__.'/auth.php';
-Route::get('/hasil-fet', \App\Livewire\FetScheduleViewer::class)->name('hasil.fet');
-Route::get('/test-conflict-detector', ScheduleConflictDetector::class);

@@ -2,60 +2,57 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Schedule extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    use HasFactory;
+
     protected $fillable = [
-        'activity_id', 'kode_mk', 'subject', 'kode_dosen', 'teacher',
-        'kelas', 'sks', 'room_id', 'time_slot_id' // <- jumlah_peserta dihapus
+        'activity_id',
+        'subject_id',
+        'student_group_id',
+        'room_id',
+        'time_slot_id',
+        'day_id',
     ];
 
-    /**
-     * Get the room associated with the schedule.
-     */
+    // Ganti 'room_id' ke 'master_ruangan_id' jika nama kolom di tabel Anda berbeda
     public function room(): BelongsTo
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(MasterRuangan::class, 'room_id');
     }
 
-    /**
-     * Get the time slot associated with the schedule.
-     */
     public function timeSlot(): BelongsTo
     {
         return $this->belongsTo(TimeSlot::class);
     }
 
-    /**
-     * Optional helper: get day from timeSlot directly
-     */
-    public function getDayAttribute(): ?string
+    public function day(): BelongsTo
     {
-        return $this->timeSlot?->day;
+        return $this->belongsTo(Day::class);
     }
 
-    /**
-     * Optional helper: get time string from timeSlot
-     */
-    public function getTimeRangeAttribute(): ?string
+    public function activity(): BelongsTo
     {
-        return $this->timeSlot
-            ? $this->timeSlot->start_time . ' - ' . $this->timeSlot->end_time
-            : null;
+        return $this->belongsTo(Activity::class);
     }
 
-    /**
-     * Optional helper: get room name
-     */
-    public function getRoomNameAttribute(): ?string
+    public function subject(): BelongsTo
     {
-        return $this->room?->name;
+        return $this->belongsTo(Subject::class);
+    }
+
+    public function studentGroup(): BelongsTo
+    {
+        return $this->belongsTo(StudentGroup::class);
+    }
+
+    public function teachers(): BelongsToMany
+    {
+        return $this->belongsToMany(Teacher::class, 'schedule_teacher');
     }
 }

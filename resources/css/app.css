@@ -1,7 +1,6 @@
+@import "tom-select/dist/css/tom-select.default.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-[x-cloak] {
-    display: none;
-}

@@ -3,116 +3,133 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Illuminate\Support\Facades\Log;
+// Pastikan model yang relevan diimpor
 use App\Models\Schedule;
-use Carbon\Carbon;
+use App\Models\TimeSlot;
 use App\Models\Room;
+use Carbon\Carbon;
 
 class ScheduleConflictDetector extends Component
 {
-    public $schedules = [];
-    public $conflicts = [];
-    public $showCleanNotification = false;
-    public $showConflictNotification = false; // <-- Properti baru untuk notifikasi konflik
+    // Properti untuk notifikasi umum
+    public $showConflictNotification = false;
+    public $showCleanNotification = false; // Ini untuk notifikasi "Tidak Ada Konflik!"
 
-    // Listener untuk event dari komponen lain
-    protected $listeners = ['refreshConflictDetector' => 'loadSchedulesAndDetectConflicts'];
+    // Properti untuk menyimpan detail konflik
+    public $conflicts = []; // Pastikan ini dideklarasikan
 
+    // Listeners untuk menerima event dari FetScheduleViewer
+    protected $listeners = [
+        'refreshConflictDetector' => 'detectConflicts',
+        // Jika Anda memiliki event spesifik untuk menampilkan notifikasi konflik dari tempat lain
+        // 'show-conflict-notification' => 'showConflictNotificationEvent',
+        // 'clearConflictAlert' => 'clearConflictAlert', // Listener untuk tombol close
+    ];
+
+    // Method yang dipanggil saat mount komponen
     public function mount()
     {
-        $this->loadSchedulesAndDetectConflicts();
+        Log::info('ScheduleConflictDetector: Component mounted.');
+        // detectConflicts() akan dipanggil setelah data jadwal utama dimuat/diperbarui
+        // Kita tidak ingin memanggilnya di mount kecuali sangat diperlukan,
+        // karena mount() FetScheduleViewer sudah akan memicu refreshConflictDetector
     }
 
-    public function loadSchedules()
-    {
-        $this->schedules = Schedule::with('timeSlot', 'room')->get();
-    }
-
-    public function loadSchedulesAndDetectConflicts()
-    {
-        $this->loadSchedules();
-        $this->detectConflicts();
-    }
-
+    // Method ini akan dipanggil oleh event 'refreshConflictDetector'
     public function detectConflicts()
     {
-        $this->conflicts = []; // Reset konflik sebelum deteksi ulang
-        $this->showCleanNotification = false; // Reset notifikasi bersih
+        Log::info('ScheduleConflictDetector: Detecting conflicts...');
+        $this->conflicts = []; // Bersihkan konflik sebelumnya
         $this->showConflictNotification = false; // Reset notifikasi konflik
+        $this->showCleanNotification = false; // Reset notifikasi bersih
 
-        $groupedSchedules = $this->schedules->filter(fn($s) => $s->timeSlot)->groupBy('timeSlot.day');
+        $schedules = Schedule::with(['timeSlot', 'room'])->get();
 
-        foreach ($groupedSchedules as $day => $schedulesOnDay) {
-            $count = $schedulesOnDay->count();
+        if ($schedules->isEmpty()) {
+            Log::info('ScheduleConflictDetector: No schedules found to detect conflicts.');
+            $this->showCleanNotification = true; // Tampilkan notifikasi bersih jika tidak ada jadwal
+            $this->dispatch('showCleanNotification', 'Tidak ada jadwal yang terdeteksi.');
+            return;
+        }
 
-            for ($i = 0; $i < $count; $i++) {
-                for ($j = $i + 1; $j < $count; $j++) {
-                    $session1 = $schedulesOnDay[$i];
-                    $session2 = $schedulesOnDay[$j];
+        $teacherOccupancy = []; // Dosen -> Hari -> Jam -> [Activities]
+        $roomOccupancy = [];    // Ruangan -> Hari -> Jam -> [Activities]
+        $groupOccupancy = [];   // Kelas -> Hari -> Jam -> [Activities]
 
-                    if (!$session1->timeSlot || !$session2->timeSlot) {
-                        continue;
-                    }
+        foreach ($schedules as $schedule) {
+            $day = optional($schedule->timeSlot)->day;
+            $startTime = optional($schedule->timeSlot)->start_time;
+            $endTime = optional($schedule->timeSlot)->end_time;
+            $roomName = optional($schedule->room)->name;
+            $teacher = $schedule->teacher;
+            $kelas = $schedule->kelas;
 
-                    $start1 = Carbon::parse($session1->timeSlot->start_time);
-                    $end1   = Carbon::parse($session1->timeSlot->end_time);
-                    $start2 = Carbon::parse($session2->timeSlot->start_time);
-                    $end2   = Carbon::parse($session2->timeSlot->end_time);
-
-                    if ($start1->lessThan($end2) && $start2->lessThan($end1)) {
-                        if ($session1->room_id !== null && $session1->room_id === $session2->room_id && $session1->room && $session2->room) {
-                            $this->conflicts[] = [
-                                'type' => 'Ruangan',
-                                'resource' => $session1->room->name,
-                                'time' => $session1->timeSlot->day . ', ' . $session1->timeSlot->start_time . '-' . $session1->timeSlot->end_time,
-                                'sessions' => [$session1->subject . ' (' . $session1->kelas . ')', $session2->subject . ' (' . $session2->kelas . ')'],
-                            ];
-                        }
-
-                        if (!empty($session1->kode_dosen) && $session1->kode_dosen === $session2->kode_dosen) {
-                            $this->conflicts[] = [
-                                'type' => 'Guru',
-                                'resource' => $session1->teacher,
-                                'time' => $session1->timeSlot->day . ', ' . $session1->timeSlot->start_time . '-' . $session1->timeSlot->end_time,
-                                'sessions' => [$session1->subject . ' (' . $session1->kelas . ')', $session2->subject . ' (' . $session2->kelas . ')'],
-                            ];
-                        }
-
-                        if (!empty($session1->kelas) && $session1->kelas === $session2->kelas) {
-                            $this->conflicts[] = [
-                                'type' => 'Kelas',
-                                'resource' => $session1->kelas,
-                                'time' => $session1->timeSlot->day . ', ' . $session1->timeSlot->start_time . '-' . $session1->timeSlot->end_time,
-                                'sessions' => [$session1->subject . ' (' . $session1->teacher . ')', $session2->subject . ' (' . $session2->teacher . ')'],
-                            ];
-                        }
-                    }
-                }
+            if (!$day || !$startTime || !$endTime) {
+                Log::warning("ScheduleConflictDetector: Skipping schedule due to missing time slot data: ID {$schedule->id}");
+                continue;
             }
+
+            $currentSlot = $day . '-' . $startTime . '-' . $endTime;
+
+            // Konflik Dosen
+            if (isset($teacherOccupancy[$teacher][$currentSlot])) {
+                $this->conflicts[] = [
+                    'type' => 'Dosen Bentrok',
+                    'resource' => $teacher,
+                    'time' => "{$day}, {$startTime} - {$endTime}",
+                    'sessions' => array_merge([$schedule->subject . ' (' . $kelas . ')'], array_map(function($s) { return $s->subject . ' (' . $s->kelas . ')'; }, $teacherOccupancy[$teacher][$currentSlot])),
+                ];
+            }
+            $teacherOccupancy[$teacher][$currentSlot][] = $schedule;
+
+            // Konflik Ruangan
+            if ($roomName && isset($roomOccupancy[$roomName][$currentSlot])) {
+                $this->conflicts[] = [
+                    'type' => 'Ruangan Bentrok',
+                    'resource' => $roomName,
+                    'time' => "{$day}, {$startTime} - {$endTime}",
+                    'sessions' => array_merge([$schedule->subject . ' (' . $teacher . ')'], array_map(function($s) { return $s->subject . ' (' . $s->teacher . ')'; }, $roomOccupancy[$roomName][$currentSlot])),
+                ];
+            }
+            if ($roomName) { // Hanya tambahkan jika roomName valid
+                $roomOccupancy[$roomName][$currentSlot][] = $schedule;
+            }
+
+            // Konflik Kelas
+            if (isset($groupOccupancy[$kelas][$currentSlot])) {
+                $this->conflicts[] = [
+                    'type' => 'Kelas Bentrok',
+                    'resource' => $kelas,
+                    'time' => "{$day}, {$startTime} - {$endTime}",
+                    'sessions' => array_merge([$schedule->subject . ' (' . $teacher . ')'], array_map(function($s) { return $s->subject . ' (' . $s->teacher . ')'; }, $groupOccupancy[$kelas][$currentSlot])),
+                ];
+            }
+            $groupOccupancy[$kelas][$currentSlot][] = $schedule;
         }
 
-        // --- Logika Baru untuk Notifikasi ---
         if (!empty($this->conflicts)) {
-            // Jika ada konflik, tampilkan notifikasi konflik
             $this->showConflictNotification = true;
-            $this->dispatch('show-conflict-notification', ['count' => count($this->conflicts)]); // Kirim data ke JS
+            Log::warning('ScheduleConflictDetector: Conflicts detected: ' . count($this->conflicts));
+            // Mengirim event ke Alpine.js di frontend
+            $this->dispatch('showConflictNotification', ['count' => count($this->conflicts)]);
         } else {
-            // Jika tidak ada konflik, tampilkan notifikasi "Bersih" sebentar
             $this->showCleanNotification = true;
-            $this->dispatch('hide-clean-notification-after-delay'); // Panggil JS untuk menyembunyikan
+            Log::info('ScheduleConflictDetector: No conflicts detected.');
+            // Mengirim event ke Alpine.js di frontend
+            $this->dispatch('showCleanNotification', 'Jadwal Anda bersih dari bentrokan.');
         }
-        // Pastikan session flash selalu di-manage oleh Livewire
-        session()->forget('conflict_alert'); // Hapus session flash lama
+
+        // Jika Anda ingin notifikasi sukses/bersih menghilang setelah beberapa saat,
+        // logika setTimeout ada di blade.
     }
 
     public function clearConflictAlert()
     {
-        $this->showConflictNotification = false; // Sembunyikan notifikasi konflik dari properti
-        session()->forget('conflict_alert'); // Hapus juga dari session flash (opsional, tapi aman)
-    }
-
-    public function hideCleanNotification()
-    {
+        $this->showConflictNotification = false;
         $this->showCleanNotification = false;
+        $this->conflicts = []; // Hapus detail konflik juga
+        Log::info('ScheduleConflictDetector: Conflict alert cleared by user.');
     }
 
     public function render()

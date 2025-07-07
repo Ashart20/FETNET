@@ -29,4 +29,20 @@ public function render()
 {
 return view('livewire.auth.login-form');
 }
+    public function handleUserRedirect($user)
+    {
+        if ($user->hasRole('fakultas')) {
+            return redirect()->route('fakultas.prodi');
+        }
+
+        if ($user->hasRole('prodi')) {
+            // Pastikan Anda sudah membuat rute bernama 'prodi.dashboard'
+            return redirect()->route('prodi.dashboard');
+        }
+        if ($user->hasRole('mahasiswa')) {
+            return redirect()->route('mahasiswa.dashboard');
+        }
+        // Pengalihan default untuk user lain
+        return redirect('/dashboard');
+    }
 }

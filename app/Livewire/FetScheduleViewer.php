@@ -2,147 +2,123 @@
 
 namespace App\Livewire;
 
+use App\Events\ScheduleDataUpdatedEvent;
+use App\Models\Day;
+use App\Models\MasterRuangan;
+use App\Models\Schedule;
+use App\Models\StudentGroup;
+use App\Models\Subject;
+use App\Models\Teacher;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Schedule;
-use App\Models\Room;
-use App\Models\TimeSlot;
-use App\Services\FetWatchService;
 
 class FetScheduleViewer extends Component
 {
     use WithPagination;
 
-    protected $listeners = ['scheduleDataUpdated' => 'refreshScheduleData'];
+    // Properti untuk filter
+    public string $filterHari = '';
+    public string $filterKelas = '';
+    public string $filterMatkul = '';
+    public string $filterRuangan = '';
+    public string $filterDosen = '';
 
-    public $filterHari = '';
-    public $filterKelas = '';
-    public $filterMatkul = '';
-    public $filterRuangan = '';
-    public $filterDosen = '';
-    // HAPUS properti $apply. Ini tidak lagi dibutuhkan.
-    // public $apply = false;
+    // Properti untuk opsi dropdown
+    public array $daftarHari = [];
+    public array $daftarKelas = [];
+    public array $daftarMatkul = [];
+    public array $daftarRuangan = [];
+    public array $daftarDosen = [];
 
-    // ... (properti daftarHari, daftarKelas, dll. dan filtersConfig tetap ada)
-    public $daftarHari = [];
-    public $daftarKelas = [];
-    public $daftarMatkul = [];
-    public $daftarRuangan = [];
-    public $daftarDosen = [];
-    public $filtersConfig = [];
-
-
-    protected $queryString = [
-        'filterHari',
-        'filterKelas',
-        'filterMatkul',
-        'filterRuangan',
-        'filterDosen',
-    ];
-
-    // Ubah applyFilter() agar hanya mereset paginasi
-    public function applyFilter()
+    /**
+     * Listener untuk event broadcast.
+     * Menggunakan atribut #[On] dari Livewire 3.
+     */
+    #[On(ScheduleDataUpdatedEvent::class)]
+    public function refreshScheduleData(): void
     {
-        // $this->apply = true; // Hapus baris ini
-        $this->resetPage(); // Hanya ini yang diperlukan. Ini akan memicu re-render
-    }
-
-    public function resetFilter()
-    {
-        $this->reset([
-            'filterHari',
-            'filterKelas',
-            'filterMatkul',
-            'filterRuangan',
-            'filterDosen',
-            // HAPUS 'apply' dari sini
-            // 'apply'
-        ]);
         $this->resetPage();
     }
 
-    public function mount(FetWatchService $watcher)
-    {
-        $watcher->processAvailableFetFiles();
-        $this->loadFilterOptions();
-        $this->buildFiltersConfig();
-    }
-
-    public function refreshScheduleData()
+    public function mount(): void
     {
         $this->loadFilterOptions();
-        $this->buildFiltersConfig();
-        $this->dispatch('refreshConflictDetector');
     }
 
-    public function loadFilterOptions()
+    public function loadFilterOptions(): void
     {
-        // ... (tetap sama seperti sebelumnya)
-        $getSortedUniqueValues = function($model, $column) {
-            $values = $model::distinct()->pluck($column)
-                ->map(fn($item) => trim($item))
-                ->filter()
-                ->toArray();
-            sort($values);
-            return $values;
-        };
+        $user = Auth::user();
+        $prodiId = $user?->prodi_id; // Gunakan null-safe operator
 
-        $this->daftarKelas = $getSortedUniqueValues(Schedule::class, 'kelas');
-        $this->daftarMatkul = $getSortedUniqueValues(Schedule::class, 'subject');
-        $this->daftarRuangan = $getSortedUniqueValues(Room::class, 'name');
-        $this->daftarDosen = $getSortedUniqueValues(Schedule::class, 'teacher');
+        // Logika untuk memuat opsi dropdown berdasarkan peran user
+        $this->daftarHari = Day::orderBy('id')->pluck('name')->toArray();
+        $this->daftarRuangan = MasterRuangan::orderBy('nama_ruangan')->pluck('nama_ruangan')->toArray();
 
-        $hariMentah = $getSortedUniqueValues(TimeSlot::class, 'day');
-        $urutanHariDefault = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-
-        usort($hariMentah, function($a, $b) use ($urutanHariDefault) {
-            $posA = array_search($a, $urutanHariDefault);
-            $posB = array_search($b, $urutanHariDefault);
-
-            if ($posA === false && $posB === false) return 0;
-            if ($posA === false) return 1;
-            if ($posB === false) return -1;
-
-            return $posA <=> $posB;
-        });
-        $this->daftarHari = $hariMentah;
+        // Query dinamis menggunakan when() untuk prodi
+        $this->daftarKelas = StudentGroup::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))
+            ->whereNotNull('parent_id')
+            ->orderBy('nama_kelompok')
+            ->pluck('nama_kelompok')
+            ->toArray();
+        $this->daftarMatkul = Subject::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))->orderBy('nama_matkul')->pluck('nama_matkul')->toArray();
+        $this->daftarDosen = Teacher::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))->orderBy('nama_dosen')->pluck('nama_dosen')->toArray();
     }
 
-    protected function buildFiltersConfig()
+    /**
+     * Hook ini berjalan setiap kali salah satu properti filter diubah.
+     */
+    public function updating($property): void
     {
-        $this->filtersConfig = [
-            ['label' => 'Hari', 'model' => 'filterHari', 'data_list' => $this->daftarHari],
-            ['label' => 'Kelas', 'model' => 'filterKelas', 'data_list' => $this->daftarKelas],
-            ['label' => 'Mata Kuliah', 'model' => 'filterMatkul', 'data_list' => $this->daftarMatkul],
-            ['label' => 'Ruangan', 'model' => 'filterRuangan', 'data_list' => $this->daftarRuangan],
-            ['label' => 'Dosen', 'model' => 'filterDosen', 'data_list' => $this->daftarDosen],
-        ];
+        if (str_starts_with($property, 'filter')) {
+            $this->resetPage();
+        }
     }
 
-    public function render()
+    public function resetFilters(): void
     {
-        $query = Schedule::with(['room', 'timeSlot']);
+        $this->reset('filterHari', 'filterKelas', 'filterMatkul', 'filterRuangan', 'filterDosen');
+        $this->resetPage();
+    }
 
-        // HAPUS conditional if ($this->apply) ini
-        // if ($this->apply) {
+    public function render(): View
+    {
+        $user = Auth::user();
+        $prodiId = $user?->prodi_id;
+        $studentGroupId = $user?->student_group_id;
 
-        $query->when($this->filterHari, fn($q) =>
-        $q->whereHas('timeSlot', fn($sub) => $sub->where('day', $this->filterHari))
-        )
-            ->when($this->filterKelas, fn($q) => $q->where('kelas', $this->filterKelas))
-            ->when($this->filterMatkul, fn($q) => $q->where('subject', $this->filterMatkul))
-            ->when($this->filterRuangan, fn($q) =>
-            $q->whereHas('room', fn($sub) => $sub->where('name', $this->filterRuangan))
-            )
-            ->when($this->filterDosen, fn($q) => $q->where('teacher', $this->filterDosen));
+        // Eager load semua relasi yang dibutuhkan untuk performa optimal
+        $query = Schedule::query()->with([
+            'day', 'timeSlot', 'room', 'activity.subject', 'activity.studentGroup', 'activity.teachers'
+        ]);
 
-        // HAPUS kurung kurawal penutup if ($this->apply)
-        // }
+        // Terapkan filter berdasarkan peran pengguna
+        if ($user->hasRole('prodi') && $prodiId) {
+            $query->whereHas('activity.subject', fn($q) => $q->where('prodi_id', $prodiId));
+        } elseif ($user->hasRole('mahasiswa') && $studentGroupId) {
+            $query->whereHas('activity.studentGroup', fn($q) => $q->where('id', $studentGroupId));
+        }
 
-        $jadwal = $query->paginate(10)->withQueryString();
+        // Terapkan filter dari dropdown
+        $query->when($this->filterHari, fn($q, $val) => $q->whereHas('day', fn($sub) => $sub->where('name', $val)));
+        $query->when($this->filterRuangan, fn($q, $val) => $q->whereHas('room', fn($sub) => $sub->where('nama_ruangan', $val)));
+        $query->when($this->filterDosen, fn($q, $val) => $q->whereHas('activity.teachers', fn($sub) => $sub->where('nama_dosen', $val)));
+        $query->when($this->filterKelas, fn($q, $val) => $q->whereHas('activity.studentGroup', fn($sub) => $sub->where('nama_kelompok', $val)));
+        $query->when($this->filterMatkul, fn($q, $val) => $q->whereHas('activity.subject', fn($sub) => $sub->where('nama_matkul', $val)));
+
+        // Urutkan hasil akhir agar lebih rapi
+        $jadwal = $query->join('days', 'schedules.day_id', '=', 'days.id')
+            ->join('time_slots', 'schedules.time_slot_id', '=', 'time_slots.id')
+            ->orderBy('days.id')
+            ->orderBy('time_slots.start_time')
+            ->select('schedules.*') // Penting untuk menghindari konflik nama kolom
+            ->paginate(25);
 
         return view('livewire.fet-schedule-viewer', [
             'jadwal' => $jadwal,
-        ]);
+        ])->layout('layouts.app');
     }
 }
