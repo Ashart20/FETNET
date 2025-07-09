@@ -1,66 +1,84 @@
 <div>
-    <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 dark:bg-gradient-to-bl dark:from-gray-700/50 dark:via-transparent border-b border-gray-200 dark:border-gray-700">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Manajemen Master Ruangan</h1>
+    {{-- Komponen Toast untuk menampilkan notifikasi --}}
+    <x-mary-toast />
 
-        @if (session()->has('message'))
-            <div class="bg-green-100 dark:bg-green-900/50 border-l-4 border-green-500 text-green-700 dark:text-green-300 p-4 my-4 rounded-md" role="alert">
-                <p>{{ session('message') }}</p>
+    <div class="p-6 lg:p-8">
+        {{-- Header halaman --}}
+        <x-mary-header title="Manajemen Ruangan" subtitle="Kelola semua ruangan untuk penjadwalan." />
+
+        <div class="my-4 flex justify-between items-center">
+            {{-- Tombol utama --}}
+            <x-mary-button label="Tambah Ruangan" @click="$wire.create()" class="btn-primary" icon="o-plus" />
+
+            {{-- Fitur Impor dan Download Template --}}
+            <div class="flex items-center space-x-2">
+                <x-mary-button label="Download Template" wire:click="downloadTemplate" icon="o-document-arrow-down" class="btn-sm btn-ghost" />
+
+                {{-- Komponen file input dari MaryUI. `wire:model.live` akan memicu `updatedFile()` secara otomatis --}}
+                <x-mary-file wire:model.live="file" label="Impor Excel" placeholder="Pilih file" class="w-48" spinner>
+                    <x-slot:prepend>
+                        <x-mary-icon name="o-arrow-up-tray" />
+                    </x-slot:prepend>
+                </x-mary-file>
             </div>
-        @endif
-
-        <button wire:click="create()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">
-            Tambah Ruangan Baru
-        </button>
-
-        @if($isModalOpen)
-            @include('livewire.fakultas.room-modal')
-        @endif
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 mt-4">
-                <thead class="bg-gray-50 dark:bg-gray-700/50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama Ruangan</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Kode</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gedung</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tipe</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Lantai</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Kapasitas</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
-                </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                @forelse($rooms as $room)
-                    {{-- PERBAIKAN: Menambahkan wire:key untuk optimasi --}}
-                    <tr wire:key="{{ $room->id }}">
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $room->nama_ruangan }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $room->kode_ruangan }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $room->building->name ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $room->tipe }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $room->lantai }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $room->kapasitas }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button wire:click="edit({{ $room->id }})" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-xs">Edit</button>
-                            {{-- PERBAIKAN: Menggunakan wire:confirm untuk konfirmasi hapus --}}
-                            <button wire:click="delete({{ $room->id }})" wire:confirm="Anda yakin ingin menghapus ruangan ini?"
-                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs ml-2">
-                                Hapus
-                            </button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                            Belum ada data ruangan.
-                        </td>
-                    </tr>
-                @endforelse
-                </tbody>
-            </table>
         </div>
+        {{-- Tabel untuk menampilkan data ruangan --}}
+        <x-mary-table :headers="$this->headers()" :rows="$rooms" with-pagination>
+            {{-- Menggunakan relasi untuk menampilkan nama gedung --}}
+            @scope('cell_building.name', $room)
+            {{ $room->building->name ?? 'N/A' }}
+            @endscope
 
-        <div class="mt-4">
-            {{ $rooms->links() }}
-        </div>
+            {{-- Scope untuk tombol aksi (edit & hapus) --}}
+            @scope('actions', $room)
+            <div class="flex space-x-2">
+                <x-mary-button icon="o-pencil" @click="$wire.edit({{ $room->id }})" class="btn-sm btn-warning" spinner />
+                <x-mary-button
+                    icon="o-trash"
+                    wire:click="delete({{ $room->id }})"
+                    wire:confirm="PERHATIAN!|Anda yakin ingin menghapus ruangan '{{ $room->nama_ruangan }}'?|Data yang terhubung mungkin akan terpengaruh."
+                    class="btn-sm btn-error"
+                    spinner />
+            </div>
+            @endscope
+        </x-mary-table>
     </div>
+
+    {{-- ==================== MODAL FORM ==================== --}}
+    <x-mary-modal wire:model="roomModal" title="{{ $roomId ? 'Edit' : 'Tambah' }} Ruangan" separator>
+        {{-- Form di dalam modal --}}
+        <x-mary-form wire:submit="store">
+            <div class="space-y-4">
+                {{-- Detail Ruangan --}}
+                <x-mary-input label="Nama Ruangan" wire:model="nama_ruangan" />
+                <x-mary-input label="Kode Ruangan" wire:model="kode_ruangan" />
+                <x-mary-input label="Lantai" wire:model="lantai" placeholder="Contoh: 5" />
+                <x-mary-input label="Kapasitas" wire:model="kapasitas" type="number" />
+                <x-mary-select label="Tipe Ruangan" wire:model="tipe" :options="[
+                    ['id' => 'KELAS_TEORI', 'name' => 'Kelas Teori'],
+                    ['id' => 'LABORATORIUM', 'name' => 'Laboratorium'],
+                    ['id' => 'AUDITORIUM', 'name' => 'Auditorium'],
+                ]" />
+
+                {{-- Form kecil untuk menambah gedung baru jika tidak ada di list --}}
+                <div class="p-4 border rounded-lg dark:border-gray-700 space-y-3 mt-4">
+                    <p class="text-sm font-bold text-gray-600 dark:text-gray-300">Gedung tidak ada di daftar?</p>
+                    <x-mary-input wire:model="newBuildingName" label="Nama Gedung Baru" placeholder="Contoh: Graha Pendidikan" />
+                    <x-mary-input wire:model="newBuildingCode" label="Kode Gedung Baru" placeholder="Contoh: GP" />
+                    <x-mary-button label="Simpan Gedung Baru" wire:click="addNewBuilding" class="btn-success btn-sm w-full" spinner="addNewBuilding" />
+                </div>
+
+                {{-- Dropdown Gedung & Form Tambah Gedung --}}
+                <x-mary-select label="Gedung" :options="$buildings" option-value="id" option-label="name" wire:model="building_id" placeholder="-- Pilih Gedung --" />
+
+
+            </div>
+
+            {{-- Tombol Aksi di bagian bawah modal --}}
+            <x-slot:actions>
+                <x-mary-button label="Batal" @click="$wire.closeModal()" />
+                <x-mary-button label="{{ $roomId ? 'Update' : 'Simpan' }}" type="submit" class="btn-primary" spinner="store" />
+            </x-slot:actions>
+        </x-mary-form>
+    </x-mary-modal>
 </div>

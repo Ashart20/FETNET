@@ -3,20 +3,25 @@
 namespace App\Livewire\Prodi;
 
 use App\Models\Subject;
-use Illuminate\Validation\Rule; // Import kelas Rule untuk validasi canggih
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\SubjectsImport;
+use Maatwebsite\Excel\Validators\ValidationException;
+use Maatwebsite\Excel\Excel as ExcelType;
 
 class ManageSubjects extends Component
 {
-    use WithPagination;
+    use WithPagination,  WithFileUploads;
 
     // Properti untuk form modal
     public ?int $subjectId = null;
     public string $nama_matkul = '';
     public string $kode_matkul = '';
     public ?int $sks = null;
-
+    public $file;
     public bool $isModalOpen = false;
 
     /**
@@ -58,7 +63,35 @@ class ManageSubjects extends Component
             'subjects' => $subjects
         ])->layout('layouts.app');
     }
+    // app/Livewire/Prodi/ManageSubjects.php
 
+    public function updatedFile()
+    {
+        $this->validateOnly('file');
+
+        try {
+            Excel::import(new SubjectsImport(auth()->user()->prodi_id), $this->file);
+
+            session()->flash('message', 'Semua data mata kuliah berhasil diimpor.');
+
+            $this->reset('file');
+
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = [];
+            foreach ($failures as $failure) {
+                $errorMessages[] = "Baris ke-{$failure->row()}: " . implode(', ', $failure->errors());
+            }
+            session()->flash('error', "Impor Gagal. Terdapat beberapa kesalahan:\n" . implode("\n", $errorMessages));
+        } catch (\Exception $e) {
+            session()->flash('error', 'Impor Gegal. Pastikan format dan header file Excel Anda sudah benar. Error: ' . $e->getMessage());
+        }
+    }
+    public function deleteAllSubjects()
+    {
+        Subject::where('prodi_id', auth()->user()->prodi_id)->delete();
+        session()->flash('message', 'Semua data mata kuliah telah berhasil dihapus.');
+    }
     public function create()
     {
         $this->resetInputFields();

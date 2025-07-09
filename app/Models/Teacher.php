@@ -14,14 +14,16 @@ class Teacher extends Model
     protected $fillable = [
         'nama_dosen',
         'kode_dosen',
-        'prodi_id',
     ];
 
     public function prodi(): BelongsTo
     {
         return $this->belongsTo(Prodi::class);
     }
-
+    public function prodis(): BelongsToMany
+    {
+        return $this->belongsToMany(Prodi::class, 'prodi_teacher');
+    }
     public function activities(): BelongsToMany
     {
         return $this->belongsToMany(Activity::class, 'activity_teacher');

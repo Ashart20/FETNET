@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_dosen'); // <-- UBAH INI
             $table->string('kode_dosen')->unique(); // <-- UBAH INI
-            $table->foreignId('prodi_id')->constrained('prodis')->onDelete('cascade');
+            //$table->foreignId('prodi_id')->constrained('prodis')->onDelete('cascade');
             $table->timestamps();
         });
     }

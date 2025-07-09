@@ -4,51 +4,63 @@ namespace App\Livewire\Fakultas;
 
 use App\Models\Building;
 use App\Models\MasterRuangan;
+use App\Imports\RoomsImport;
+use App\Exports\RoomTemplateExport;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
+use Illuminate\Support\Facades\Storage;
+use Mary\Traits\Toast;
+
 
 class ManageRooms extends Component
 {
     use WithPagination;
+    use Toast;
+    use WithFileUploads;
 
     // Properti untuk form utama
     #[Rule('required|string|max:255')]
-    public $nama_ruangan = '';
+    public string $nama_ruangan = '';
 
-    #[Rule] // Aturan dinamis di method rules()
-    public $kode_ruangan = '';
+    #[Rule] // Aturan validasi dinamis tetap di method rules()
+    public string $kode_ruangan = '';
 
-    #[Rule('required|exists:buildings,id')]
-    public $building_id = '';
+    #[Rule('required|exists:buildings,id', message: 'Gedung wajib dipilih.')]
+    public string $building_id = '';
 
     #[Rule('required|string|max:50')]
-    public $lantai = '';
+    public string $lantai = '';
 
     #[Rule('required|integer|min:1')]
-    public $kapasitas = '';
+    public int $kapasitas = 10; // Beri nilai default
 
-    public $tipe = 'KELAS_TEORI';
+    #[Rule('required|string|in:KELAS_TEORI,LABORATORIUM,AUDITORIUM')]
+    public string $tipe = 'KELAS_TEORI';
 
-    public $roomId;
+    public ?int $roomId = null; // Gunakan tipe data nullable
 
     // Properti untuk data dropdown
     public Collection $buildings;
 
     // Properti untuk menambah gedung baru dari modal
-    #[Rule('required|string|unique:buildings,name')]
-    public $newBuildingName = '';
+    #[Rule('required|string|unique:buildings,name', message: 'Nama gedung ini sudah ada.')]
+    public string $newBuildingName = '';
 
-    #[Rule('required|string|unique:buildings,code')]
-    public $newBuildingCode = '';
+    #[Rule('required|string|unique:buildings,code', message: 'Kode gedung ini sudah ada.')]
+    public string $newBuildingCode = '';
 
-    public $isModalOpen = false;
-
+    // 3. Ganti properti isModalOpen dengan ini untuk kontrol modal Mary UI
+    public bool $roomModal = false;
+    public $file;
     /**
      * Aturan validasi dinamis untuk kode ruangan.
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'kode_ruangan' => 'required|string|max:50|unique:master_ruangans,kode_ruangan,' . $this->roomId,
@@ -56,57 +68,110 @@ class ManageRooms extends Component
     }
 
     /**
-     * Pesan validasi kustom.
+     * Inisialisasi data saat komponen dimuat.
      */
-    protected $messages = [
-        'building_id.required' => 'Gedung wajib dipilih.',
-        'newBuildingName.unique' => 'Nama gedung ini sudah ada.',
-        'newBuildingCode.unique' => 'Kode gedung ini sudah ada.',
-    ];
-
-    public function mount()
+    public function mount(): void
     {
         $this->loadBuildings();
     }
 
+    /**
+     * Mendefinisikan header untuk tabel Mary UI.
+     * 4. Tambahkan method ini untuk mendefinisikan kolom tabel.
+     */
+    public function headers(): array
+    {
+        return [
+            ['key' => 'nama_ruangan', 'label' => 'Nama Ruangan'],
+            ['key' => 'kode_ruangan', 'label' => 'Kode'],
+            ['key' => 'building.name', 'label' => 'Gedung'],
+            ['key' => 'tipe', 'label' => 'Tipe'],
+            ['key' => 'lantai', 'label' => 'Lantai'],
+            ['key' => 'kapasitas', 'label' => 'Kapasitas'],
+            ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
+        ];
+    }
+
     public function render()
     {
+        // Ambil data ruangan dengan eager loading building
         $rooms = MasterRuangan::with('building')->latest()->paginate(10);
 
         return view('livewire.fakultas.manage-rooms', [
-            'rooms' => $rooms
+            'rooms' => $rooms,
         ])->layout('layouts.app');
     }
 
-    public function create()
+    public function updatedFile()
     {
-        $this->resetInputFields();
-        $this->openModal();
+        $this->validateOnly('file');
+
+        try {
+            // Proses impor file Excel
+            Excel::import(new RoomsImport(), $this->file);
+            $this->success('Data ruangan berhasil diimpor.', position: 'toast-bottom');
+            $this->reset('file');
+
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = [];
+            foreach ($failures as $failure) {
+
+                $errorMessages[] = "Baris ke-{$failure->row()}: " . implode(', ', $failure->errors());
+            }
+
+            $this->error('Impor Gagal. Ditemukan kesalahan:', implode("<br>", $errorMessages), timeout: 10000);
+
+        } catch (\Exception $e) {
+
+            $this->error('Impor Gagal.', 'Pastikan format dan header file Excel Anda sudah benar. ' . $e->getMessage(), timeout: 10000);
+        }
     }
 
-    public function store()
+    public function downloadTemplate()
     {
-        // Validasi untuk form ruangan utama
-        $validatedData = $this->validate([
-            'nama_ruangan' => 'required|string|max:255',
-            'kode_ruangan' => 'required|string|max:50|unique:master_ruangans,kode_ruangan,' . $this->roomId,
-            'building_id' => 'required|exists:buildings,id',
-            'lantai' => 'required|string|max:50',
-            'kapasitas' => 'required|integer|min:1',
-            'tipe'         => 'required|string|in:KELAS_TEORI,LABORATORIUM,AUDITORIUM',
-        ]);
+        $filename = 'templates/template_ruangan.xlsx';
+        $disk = 'local'; // storage/app
 
+        // Data untuk template
+        $data = [
+            ['nama_ruangan', 'kode_ruangan', 'kode_gedung', 'lantai', 'kapasitas', 'tipe'], // Header
+            ['B2-183-PTE', '183', 'C', '5', 40, 'KELAS_TEORI'],
+            ['LAB ELKOM', '185', 'C', '4', 30, 'LABORATORIUM'],
+        ];
+
+        // Buat file menggunakan Export Class yang baru
+        Excel::store(new RoomTemplateExport($data), $filename, $disk);
+
+        // Unduh file menggunakan Storage facade
+        return Storage::disk($disk)->download($filename);
+    }
+
+    public function create(): void
+    {
+        $this->resetInputFields();
+        $this->roomModal = true; // Buka modal Mary UI
+    }
+
+    public function store(): void
+    {
+        // Validasi data utama
+        $validatedData = $this->validate();
+
+        // Tambahkan user_id jika ada user yang login
         $validatedData['user_id'] = auth()->id();
 
         MasterRuangan::updateOrCreate(['id' => $this->roomId], $validatedData);
 
-        session()->flash('message', $this->roomId ? 'Data Ruangan Berhasil Diperbarui.' : 'Data Ruangan Berhasil Ditambahkan.');
-        $this->closeModal();
+        // 5. Gunakan notifikasi Toast dari Mary UI
+        $message = $this->roomId ? 'Data Ruangan Berhasil Diperbarui.' : 'Data Ruangan Berhasil Ditambahkan.';
+        $this->success($message);
+
+        $this->closeModal(); // Tutup modal setelah berhasil
     }
 
-    public function addNewBuilding()
+    public function addNewBuilding(): void
     {
-        // Validasi untuk form gedung baru saja
         $validated = $this->validate([
             'newBuildingName' => 'required|string|unique:buildings,name',
             'newBuildingCode' => 'required|string|unique:buildings,code',
@@ -121,11 +186,11 @@ class ManageRooms extends Component
         $this->building_id = $building->id; // Langsung pilih gedung yang baru dibuat
         $this->reset(['newBuildingName', 'newBuildingCode']);
 
-        // PERBAIKAN: Gunakan flash message untuk feedback yang lebih jelas
-        session()->flash('building-message', 'Gedung baru berhasil ditambahkan!');
+        // 6. Gunakan Toast untuk feedback
+        $this->info('Gedung baru berhasil ditambahkan!', position: 'toast-bottom');
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         $room = MasterRuangan::findOrFail($id);
         $this->roomId = $id;
@@ -136,29 +201,33 @@ class ManageRooms extends Component
         $this->lantai = $room->lantai;
         $this->kapasitas = $room->kapasitas;
 
-        $this->openModal();
+        $this->roomModal = true; // Buka modal Mary UI
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
-        MasterRuangan::destroy($id);
-        session()->flash('message', 'Data Ruangan Berhasil Dihapus.');
+        try {
+            MasterRuangan::destroy($id);
+            $this->warning('Data Ruangan Berhasil Dihapus.');
+        } catch (\Exception $e) {
+            $this->error('Gagal menghapus ruangan. Mungkin terhubung dengan data lain.');
+        }
     }
 
-    public function openModal() { $this->isModalOpen = true; }
-
-    public function closeModal() {
-        $this->isModalOpen = false;
+    // Cukup ganti nama method agar lebih deskriptif
+    public function closeModal(): void
+    {
+        $this->roomModal = false;
         $this->resetInputFields();
     }
 
-    private function resetInputFields()
+    private function resetInputFields(): void
     {
-        $this->resetExcept('buildings'); // Jangan reset data dropdown gedung
+        $this->resetExcept('buildings'); // Jangan reset data dropdown
         $this->resetErrorBag();
     }
 
-    private function loadBuildings()
+    private function loadBuildings(): void
     {
         $this->buildings = Building::orderBy('name')->get();
     }

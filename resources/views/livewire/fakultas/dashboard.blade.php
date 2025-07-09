@@ -24,7 +24,6 @@
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Pintasan</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
                 <a href="{{ route('fakultas.prodi') }}" class="block p-6 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">Manajemen Prodi</a>
-                <a href="{{ route('fakultas.users') }}" class="block p-6 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">Manajemen User</a>
                 <a href="{{ route('fakultas.rooms') }}" class="block p-6 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">Manajemen Ruangan</a>
                 <a href="{{ route('fakultas.room-constraints') }}" class="block p-6 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">Batasan Ruangan</a>
             </div>

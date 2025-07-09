@@ -1,62 +1,81 @@
 <div>
-    <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 dark:bg-gradient-to-bl dark:from-gray-700/50 dark:via-transparent border-b border-gray-200 dark:border-gray-700">
+    <x-mary-toast />
 
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Manajemen Program Studi</h1>
+    <div class="p-6 lg:p-8">
+        <x-mary-header title="Manajemen Prodi, User, dan Cluster"
+                       subtitle="Kelola data prodi dan user adminnya dari satu tempat." />
 
-        @if (session()->has('message'))
-            <div class="bg-green-100 dark:bg-green-900/50 border-l-4 border-green-500 dark:border-green-600 text-green-700 dark:text-green-300 p-4 my-4 rounded-md" role="alert">
-                <p>{{ session('message') }}</p>
+        <div class="my-4">
+            <x-mary-button label="Tambah Prodi & User" @click="$wire.create()" class="btn-primary" icon="o-plus" />
+        </div>
+
+        {{-- Tabel Merry UI --}}
+        <x-mary-table :headers="$this->headers()" :rows="$prodis" with-pagination>
+            @scope('cell_users', $prodi)
+            @forelse($prodi->users as $user)
+                <div class="text-sm">
+                    <div class="font-medium text-gray-800 dark:text-gray-200">{{ $user->name }}</div>
+                    <div class="text-xs text-gray-500">{{ $user->email }}</div>
+                </div>
+            @empty
+                <x-mary-badge value="Belum ada user" class="badge-error" />
+            @endforelse
+            @endscope
+
+            @scope('actions', $prodi)
+            <div class="flex space-x-2">
+                <x-mary-button icon="o-pencil" @click="$wire.edit({{ $prodi->id }})" class="btn-sm btn-warning" />
+                <x-mary-button icon="o-trash" wire:click="delete({{ $prodi->id }})" wire:confirm="PERHATIAN!|Anda yakin ingin menghapus prodi ini?|Aksi ini juga akan menghapus user yang terhubung." class="btn-sm btn-error" />
             </div>
-        @endif
+            @endscope
+        </x-mary-table>
 
-        <button wire:click="create()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">
-            Tambah Prodi Baru
-        </button>
+        {{-- Modal untuk form tambah/edit --}}
+        {{-- Di dalam file .../manage-prodi.blade.php --}}
 
-        @if($isModalOpen)
-            @include('livewire.fakultas.prodi-modal')
-        @endif
+        <x-mary-modal wire:model="prodiModal" title="{{ $prodiId ? 'Edit' : 'Tambah' }} Prodi & User" separator>
+            <x-mary-form wire:submit="store">
+                {{-- Gunakan Grid untuk membagi form menjadi 2 kolom --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 mt-4">
-                <thead class="bg-gray-50 dark:bg-gray-700/50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">No.</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama Prodi</th>
-                    {{-- PERBAIKAN: Ganti header kolom --}}
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Kode</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
-                </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                @forelse($prodis as $index => $prodi)
-                    <tr wire:key="{{ $prodi->id }}">
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $prodis->firstItem() + $index }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $prodi->nama_prodi }}</td>
-                        {{-- PERBAIKAN: Tampilkan kolom 'kode' --}}
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $prodi->kode }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button wire:click="edit({{ $prodi->id }})" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-xs">Edit</button>
-                            {{-- PERBAIKAN: Gunakan wire:confirm untuk konfirmasi hapus --}}
-                            <button wire:click="delete({{ $prodi->id }})" wire:confirm="Anda yakin ingin menghapus prodi ini?"
-                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs ml-2">
-                                Hapus
-                            </button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                            Belum ada data program studi.
-                        </td>
-                    </tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
+                    {{-- KOLOM KIRI: Detail Program Studi --}}
+                    <div class="space-y-4">
+                        <x-mary-header title="Detail Program Studi" size="text-lg" with-separator />
+                        <x-mary-input label="Nama Prodi" wire:model="nama_prodi" />
+                        <x-mary-input label="Kode Prodi" wire:model="kode" />
+                        {{-- Form kecil untuk menambah cluster baru --}}
+                        <div class="p-4 border rounded-lg dark:border-gray-700 space-y-3">
+                            <p class="text-sm font-bold text-gray-600 dark:text-gray-300">Tambah Cluster Baru</p>
+                            @if(session('cluster-message'))
+                                <x-mary-alert :description="session('cluster-message')" icon="o-check-circle" class="alert-success text-xs" />
+                            @endif
+                            {{-- Dibuat vertikal agar lebih rapi --}}
+                            <x-mary-input wire:model="newClusterName" label="Nama Cluster Baru" placeholder="Contoh:Departemen Pendidikan Elektro" />
+                            <x-mary-input wire:model="newClusterCode" label="Kode Cluster Baru" placeholder="Contoh: DPTE" />
+                            <x-mary-button label="Simpan Cluster" wire:click="addNewCluster" class="btn-primary btn-sm w-full" spinner="addNewCluster" />
+                        </div>
 
-        <div class="mt-4">
-            {{ $prodis->links() }}
-        </div>
+                        {{-- Dropdown Cluster Standar --}}
+                        <x-mary-select label="Cluster" :options="$clusters" wire:model="cluster_id" placeholder="-- Pilih Cluster --" />
+
+
+                    </div>
+
+                    {{-- KOLOM KANAN: Akun User Admin Prodi --}}
+                    <div class="space-y-4">
+                        <x-mary-header title="Akun User Admin Prodi" size="text-lg" with-separator />
+                        <x-mary-input label="Nama User" wire:model="name" />
+                        <x-mary-input label="Email" wire:model="email" type="email" />
+                        <x-mary-input label="Password" wire:model="password" type="password" placeholder="{{ $prodiId ? 'Kosongkan jika tidak diubah' : '' }}" />
+                    </div>
+                </div>
+
+                {{-- Tombol Aksi di bagian bawah modal --}}
+                <x-slot:actions>
+                    <x-mary-button label="Batal" @click="$wire.closeModal()" />
+                    <x-mary-button label="{{ $prodiId ? 'Update Data' : 'Simpan Semua' }}" type="submit" class="btn-primary" spinner="store" />
+                </x-slot:actions>
+            </x-mary-form>
+        </x-mary-modal>
     </div>
 </div>

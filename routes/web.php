@@ -8,7 +8,6 @@ use App\Livewire\FetScheduleViewer;
 use App\Livewire\Guide;
 use App\Livewire\Fakultas\Dashboard as FakultasDashboard;
 use App\Livewire\Fakultas\ManageProdi;
-use App\Livewire\Fakultas\ManageProdiUsers;
 use App\Livewire\Fakultas\ManageRooms;
 use App\Livewire\Fakultas\ManageRoomConstraints;
 use App\Livewire\Prodi\Dashboard as ProdiDashboard;
@@ -43,7 +42,6 @@ Route::middleware(['auth', 'role:prodi|mahasiswa'])->get('/hasil-fet', FetSchedu
 Route::middleware(['auth', 'role:fakultas'])->prefix('fakultas')->name('fakultas.')->group(function () {
     Route::get('/dashboard', FakultasDashboard::class)->name('dashboard');
     Route::get('/prodi', ManageProdi::class)->name('prodi');
-    Route::get('/users', ManageProdiUsers::class)->name('users');
     Route::get('/ruangan', ManageRooms::class)->name('rooms');
     Route::get('/batasan-ruangan', ManageRoomConstraints::class)->name('room-constraints');
 });

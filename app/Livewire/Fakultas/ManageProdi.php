@@ -2,113 +2,172 @@
 
 namespace App\Livewire\Fakultas;
 
+use App\Models\Cluster;
 use App\Models\Prodi;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Rule; // Gunakan atribut Rule dari Livewire 3
+use Mary\Traits\Toast;
+use Illuminate\View\View;
 
 class ManageProdi extends Component
 {
-    use WithPagination;
+    use WithPagination, Toast;
 
-    // Properti untuk form, di-reset setelah submit
-    #[Rule('required|string|min:3')]
-    public $nama_prodi = '';
+    // Properti untuk Prodi
+    public ?int $prodiId = null;
+    public string $nama_prodi = '';
+    public string $kode = '';
+    public $cluster_id = '';
 
-    // PERBAIKAN: Gunakan 'kode' bukan 'kode_prodi'
-    // Aturan validasi yang lebih canggih untuk menangani 'unique' saat update
-    #[Rule]
-    public $kode = '';
+    // Properti untuk User Prodi
+    public ?int $userId = null;
+    public string $name = '';
+    public string $email = '';
+    public string $password = '';
 
-    public $prodiId;
+    // Properti untuk data & state
+    public Collection $clusters;
+    public bool $prodiModal = false;
 
-    // Properti untuk mengelola state modal
-    public $isModalOpen = false;
+    // Properti untuk form tambah cluster
+    public string $newClusterName = '';
+    public string $newClusterCode = '';
 
-    /**
-     * Aturan validasi dinamis untuk kolom 'kode'.
-     */
-    public function rules()
+    public function mount(): void
+    {
+        $this->loadClusters();
+    }
+
+    public function loadClusters(): void
+    {
+        // Asumsi user fakultas tidak terikat prodi, jadi kita ambil semua cluster
+        // Jika cluster harus terikat user, gunakan: Cluster::where('user_id', auth()->id())->...
+        $this->clusters = Cluster::orderBy('name')->get();
+    }
+
+    // Method untuk mendefinisikan header tabel Merry UI
+    public function headers(): array
     {
         return [
-            'nama_prodi' => 'required|string|min:3',
-            // Aturan unique ini akan mengabaikan prodi dengan ID saat ini,
-            // sehingga tidak terjadi error "kode sudah ada" saat mengedit prodi itu sendiri.
-            'kode' => 'required|string|max:10|unique:prodis,kode,' . $this->prodiId,
+            ['key' => 'nama_prodi', 'label' => 'Nama Prodi'],
+            ['key' => 'kode', 'label' => 'Kode'],
+            ['key' => 'cluster.name', 'label' => 'Cluster'],
+            ['key' => 'users', 'label' => 'User Terdaftar', 'sortable' => false],
         ];
     }
 
-    /**
-     * Pesan validasi kustom dalam Bahasa Indonesia.
-     */
-    public function messages()
-    {
-        return [
-            'nama_prodi.required' => 'Nama prodi wajib diisi.',
-            'kode.required' => 'Kode prodi wajib diisi.',
-            'kode.unique' => 'Kode prodi ini sudah digunakan.',
-        ];
-    }
-
-    public function render()
+    public function render(): View
     {
         return view('livewire.fakultas.manage-prodi', [
-            'prodis' => Prodi::latest()->paginate(10)
+            'prodis' => Prodi::with('cluster', 'users')->latest()->paginate(10)
         ])->layout('layouts.app');
     }
 
-    public function create()
+    // Method untuk menambah cluster baru dari dalam modal
+    public function addNewCluster(): void
     {
-        $this->resetInputFields();
-        $this->openModal();
-    }
-
-    public function store()
-    {
-        $validatedData = $this->validate();
-
-        // PERBAIKAN: Gunakan 'kode' bukan 'kode_prodi'
-        Prodi::updateOrCreate(['id' => $this->prodiId], [
-            'nama_prodi' => $validatedData['nama_prodi'],
-            'kode' => $validatedData['kode'],
+        $validated = $this->validate([
+            'newClusterName' => ['required', 'string', Rule::unique('clusters', 'name')->where('user_id', auth()->id())],
+            'newClusterCode' => ['required', 'string', 'max:10', Rule::unique('clusters', 'code')->where('user_id', auth()->id())],
         ]);
 
-        session()->flash('message', $this->prodiId ? 'Prodi Berhasil Diperbarui.' : 'Prodi Berhasil Ditambahkan.');
+        // PERBAIKAN: Hapus tanda komentar dari baris user_id
+        $cluster = Cluster::create([
+            'name' => $validated['newClusterName'],
+            'code' => $validated['newClusterCode'],
+            'user_id' => auth()->id(),
+        ]);
 
+        $this->loadClusters();
+        $this->cluster_id = $cluster->id;
+        $this->reset(['newClusterName', 'newClusterCode']);
+        $this->toast(type: 'success', title: 'Cluster baru berhasil ditambahkan!');
+    }
+
+    public function create(): void
+    {
+        $this->resetInputFields();
+        $this->prodiModal = true;
+    }
+
+    public function store(): void
+    {
+        $validatedData = $this->validate([
+            'nama_prodi' => ['required', 'string', 'min:3'],
+            'kode'       => ['required', 'string', 'max:10', Rule::unique('prodis')->ignore($this->prodiId)],
+            'cluster_id' => ['nullable', 'exists:clusters,id'],
+            'name'       => ['required', 'string'],
+            'email'      => ['required', 'email', Rule::unique('users')->ignore($this->userId)],
+            'password'   => [$this->prodiId ? 'nullable' : 'required', 'min:8'],
+        ]);
+
+        DB::transaction(function () use ($validatedData) {
+            $prodiData = [
+                'nama_prodi' => $validatedData['nama_prodi'],
+                'kode'       => $validatedData['kode'],
+                'cluster_id' => $validatedData['cluster_id'] ?: null,
+            ];
+            $prodi = Prodi::updateOrCreate(['id' => $this->prodiId], $prodiData);
+
+            $userData = [
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'prodi_id' => $prodi->id,
+            ];
+            if (!empty($validatedData['password'])) {
+                $userData['password'] = Hash::make($validatedData['password']);
+            }
+            $user = User::updateOrCreate(['id' => $this->userId], $userData);
+
+            if (!$this->prodiId) {
+                $user->assignRole('prodi');
+            }
+        });
+
+        $this->toast(type: 'success', title: $this->prodiId ? 'Data berhasil diperbarui.' : 'Data berhasil ditambahkan.');
         $this->closeModal();
     }
 
-    public function edit($id)
+    public function edit(Prodi $prodi): void
     {
-        $prodi = Prodi::findOrFail($id);
-        $this->prodiId = $id;
+        $this->resetInputFields();
+        $user = $prodi->users->first();
+
+        $this->prodiId = $prodi->id;
         $this->nama_prodi = $prodi->nama_prodi;
-        // PERBAIKAN: Gunakan 'kode' bukan 'kode_prodi'
         $this->kode = $prodi->kode;
+        $this->cluster_id = $prodi->cluster_id;
 
-        $this->openModal();
+        if ($user) {
+            $this->userId = $user->id;
+            $this->name = $user->name;
+            $this->email = $user->email;
+        }
+
+        $this->prodiModal = true;
     }
 
-    public function delete($id)
+    public function delete(Prodi $prodi): void
     {
-        // PERBAIKAN: Gunakan `destroy` lebih aman dan ringkas
-        Prodi::destroy($id);
-        session()->flash('message', 'Prodi Berhasil Dihapus.');
+        $prodi->delete();
+        $this->toast(type: 'success', title: 'Prodi Berhasil Dihapus.');
     }
 
-    public function openModal()
+    public function closeModal(): void
     {
-        $this->isModalOpen = true;
-    }
-
-    public function closeModal()
-    {
-        $this->isModalOpen = false;
+        $this->prodiModal = false;
         $this->resetInputFields();
     }
 
-    private function resetInputFields()
+    private function resetInputFields(): void
     {
-        $this->reset(['nama_prodi', 'kode', 'prodiId']);
+        $this->reset();
+        $this->loadClusters();
+        $this->resetErrorBag();
     }
 }

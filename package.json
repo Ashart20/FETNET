@@ -6,7 +6,6 @@
         "dev": "vite"
     },
     "dependencies": {
-        "@tailwindcss/vite": "^4.0.9",
         "alpinejs": "^3.14.8",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
@@ -22,10 +21,12 @@
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
         "@tailwindcss/typography": "^0.5.10",
+        "@tailwindcss/vite": "^4.1.11",
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.2",
+        "daisyui": "^4.12.24",
         "postcss": "^8.4.31",
-        "tailwindcss": "^3.1.0"
+        "tailwindcss": "^3.4.17"
     },
     "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
