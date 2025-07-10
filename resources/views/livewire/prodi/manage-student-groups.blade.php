@@ -1,33 +1,41 @@
 <div>
-    <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Manajemen Struktur Kelompok Mahasiswa</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">
-            Kelola struktur Tingkat (Year), Kelompok (Group), dan Sub-Kelompok.
-        </p>
+    <x-mary-toast />
 
-        @if (session()->has('message'))
-            <div class="bg-green-100 border border-green-400 text-green-700 dark:bg-green-900/50 dark:border-green-800 dark:text-green-200 p-4 my-4 rounded-md" role="alert">
-                <p>{{ session('message') }}</p>
-            </div>
-        @endif
+    <div class="p-4">
+        <x-mary-header title="Manajemen Struktur Kelompok Mahasiswa" subtitle="Kelola struktur Tingkat, Kelompok, dan Sub-Kelompok.">
+            <x-slot:actions>
+                <x-mary-button label="Tambah Tingkat (Year)" icon="o-plus" @click="$wire.create(null)" class="btn-primary" />
+            </x-slot:actions>
+        </x-mary-header>
 
-        {{-- Tombol untuk menambah Tingkat/Year baru (level teratas) --}}
-        <button wire:click="create(null)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4">
-            Tambah Tingkat (Year)
-        </button>
-
-        @if($isModalOpen)
-            @include('livewire.prodi.student-group-modal')
-        @endif
-
-        {{-- Daftar hierarkis --}}
-        <div class="border dark:border-gray-700 rounded-lg p-4">
+        {{-- Daftar hierarkis dibungkus Card --}}
+        <x-mary-card class="mt-4">
             @forelse($groups as $group)
                 {{-- Panggil komponen rekursif untuk setiap item level atas --}}
                 @include('livewire.prodi.partials.student-group-item', ['group' => $group, 'level' => 0])
             @empty
-                <p class="text-center text-gray-500 dark:text-gray-400">Belum ada data. Silakan tambahkan tingkat baru.</p>
+                <x-mary-alert title="Belum Ada Data" description="Silakan tambahkan tingkat (year) baru untuk memulai." icon="o-information-circle" />
             @endforelse
-        </div>
+        </x-mary-card>
     </div>
+
+    {{-- Modal Form --}}
+    <x-mary-modal wire:model="studentGroupModal" title="{{ $studentGroupId ? 'Edit' : 'Tambah' }} Data" separator>
+        <x-mary-form wire:submit="store">
+            <div class="space-y-4">
+                @if($parentId)
+                    <x-mary-alert :description="'Menambahkan Sub-item di bawah: <strong>' . (\App\Models\StudentGroup::find($parentId)->nama_kelompok ?? '') . '</strong>'" class="alert-info" />
+                @endif
+                <x-mary-input label="Angkatan" wire:model="angkatan" placeholder="Contoh: 2023" class="input-bordered" />
+                <x-mary-input label="Nama (Tingkat/Kelompok/Sub)" wire:model="nama_kelompok" placeholder="Contoh: TE 01" class="input-bordered" />
+                <x-mary-input label="Kode (Opsional)" wire:model="kode_kelompok" class="input-bordered" />
+                <x-mary-input label="Jumlah Mahasiswa" wire:model="jumlah_mahasiswa" type="number" class="input-bordered" />
+            </div>
+
+            <x-slot:actions>
+                <x-mary-button label="Batal" @click="$wire.closeModal()" />
+                <x-mary-button label="{{ $studentGroupId ? 'Update' : 'Simpan' }}" type="submit" class="btn-primary" spinner="store" />
+            </x-slot:actions>
+        </x-mary-form>
+    </x-mary-modal>
 </div>

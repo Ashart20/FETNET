@@ -1,61 +1,41 @@
 <div>
-    <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 dark:bg-gradient-to-bl dark:from-gray-700/50 dark:via-transparent border-b border-gray-200 dark:border-gray-700">
+    {{-- Komponen Toast untuk notifikasi --}}
+    <x-mary-toast />
 
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Manajemen Data Dosen</h1>
+    <div class="p-6 lg:p-8">
+        {{-- Header Halaman Mary UI --}}
+        <x-mary-header title="Manajemen Data Dosen" subtitle="Kelola data dosen di program studi Anda.">
+            {{-- Slot untuk tombol aksi di header --}}
+            <x-slot:actions>
+                <x-mary-button label="Tambah Dosen" @click="$wire.create()" class="btn-primary" icon="o-plus" />
+            </x-slot:actions>
+        </x-mary-header>
 
-        @if (session()->has('message'))
-            <div class="bg-green-100 dark:bg-green-900/50 border-l-4 border-green-500 dark:border-green-600 text-green-700 dark:text-green-300 p-4 my-4 rounded-md" role="alert">
-                <p>{{ session('message') }}</p>
+        {{-- Tabel Mary UI --}}
+        <x-mary-table :headers="$headers" :rows="$teachers" with-pagination>
+            {{-- Slot untuk tombol aksi di setiap baris --}}
+            @scope('actions', $teacher)
+            <div class="flex space-x-2">
+                <x-mary-button icon="o-pencil" @click="$wire.edit({{ $teacher->id }})" class="btn-sm btn-warning" tooltip="Edit" />
+                <x-mary-button icon="o-trash" wire:click="delete({{ $teacher->id }})" wire:confirm="PERHATIAN!|Anda yakin ingin menghapus data dosen ini?|Aksi ini tidak bisa dibatalkan." class="btn-sm btn-error" tooltip="Hapus" />
             </div>
-        @endif
-
-        <button wire:click="create()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">
-            Tambah Data Dosen Baru
-        </button>
-
-        {{-- Memanggil Modal --}}
-        @if($isModalOpen)
-            @include('livewire.prodi.teacher-modal')
-        @endif
-
-        {{-- Tabel Data Guru --}}
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 mt-4">
-                <thead class="bg-gray-50 dark:bg-gray-700/50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">No.</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama dosen</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Kode dosen</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
-                </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                @forelse($teachers as $index => $teacher)
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $teachers->firstItem() + $index }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $teacher->nama_dosen }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ $teacher->kode_dosen }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button wire:click="edit({{ $teacher->id }})" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-xs">Edit</button>
-                            <button wire:click="delete({{ $teacher->id }})" wire:confirm="Anda yakin ingin menghapus data ini?"
-                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs ml-2">
-                                Hapus
-                            </button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                            Belum ada data dosen. Silakan tambahkan data baru.
-                        </td>
-                    </tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <div class="mt-4">
-            {{ $teachers->links() }}
-        </div>
+            @endscope
+        </x-mary-table>
     </div>
+
+    {{-- Modal Mary UI untuk form --}}
+    <x-mary-modal wire:model="teacherModal" title="{{ $teacherId ? 'Edit' : 'Tambah' }} Data Dosen" separator>
+        <x-mary-form wire:submit="store">
+            <div class="space-y-4">
+                <x-mary-input label="Nama Lengkap Dosen" wire:model="nama_dosen" placeholder="Masukkan nama lengkap beserta gelar" class="input-bordered" />
+                <x-mary-input label="Kode Dosen" wire:model="kode_dosen" placeholder="Contoh: BDO, RMD" class="input-bordered" />
+            </div>
+
+            {{-- Slot untuk tombol aksi di modal --}}
+            <x-slot:actions>
+                <x-mary-button label="Batal" @click="$wire.closeModal()" />
+                <x-mary-button label="{{ $teacherId ? 'Update Data' : 'Simpan' }}" type="submit" class="btn-primary" spinner="store" />
+            </x-slot:actions>
+        </x-mary-form>
+    </x-mary-modal>
 </div>

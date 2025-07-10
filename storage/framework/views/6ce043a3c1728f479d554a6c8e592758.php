@@ -25,7 +25,6 @@
             </select>
         </div>
 
-        
         <div class="overflow-x-auto">
             <div wire:loading.class="opacity-50" wire:target="selectedRoomId">
                 <table class="min-w-full border-collapse">
@@ -52,18 +51,21 @@
 
                                 <td wire:key="cell-<?php echo e($day->id); ?>-<?php echo e($slot->id); ?>"
                                     wire:click="<?php echo e($selectedRoomId ? 'toggleConstraint('.$day->id.', '.$slot->id.')' : ''); ?>"
-                                    class="p-2 border dark:border-gray-600 transition-colors
-                                            <?php if($selectedRoomId): ?>
-                                                <?php echo e($isConstrained ? 'bg-red-200 dark:bg-red-800/60 hover:bg-red-300 dark:hover:bg-red-700' : 'bg-green-200 dark:bg-green-800/30 hover:bg-green-300 dark:hover:bg-green-700'); ?> cursor-pointer
-                                            <?php else: ?>
-                                                bg-gray-100 dark:bg-gray-800 cursor-not-allowed
-                                            <?php endif; ?>
-                                        ">
+                                    class="p-2 border dark:border-gray-600 relative <?php echo e($this->getCellClasses($day->id, $slot->id)); ?>">
+
+                                    
                                     <div wire:loading wire:target="toggleConstraint(<?php echo e($day->id); ?>, <?php echo e($slot->id); ?>)">
                                         <svg class="animate-spin h-5 w-5 mx-auto text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
+                                    </div>
+
+                                    
+                                    <div wire:loading.remove wire:target="toggleConstraint(<?php echo e($day->id); ?>, <?php echo e($slot->id); ?>)">
+                                        <!--[if BLOCK]><![endif]--><?php if($isConstrained): ?>
+                                            <span class="font-bold text-lg text-red-900 dark:text-red-200">X</span>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                     </div>
                                 </td>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
@@ -83,7 +85,7 @@
         
         <div class="mt-4 text-sm text-gray-600 dark:text-gray-400 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
             <div class="flex items-center"><div class="w-4 h-4 mr-2 bg-green-200 dark:bg-green-800/30 border dark:border-gray-600"></div> Waktu Tersedia</div>
-            <div class="flex items-center"><div class="w-4 h-4 mr-2 bg-red-200 dark:bg-red-800/60 border dark:border-gray-600"></div> Waktu Tidak Tersedia</div>
+            <div class="flex items-center"><div class="w-4 h-4 mr-2 bg-red-200 dark:bg-red-800/60 border dark:border-gray-600 flex items-center justify-center font-bold text-red-900 dark:text-red-200">X</div> Waktu Tidak Tersedia</div>
             <div class="flex items-center"><div class="w-4 h-4 mr-2 bg-gray-100 dark:bg-gray-800 border dark:border-gray-600"></div> Pilih ruangan untuk memulai</div>
         </div>
     </div>

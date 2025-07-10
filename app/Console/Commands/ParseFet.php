@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 
 class ParseFet extends Command
 {
-    protected $signature = 'fet:parse {file}';
+    protected $signature = 'fet:parse {file} {--no-cleanup : Jangan hapus data jadwal lama sebelum parsing}';
     protected $description = 'Parse a FET result file and import the generated timetable based on constraint lists';
 
     public function handle(): void
@@ -39,8 +39,9 @@ class ParseFet extends Command
 
             DB::transaction(function () use ($xml) {
                 // 1. Persiapan: Hapus data lama dan pramuat data master
-                $this->cleanupOldSchedule();
-
+                if (!$this->option('no-cleanup')) {
+                    $this->cleanupOldSchedule();
+                }
                 $daysMap = Day::all()->keyBy('name');
                 $timeSlotsMap = TimeSlot::all()->keyBy(fn($slot) => date('H:i', strtotime($slot->start_time)));
                 $roomsMap = MasterRuangan::all()->keyBy('nama_ruangan');

@@ -47,10 +47,11 @@
                     Pastikan semua data di setiap prodi (dosen, matkul, aktivitas, dan batasan) sudah lengkap. Proses ini akan berjalan di latar belakang.
                 </p>
 
+                
                 <?php if(session('status')): ?>
                     <?php if (isset($component)) { $__componentOriginalc667a2ae20740422749e04d86ccbd727 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc667a2ae20740422749e04d86ccbd727 = $attributes; } ?>
-<?php $component = Mary\View\Components\Alert::resolve(['description' => session('status'),'icon' => 'o-information-circle'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Alert::resolve(['icon' => 'o-information-circle'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-alert'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -58,7 +59,8 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Alert::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['class' => 'alert-info mb-4']); ?>
-<?php echo $__env->renderComponent(); ?>
+                        <span class="text-white"><?php echo e(session('status')); ?></span>
+                     <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalc667a2ae20740422749e04d86ccbd727)): ?>
 <?php $attributes = $__attributesOriginalc667a2ae20740422749e04d86ccbd727; ?>
@@ -72,7 +74,7 @@
                 <?php if(session('error')): ?>
                     <?php if (isset($component)) { $__componentOriginalc667a2ae20740422749e04d86ccbd727 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc667a2ae20740422749e04d86ccbd727 = $attributes; } ?>
-<?php $component = Mary\View\Components\Alert::resolve(['description' => session('error'),'icon' => 'o-exclamation-triangle'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Alert::resolve(['icon' => 'o-exclamation-triangle'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-alert'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -80,7 +82,8 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Alert::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['class' => 'alert-error mb-4']); ?>
-<?php echo $__env->renderComponent(); ?>
+                        <span class="text-white"><?php echo e(session('error')); ?></span>
+                     <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalc667a2ae20740422749e04d86ccbd727)): ?>
 <?php $attributes = $__attributesOriginalc667a2ae20740422749e04d86ccbd727; ?>

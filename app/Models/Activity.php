@@ -55,4 +55,8 @@ class Activity extends Model
     {
         return $this->belongsTo(Prodi::class);
     }
+    public function getTeacherNamesAttribute(): string
+    {
+        return $this->teachers->pluck('nama_dosen')->implode(', ');
+    }
 }

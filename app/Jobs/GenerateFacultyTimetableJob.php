@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\User;
 use App\Models\Prodi;
+use App\Models\Schedule;
 use App\Services\FetFileGeneratorService;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class GenerateFacultyTimetableJob implements ShouldQueue
@@ -32,6 +34,10 @@ class GenerateFacultyTimetableJob implements ShouldQueue
 
     public function handle(FetFileGeneratorService $fetFileGenerator): void
     {
+        Log::info('Memulai generate jadwal fakultas. Menghapus semua data jadwal lama...');
+        DB::table('schedule_teacher')->delete();
+        Schedule::query()->delete();
+        Log::info('Data jadwal lama berhasil dihapus.');
         $prodis = Prodi::all();
 
         foreach ($prodis as $prodi) {
@@ -84,7 +90,9 @@ class GenerateFacultyTimetableJob implements ShouldQueue
 
             if (File::exists($outputFilePath)) {
                 Log::info("[Prodi: {$prodi->kode}] File hasil ditemukan, memanggil parser: {$outputFilePath}");
-                Artisan::call('fet:parse', ['file' => $outputFilePath]);
+                Artisan::call('fet:parse', [
+                    'file' => $outputFilePath,
+                    '--no-cleanup' => true   ]);
                 Log::info("[Prodi: {$prodi->kode}] Parsing selesai.");
             } else {
                 Log::error("[Prodi: {$prodi->kode}] Parsing GAGAL: File hasil tidak ditemukan di path yang diharapkan: {$outputFilePath}");

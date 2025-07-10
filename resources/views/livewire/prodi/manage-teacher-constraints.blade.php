@@ -54,12 +54,19 @@
                                     class="p-2 border dark:border-gray-600 cursor-pointer transition-colors
                                     {{ $isConstrained ? 'bg-red-200 dark:bg-red-800/60 hover:bg-red-300 dark:hover:bg-red-700' : 'bg-green-200 dark:bg-green-800/30 hover:bg-green-300 dark:hover:bg-green-700' }}">
 
-                                    {{-- Tampilkan ikon loading saat sel diklik --}}
+                                    {{-- Ikon loading saat sel diklik --}}
                                     <div wire:loading wire:target="toggleConstraint({{ $day->id }}, {{ $slot->id }})">
                                         <svg class="animate-spin h-5 w-5 mx-auto text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
+                                    </div>
+
+                                    {{-- PERBAIKAN: Menampilkan 'X' jika waktu tidak tersedia --}}
+                                    <div wire:loading.remove wire:target="toggleConstraint({{ $day->id }}, {{ $slot->id }})">
+                                        @if($isConstrained)
+                                            <span class="font-bold text-lg text-red-900 dark:text-red-200">X</span>
+                                        @endif
                                     </div>
                                 </td>
                             @endforeach
@@ -71,9 +78,14 @@
         @endif
 
         {{-- Legenda --}}
-        <div class="mt-4 text-sm text-gray-600 dark:text-gray-400 flex space-x-4">
-            <div class="flex items-center"><div class="w-4 h-4 mr-2 bg-green-200 dark:bg-green-800/30 border dark:border-gray-600"></div> Waktu Tersedia (Klik untuk membatasi)</div>
-            <div class="flex items-center mt-2 md:mt-0"><div class="w-4 h-4 mr-2 bg-red-200 dark:bg-red-800/60 border dark:border-gray-600"></div> Waktu Tidak Tersedia (Klik untuk membebaskan)</div>
+        <div class="mt-4 text-sm text-gray-600 dark:text-gray-400 flex flex-col md:flex-row md:space-x-4">
+            <div class="flex items-center">
+                <div class="w-4 h-4 mr-2 bg-green-200 dark:bg-green-800/30 border dark:border-gray-600"></div> Waktu Tersedia
+            </div>
+            {{-- PERBAIKAN: Menambahkan 'X' pada legenda --}}
+            <div class="flex items-center mt-2 md:mt-0">
+                <div class="w-4 h-4 mr-2 bg-red-200 dark:bg-red-800/60 border dark:border-gray-600 flex items-center justify-center font-bold text-red-900 dark:text-red-200 text-xs">X</div> Waktu Tidak Tersedia
+            </div>
         </div>
     </div>
 </div>

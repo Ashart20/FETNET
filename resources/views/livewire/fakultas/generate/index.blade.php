@@ -11,11 +11,16 @@
                     Pastikan semua data di setiap prodi (dosen, matkul, aktivitas, dan batasan) sudah lengkap. Proses ini akan berjalan di latar belakang.
                 </p>
 
+                {{-- PERBAIKAN: Menggunakan slot komponen untuk kontrol warna teks yang lebih baik --}}
                 @if (session('status'))
-                    <x-mary-alert :description="session('status')" icon="o-information-circle" class="alert-info mb-4" />
+                    <x-mary-alert icon="o-information-circle" class="alert-info mb-4">
+                        <span class="text-white">{{ session('status') }}</span>
+                    </x-mary-alert>
                 @endif
                 @if (session('error'))
-                    <x-mary-alert :description="session('error')" icon="o-exclamation-triangle" class="alert-error mb-4" />
+                    <x-mary-alert icon="o-exclamation-triangle" class="alert-error mb-4">
+                        <span class="text-white">{{ session('error') }}</span>
+                    </x-mary-alert>
                 @endif
 
                 <x-slot:actions>

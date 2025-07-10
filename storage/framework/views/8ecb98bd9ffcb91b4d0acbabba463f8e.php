@@ -62,6 +62,13 @@
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
                                     </div>
+
+                                    
+                                    <div wire:loading.remove wire:target="toggleConstraint(<?php echo e($day->id); ?>, <?php echo e($slot->id); ?>)">
+                                        <!--[if BLOCK]><![endif]--><?php if($isConstrained): ?>
+                                            <span class="font-bold text-lg text-red-900 dark:text-red-200">X</span>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                    </div>
                                 </td>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                         </tr>
@@ -72,9 +79,14 @@
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
         
-        <div class="mt-4 text-sm text-gray-600 dark:text-gray-400 flex space-x-4">
-            <div class="flex items-center"><div class="w-4 h-4 mr-2 bg-green-200 dark:bg-green-800/30 border dark:border-gray-600"></div> Waktu Tersedia (Klik untuk membatasi)</div>
-            <div class="flex items-center mt-2 md:mt-0"><div class="w-4 h-4 mr-2 bg-red-200 dark:bg-red-800/60 border dark:border-gray-600"></div> Waktu Tidak Tersedia (Klik untuk membebaskan)</div>
+        <div class="mt-4 text-sm text-gray-600 dark:text-gray-400 flex flex-col md:flex-row md:space-x-4">
+            <div class="flex items-center">
+                <div class="w-4 h-4 mr-2 bg-green-200 dark:bg-green-800/30 border dark:border-gray-600"></div> Waktu Tersedia
+            </div>
+            
+            <div class="flex items-center mt-2 md:mt-0">
+                <div class="w-4 h-4 mr-2 bg-red-200 dark:bg-red-800/60 border dark:border-gray-600 flex items-center justify-center font-bold text-red-900 dark:text-red-200 text-xs">X</div> Waktu Tidak Tersedia
+            </div>
         </div>
     </div>
 </div><?php /**PATH /home/ashart20/FETNET/resources/views/livewire/prodi/manage-teacher-constraints.blade.php ENDPATH**/ ?>

@@ -9,50 +9,123 @@
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
     
-    
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-10 md:p-20 text-center border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            
+            <?php if (isset($component)) { $__componentOriginal7f194736b6f6432dc38786f292496c34 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal7f194736b6f6432dc38786f292496c34 = $attributes; } ?>
+<?php $component = Mary\View\Components\Card::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-card'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Card::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'text-center']); ?>
 
-                    <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
-                        Selamat Datang di FETNET
-                    </h1>
+                
+                
+                <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+                    Selamat Datang di FETNET
+                </h1>
 
-                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-                        Sistem Informasi Penjadwalan Otomatis FPTI Universitas Pendidikan Indonesia.
-                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-                        Platform kolaboratif untuk merancang, mengatur, dan mengotomatiskan proses penjadwalan kompleks berbasis algoritma FET.
-                    </p>
-                    </p>
+                
+                <p class="mt-4 text-lg max-w-3xl mx-auto">
+                    Sistem Informasi Penjadwalan Otomatis FPTI Universitas Pendidikan Indonesia.
+                </p>
+                <p class="mt-2 text-lg max-w-3xl mx-auto">
+                    Platform kolaboratif untuk merancang, mengatur, dan mengotomatiskan proses penjadwalan kompleks berbasis algoritma FET.
+                </p>
 
-                    
+                
+                 <?php $__env->slot('actions', null, []); ?> 
                     <?php if(auth()->guard()->guest()): ?>
-                        <div class="mt-8 flex justify-center gap-4">
-                            <a href="<?php echo e(route('login')); ?>" class="inline-block rounded-lg bg-indigo-600 px-6 py-3 text-base font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                                Masuk
-                            </a>
-                            <?php if(Route::has('register')): ?>
-                                <a href="<?php echo e(route('register')); ?>" class="inline-block rounded-lg bg-gray-200 dark:bg-gray-700 px-6 py-3 text-base font-medium text-gray-800 dark:text-gray-200 transition hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-800">
-                                    Daftar
-                                </a>
-                            <?php endif; ?>
-                        </div>
+                        <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
+<?php $component = Mary\View\Components\Button::resolve(['label' => 'Masuk','link' => ''.e(route('login')).''] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'btn-primary']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+                        <?php if(Route::has('register')): ?>
+                            <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
+<?php $component = Mary\View\Components\Button::resolve(['label' => 'Daftar','link' => ''.e(route('register')).''] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'btn-secondary']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+                        <?php endif; ?>
                     <?php endif; ?>
 
-                    
                     <?php if(auth()->guard()->check()): ?>
-                        <div class="mt-8">
-                            <a href="<?php echo e(auth()->user()->hasRole('fakultas') ? route('fakultas.dashboard') : (auth()->user()->hasRole('prodi') ? route('prodi.dashboard') : route('mahasiswa.dashboard'))); ?>"
-                               class="inline-block rounded-lg bg-indigo-600 px-6 py-3 text-base font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                                Buka Dashboard
-                            </a>
-                        </div>
+                        <?php
+                            $dashboardRoute = match (true) {
+                                auth()->user()->hasRole('fakultas') => route('fakultas.dashboard'),
+                                auth()->user()->hasRole('prodi') => route('prodi.dashboard'),
+                                default => route('mahasiswa.dashboard'),
+                            };
+                        ?>
+                        <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
+<?php $component = Mary\View\Components\Button::resolve(['label' => 'Buka Dashboard','link' => $dashboardRoute] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'btn-primary']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
                     <?php endif; ?>
+                 <?php $__env->endSlot(); ?>
 
-                </div>
-            </div>
+             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal7f194736b6f6432dc38786f292496c34)): ?>
+<?php $attributes = $__attributesOriginal7f194736b6f6432dc38786f292496c34; ?>
+<?php unset($__attributesOriginal7f194736b6f6432dc38786f292496c34); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal7f194736b6f6432dc38786f292496c34)): ?>
+<?php $component = $__componentOriginal7f194736b6f6432dc38786f292496c34; ?>
+<?php unset($__componentOriginal7f194736b6f6432dc38786f292496c34); ?>
+<?php endif; ?>
         </div>
     </div>
 

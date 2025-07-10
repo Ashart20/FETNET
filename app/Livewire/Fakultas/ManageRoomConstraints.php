@@ -23,12 +23,9 @@ class ManageRoomConstraints extends Component
         $this->rooms = MasterRuangan::orderBy('kode_ruangan')->get();
         $this->days = Day::orderBy('id')->get();
         $this->timeSlots = TimeSlot::orderBy('start_time')->get();
-
-        // Memuat batasan di awal (jika ada ID yang sudah dipilih sebelumnya)
         $this->loadConstraints();
     }
 
-    // Hook ini akan otomatis berjalan setiap kali $selectedRoomId di-update oleh wire:model.live
     public function updatedSelectedRoomId($value)
     {
         $this->loadConstraints();
@@ -55,13 +52,12 @@ class ManageRoomConstraints extends Component
 
         $key = $dayId . '-' . $timeSlotId;
 
-        // PERBAIKAN: Cek dari array properti, bukan query ke DB
         if (isset($this->constraints[$key])) {
-            // Hapus jika ada
-            RoomTimeConstraint::find($this->constraints[$key]['id'])->delete();
-            session()->flash('message', 'Batasan waktu berhasil dihapus.');
+            if($constraint = RoomTimeConstraint::find($this->constraints[$key]['id'])) {
+                $constraint->delete();
+                session()->flash('message', 'Batasan waktu berhasil dihapus.');
+            }
         } else {
-            // Buat jika tidak ada
             RoomTimeConstraint::create([
                 'master_ruangan_id' => $this->selectedRoomId,
                 'day_id' => $dayId,
@@ -70,8 +66,23 @@ class ManageRoomConstraints extends Component
             session()->flash('message', 'Batasan waktu berhasil ditambahkan.');
         }
 
-        // Muat ulang data batasan setelah diubah
         $this->loadConstraints();
+    }
+
+    public function getCellClasses($dayId, $slotId): string
+    {
+        if (!$this->selectedRoomId) {
+            return 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed';
+        }
+
+        $key = $dayId . '-' . $slotId;
+        $isConstrained = isset($this->constraints[$key]);
+
+        $baseClasses = 'cursor-pointer transition-colors';
+        $constrainedClasses = 'bg-red-200 dark:bg-red-800/60 hover:bg-red-300 dark:hover:bg-red-700';
+        $availableClasses = 'bg-green-200 dark:bg-green-800/30 hover:bg-green-300 dark:hover:bg-green-700';
+
+        return $baseClasses . ' ' . ($isConstrained ? $constrainedClasses : $availableClasses);
     }
 
     public function render()

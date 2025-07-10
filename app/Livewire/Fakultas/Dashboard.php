@@ -5,16 +5,12 @@ namespace App\Livewire\Fakultas;
 use App\Models\MasterRuangan;
 use App\Models\Prodi;
 use App\Models\User;
-use Livewire\Attributes\Computed; // Impor atribut Computed
+use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class Dashboard extends Component
 {
-    /**
-     * Menggunakan Computed Property.
-     * Metode ini akan dijalankan sekali per request dan hasilnya di-cache.
-     * Ini membuat properti tidak perlu didefinisikan di atas.
-     */
     #[Computed]
     public function stats()
     {
@@ -25,8 +21,10 @@ class Dashboard extends Component
         ];
     }
 
-    public function render()
+    public function render(): View
     {
-        return view('livewire.fakultas.dashboard')->layout('layouts.app');
+        // PERBAIKAN: Hapus awalan "view:"
+        return view('livewire.fakultas.dashboard')
+            ->layout('layouts.app');
     }
 }

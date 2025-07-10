@@ -5,30 +5,28 @@ namespace App\Livewire\Prodi;
 use App\Models\StudentGroup;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Mary\Traits\Toast; // Jangan lupa use Toast
 
 class ManageStudentGroups extends Component
 {
-    // Properti untuk data
+    use Toast; // Aktifkan Toast
+
     public $groups;
 
-    // Properti untuk form modal
     public ?int $studentGroupId = null;
-    public ?int $parentId = null; // Untuk menyimpan parent saat menambah sub-kelompok
+    public ?int $parentId = null;
 
     public string $nama_kelompok = '';
     public string $kode_kelompok = '';
     public ?int $jumlah_mahasiswa = null;
     public string $angkatan = '';
 
-    public bool $isModalOpen = false;
+    // PERUBAHAN: Ganti nama properti untuk kontrol modal
+    public bool $studentGroupModal = false;
 
-    /**
-     * Aturan validasi dinamis yang benar untuk data hierarkis.
-     */
     public function rules()
     {
         return [
-            // Nama kelompok harus unik HANYA di dalam parent yang sama.
             'nama_kelompok' => [
                 'required', 'string', 'min:3',
                 Rule::unique('student_groups')
@@ -55,7 +53,6 @@ class ManageStudentGroups extends Component
 
     public function loadGroups()
     {
-        // Ambil hanya level teratas (parent_id is null) dan muat semua turunannya secara rekursif
         $this->groups = StudentGroup::where('prodi_id', auth()->user()->prodi_id)
             ->whereNull('parent_id')
             ->with('childrenRecursive')
@@ -72,7 +69,7 @@ class ManageStudentGroups extends Component
     {
         $this->resetInputFields();
         $this->parentId = $parentId;
-        $this->openModal();
+        $this->studentGroupModal = true;
     }
 
     public function store()
@@ -83,47 +80,41 @@ class ManageStudentGroups extends Component
 
         StudentGroup::updateOrCreate(['id' => $this->studentGroupId], $validatedData);
 
-        session()->flash('message', $this->studentGroupId ? 'Data berhasil diperbarui.' : 'Data berhasil ditambahkan.');
+        // Gunakan Toast untuk notifikasi
+        $this->toast(type: 'success', title: $this->studentGroupId ? 'Data berhasil diperbarui.' : 'Data berhasil ditambahkan.');
         $this->closeModal();
-        $this->loadGroups(); // Muat ulang data pohon
     }
 
     public function edit($id)
     {
         $group = StudentGroup::where('prodi_id', auth()->user()->prodi_id)->findOrFail($id);
-
         $this->studentGroupId = $id;
         $this->parentId = $group->parent_id;
         $this->angkatan = $group->angkatan;
         $this->nama_kelompok = $group->nama_kelompok;
         $this->kode_kelompok = $group->kode_kelompok;
         $this->jumlah_mahasiswa = $group->jumlah_mahasiswa;
-
-        $this->openModal();
+        $this->studentGroupModal = true;
     }
 
     public function delete($id)
     {
-        // FindOrFail akan otomatis 404 jika tidak ditemukan
         $group = StudentGroup::where('prodi_id', auth()->user()->prodi_id)->with('childrenRecursive')->findOrFail($id);
-
-        // Hapus semua turunan (sub-kelompok) terlebih dahulu secara rekursif
-        $group->childrenRecursive()->delete();
-        $group->delete();
-
-        session()->flash('message', 'Data dan semua sub-kelompoknya berhasil dihapus.');
-        $this->loadGroups(); // Muat ulang data pohon
+        $group->delete(); // Hapus parent akan otomatis menghapus children karena onDelete('cascade')
+        $this->toast(type: 'warning', title: 'Data dan sub-kelompoknya berhasil dihapus.');
+        $this->loadGroups();
     }
 
-    public function openModal() { $this->isModalOpen = true; }
-    public function closeModal() {
-        $this->isModalOpen = false;
+    public function closeModal()
+    {
+        $this->studentGroupModal = false;
         $this->resetInputFields();
     }
+
     private function resetInputFields()
     {
-        $this->reset();
+        $this->resetExcept('groups');
         $this->resetErrorBag();
-        $this->loadGroups(); // Pastikan data tree selalu fresh saat reset
+        $this->loadGroups();
     }
 }
