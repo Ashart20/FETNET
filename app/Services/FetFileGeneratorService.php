@@ -57,33 +57,48 @@ class FetFileGeneratorService
     /**
      * Mengambil data dari database.
      */
+    // app/Services/FetFileGeneratorService.php
     private function fetchDataForProdi(Prodi $prodi): array
     {
         $prodiId = $prodi->id;
 
-        // PENTING: Untuk struktur Students_List yang baru, kita mengambil semua grup
-        // dan akan menyusunnya secara hierarkis di dalam kode.
-        // Ini mengasumsikan ada relasi parent-child di model StudentGroup.
+        // [1] Logika pengambilan dosen berdasarkan cluster
+        $teachersQuery = Teacher::query();
+        if ($prodi->cluster_id) {
+            $prodiIdsInCluster = Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
+            $teachersQuery->whereHas('prodis', function ($query) use ($prodiIdsInCluster) {
+                $query->whereIn('prodis.id', $prodiIdsInCluster);
+            });
+        } else {
+            // Fallback jika tidak ada cluster, ambil dosen dari prodi saat ini saja
+            $teachersQuery->whereHas('prodis', function ($query) use ($prodiId) {
+                $query->where('prodis.id', $prodiId);
+            });
+        }
+
+        // [2] Ambil grup mahasiswa dari prodi saat ini saja
         $studentGroups = StudentGroup::where('prodi_id', $prodiId)
-            ->with('childrenRecursive') // Asumsi relasi children
-            ->whereNull('parent_id') // Mulai dari tingkat atas (Year)
+            ->with('childrenRecursive')
+            ->whereNull('parent_id')
             ->get();
 
         return [
-            'teachers' => Teacher::where('prodi_id', $prodiId)->get(),
+            'teachers' => $teachersQuery->distinct()->get(), // Ambil data dosen yang sudah difilter
             'subjects' => Subject::where('prodi_id', $prodiId)->get(),
             'activities' => Activity::where('prodi_id', $prodiId)
-                ->with(['teachers', 'subject', 'studentGroup', 'activityTag', 'preferredRooms']) // <-- PASTIKAN ADA 'preferredRooms'
+                ->with(['teachers', 'subject', 'studentGroup', 'activityTag', 'preferredRooms'])
                 ->get(),
             'rooms' => MasterRuangan::with('building')->get(),
             'buildings' => Building::all(),
             'days' => Day::orderBy('id', 'asc')->get(),
             'timeSlots' => TimeSlot::orderBy('start_time')->get(),
-            'teacherConstraints' => TeacherTimeConstraint::whereHas('teacher', fn($q) => $q->where('prodi_id', $prodiId))->with(['teacher', 'day', 'timeSlot'])->get(),
+            'teacherConstraints' => TeacherTimeConstraint::whereHas('teacher', function ($q) use ($teachersQuery) {
+                $q->whereIn('id', $teachersQuery->pluck('id')); // Ambil batasan dari semua dosen di cluster
+            })->with(['teacher', 'day', 'timeSlot'])->get(),
             'roomConstraints' => RoomTimeConstraint::with(['masterRuangan', 'day', 'timeSlot'])->get(),
             'studentGroupConstraints' => StudentGroupTimeConstraint::whereHas('studentGroup', fn($q) => $q->where('prodi_id', $prodiId))->with(['studentGroup', 'day', 'timeSlot'])->get(),
             'activityTags' => ActivityTag::all(),
-            'studentGroups' => $studentGroups, // Data hierarkis
+            'studentGroups' => $studentGroups,
         ];
     }
 

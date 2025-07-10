@@ -52,20 +52,25 @@ class FetScheduleViewer extends Component
     public function loadFilterOptions(): void
     {
         $user = Auth::user();
-        $prodiId = $user?->prodi_id; // Gunakan null-safe operator
+        $prodiId = $user?->prodi_id;
 
-        // Logika untuk memuat opsi dropdown berdasarkan peran user
         $this->daftarHari = Day::orderBy('id')->pluck('name')->toArray();
         $this->daftarRuangan = MasterRuangan::orderBy('nama_ruangan')->pluck('nama_ruangan')->toArray();
 
-        // Query dinamis menggunakan when() untuk prodi
         $this->daftarKelas = StudentGroup::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))
             ->whereNotNull('parent_id')
             ->orderBy('nama_kelompok')
             ->pluck('nama_kelompok')
             ->toArray();
         $this->daftarMatkul = Subject::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))->orderBy('nama_matkul')->pluck('nama_matkul')->toArray();
-        $this->daftarDosen = Teacher::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))->orderBy('nama_dosen')->pluck('nama_dosen')->toArray();
+
+        // PERBAIKAN DI SINI
+        $this->daftarDosen = Teacher::when($prodiId, function ($query) use ($prodiId) {
+            // Ambil dosen yang memiliki relasi dengan prodi yang sedang login
+            $query->whereHas('prodis', function ($subQuery) use ($prodiId) {
+                $subQuery->where('prodis.id', $prodiId);
+            });
+        })->orderBy('nama_dosen')->pluck('nama_dosen')->toArray();
     }
 
     /**

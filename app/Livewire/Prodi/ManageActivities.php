@@ -4,10 +4,10 @@ namespace App\Livewire\Prodi;
 
 use App\Models\Activity;
 use App\Models\ActivityTag;
-use App\Models\MasterRuangan;
 use App\Models\StudentGroup;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\Prodi;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
@@ -17,7 +17,7 @@ class ManageActivities extends Component
 {
     use WithPagination;
 
-    public Collection $teachers, $subjects, $studentGroups, $activityTags, $rooms;
+    public Collection $teachers, $subjects, $studentGroups, $activityTags ;
 
     public ?int $activityId = null;
     public array $teacher_ids = [];
@@ -35,8 +35,7 @@ class ManageActivities extends Component
             'subject_id'           => ['required', 'exists:subjects,id'],
             'student_group_id'     => ['required', 'exists:student_groups,id'],
             'activity_tag_id'      => ['nullable', 'exists:activity_tags,id'],
-            'preferred_room_ids'   => ['nullable', 'array'],
-            'preferred_room_ids.*' => ['exists:master_ruangans,id'],
+
         ];
     }
 
@@ -50,18 +49,39 @@ class ManageActivities extends Component
     }
     public function mount()
     {
-        $prodiId = auth()->user()->prodi_id;
+        $prodi = auth()->user()->prodi;
 
-        $this->teachers = Teacher::whereHas('prodis', function ($query) use ($prodiId) {
-            $query->where('prodis.id', $prodiId);
-        })->orderBy('nama_dosen')->get();
-        $this->subjects = Subject::where('prodi_id', $prodiId)->orderBy('nama_matkul')->get();
-        $this->studentGroups = StudentGroup::where('prodi_id', $prodiId)
+        // Jika user tidak punya prodi, hentikan proses
+        if (!$prodi) {
+            $this->teachers = collect();
+            $this->subjects = collect();
+            $this->studentGroups = collect();
+            $this->activityTags = collect();
+            return;
+        }
+
+        // [PERBAIKAN] Logika pengambilan dosen berdasarkan cluster
+        if ($prodi->cluster_id) {
+            // Ambil semua ID prodi dalam cluster yang sama
+            $prodiIdsInCluster = Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
+
+            // Ambil semua dosen yang terhubung dengan prodi mana pun di dalam cluster
+            $this->teachers = Teacher::whereHas('prodis', function ($query) use ($prodiIdsInCluster) {
+                $query->whereIn('prodis.id', $prodiIdsInCluster);
+            })->distinct()->orderBy('nama_dosen')->get();
+        } else {
+            // Fallback jika tidak ada cluster, ambil dosen dari prodi saat ini saja
+            $this->teachers = $prodi->teachers()->orderBy('nama_dosen')->get();
+        }
+
+        // Bagian lain dari method mount tetap sama
+        $this->subjects = Subject::where('prodi_id', $prodi->id)->orderBy('nama_matkul')->get();
+        $this->studentGroups = StudentGroup::where('prodi_id', $prodi->id)
             ->whereNotNull('parent_id')
             ->orderBy('nama_kelompok')
             ->get();
         $this->activityTags = ActivityTag::orderBy('name')->get();
-        $this->rooms = MasterRuangan::orderBy('nama_ruangan')->get();
+
     }
 
     public function render()
@@ -98,7 +118,6 @@ class ManageActivities extends Component
 
         $activity = Activity::updateOrCreate(['id' => $this->activityId], $activityData);
         $activity->teachers()->sync($validatedData['teacher_ids']);
-        $activity->preferredRooms()->sync($validatedData['preferred_room_ids'] ?? []); // Gunakan array kosong jika tidak ada
 
         session()->flash('message', $this->activityId ? 'Aktivitas Berhasil Diperbarui.' : 'Aktivitas Berhasil Ditambahkan.');
 
@@ -106,7 +125,7 @@ class ManageActivities extends Component
     }
     public function edit($id)
     {
-        $activity = Activity::with('teachers', 'preferredRooms')
+        $activity = Activity::with('teachers')
             ->where('prodi_id', auth()->user()->prodi_id)
             ->findOrFail($id);
 
@@ -115,7 +134,6 @@ class ManageActivities extends Component
         $this->subject_id = $activity->subject_id;
         $this->student_group_id = $activity->student_group_id;
         $this->activity_tag_id = $activity->activity_tag_id;
-        $this->preferred_room_ids = $activity->preferredRooms->pluck('id')->all();
 
         $this->openModal();
     }
@@ -143,7 +161,7 @@ class ManageActivities extends Component
     private function resetInputFields()
     {
         // PERBAIKAN: Gunakan metode reset() Livewire yang lebih ringkas
-        $this->reset('activityId', 'teacher_ids', 'subject_id', 'student_group_id', 'activity_tag_id', 'preferred_room_ids');
+        $this->reset('activityId', 'teacher_ids', 'subject_id', 'student_group_id', 'activity_tag_id');
         $this->resetErrorBag();
     }
 }

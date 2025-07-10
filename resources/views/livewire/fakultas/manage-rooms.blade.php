@@ -6,23 +6,13 @@
         {{-- Header halaman --}}
         <x-mary-header title="Manajemen Ruangan" subtitle="Kelola semua ruangan untuk penjadwalan." />
 
-        <div class="my-4 flex justify-between items-center">
-            {{-- Tombol utama --}}
-            <x-mary-button label="Tambah Ruangan" @click="$wire.create()" class="btn-primary" icon="o-plus" />
-
-            {{-- Fitur Impor dan Download Template --}}
-            <div class="flex items-center space-x-2">
-                <x-mary-button label="Download Template" wire:click="downloadTemplate" icon="o-document-arrow-down" class="btn-sm btn-ghost" />
-
-                {{-- Komponen file input dari MaryUI. `wire:model.live` akan memicu `updatedFile()` secara otomatis --}}
-                <x-mary-file wire:model.live="file" label="Impor Excel" placeholder="Pilih file" class="w-48" spinner>
-                    <x-slot:prepend>
-                        <x-mary-icon name="o-arrow-up-tray" />
-                    </x-slot:prepend>
-                </x-mary-file>
-            </div>
+        {{-- [PERUBAHAN 1]: Tombol-tombol aksi dikelompokkan di sini --}}
+        <div class="my-3 flex flex-wrap gap-2">
+            <x-mary-button label="Tambah Ruangan" icon="o-plus" class="btn-primary" @click="$wire.create()" />
+            <x-mary-button label="Unduh Template Excel" icon="o-document-arrow-down" class="btn-secondary" wire:click="downloadTemplate" spinner />
         </div>
-        {{-- Tabel untuk menampilkan data ruangan --}}
+
+        {{-- Tabel untuk menampilkan data ruangan (Tidak ada perubahan di sini) --}}
         <x-mary-table :headers="$this->headers()" :rows="$rooms" with-pagination>
             {{-- Menggunakan relasi untuk menampilkan nama gedung --}}
             @scope('cell_building.name', $room)
@@ -42,11 +32,29 @@
             </div>
             @endscope
         </x-mary-table>
+
+        {{-- [PERUBAHAN 2]: Bagian khusus untuk Impor Excel ditambahkan di bawah tabel --}}
+        <div class="my-6 p-4 bg-white dark:bg-gray-800/50 shadow-sm rounded-xl border dark:border-gray-700">
+            <h3 class="font-semibold text-gray-900 dark:text-white">Impor Data dari Excel</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Unggah file .xlsx dengan header: `nama_ruangan`, `kode_ruangan`, `kode_gedung`, `lantai`, `kapasitas`, `tipe`.</p>
+
+            <div class="mt-4">
+                {{-- Input ini sekarang langsung memicu proses impor saat file dipilih --}}
+                <x-mary-file wire:model.live="file" label="Pilih File Excel" hint="Hanya .xlsx" spinner />
+
+                {{-- Indikator loading saat file sedang di-upload dan diproses --}}
+                <div wire:loading wire:target="file" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Mengunggah dan memproses file...
+                </div>
+
+                @error('file') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
+        </div>
+
     </div>
 
-    {{-- ==================== MODAL FORM ==================== --}}
+    {{-- Modal Form (Tidak ada perubahan, hanya dipastikan ada) --}}
     <x-mary-modal wire:model="roomModal" title="{{ $roomId ? 'Edit' : 'Tambah' }} Ruangan" separator>
-        {{-- Form di dalam modal --}}
         <x-mary-form wire:submit="store">
             <div class="space-y-4">
                 {{-- Detail Ruangan --}}
@@ -60,7 +68,7 @@
                     ['id' => 'AUDITORIUM', 'name' => 'Auditorium'],
                 ]" />
 
-                {{-- Form kecil untuk menambah gedung baru jika tidak ada di list --}}
+                {{-- Form kecil untuk menambah gedung baru --}}
                 <div class="p-4 border rounded-lg dark:border-gray-700 space-y-3 mt-4">
                     <p class="text-sm font-bold text-gray-600 dark:text-gray-300">Gedung tidak ada di daftar?</p>
                     <x-mary-input wire:model="newBuildingName" label="Nama Gedung Baru" placeholder="Contoh: Graha Pendidikan" />
@@ -68,13 +76,10 @@
                     <x-mary-button label="Simpan Gedung Baru" wire:click="addNewBuilding" class="btn-success btn-sm w-full" spinner="addNewBuilding" />
                 </div>
 
-                {{-- Dropdown Gedung & Form Tambah Gedung --}}
+                {{-- Dropdown Gedung --}}
                 <x-mary-select label="Gedung" :options="$buildings" option-value="id" option-label="name" wire:model="building_id" placeholder="-- Pilih Gedung --" />
-
-
             </div>
 
-            {{-- Tombol Aksi di bagian bawah modal --}}
             <x-slot:actions>
                 <x-mary-button label="Batal" @click="$wire.closeModal()" />
                 <x-mary-button label="{{ $roomId ? 'Update' : 'Simpan' }}" type="submit" class="btn-primary" spinner="store" />

@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Rule;
 use Mary\Traits\Toast;
+use App\Models\Prodi;
 
 class ManageTeachers extends Component
 {
@@ -36,15 +37,28 @@ class ManageTeachers extends Component
         'kode_dosen.unique'   => 'Kode dosen ini sudah terdaftar.',
     ];
 
+    // app/Livewire/Prodi/ManageTeachers.php
     public function render()
     {
-        $prodiId = auth()->user()->prodi_id;
+        // [1] Dapatkan prodi yang sedang login
+        $currentProdi = auth()->user()->prodi;
 
-        // PERBAIKAN: Menggunakan whereHas untuk memfilter dosen berdasarkan prodi
-        $teachers = Teacher::whereHas('prodis', function ($query) use ($prodiId) {
-            $query->where('prodis.id', $prodiId);
+        // [2] Jika user tidak punya prodi atau cluster, tampilkan data kosong
+        if (!$currentProdi || !$currentProdi->cluster_id) {
+            return view('livewire.prodi.manage-teachers', [
+                'teachers' => \Illuminate\Support\Collection::empty()->paginate(10)
+            ])->layout('layouts.app');
+        }
+
+        // [3] Dapatkan semua ID prodi dalam cluster yang sama
+        $prodiIdsInCluster = Prodi::where('cluster_id', $currentProdi->cluster_id)->pluck('id');
+
+        // [4] Ambil semua dosen yang terhubung dengan prodi mana pun di dalam cluster tersebut
+        $teachers = Teacher::whereHas('prodis', function ($query) use ($prodiIdsInCluster) {
+            $query->whereIn('prodis.id', $prodiIdsInCluster);
         })
-            ->latest()
+            ->distinct() // Pastikan tidak ada duplikat dosen
+            ->latest('teachers.created_at')
             ->paginate(10);
 
         return view('livewire.prodi.manage-teachers', [

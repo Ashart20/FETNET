@@ -57,20 +57,6 @@
                 @error('activity_tag_id') <span class="text-red-500">{{ $message }}</span> @enderror
             </div>
 
-            {{-- Dropdown untuk Preferensi Ruangan (Opsional) --}}
-            <div>
-                <label for="preferred_room_ids" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Preferensi Ruangan (Opsional):</label>
-                <div wire:ignore>
-                    <select id="select-rooms" wire:model="preferred_room_ids" multiple
-                            placeholder="Ketik untuk mencari ruangan..."
-                            class="tom-select-class"> {{-- Tambahkan kelas placeholder jika perlu styling khusus --}}
-                        @foreach($rooms as $room)
-                            <option value="{{ $room->id }}">{{ $room->nama_ruangan }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                @error('preferred_room_ids') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-            </div>
 
 
             <div class="flex justify-end pt-4 space-x-2">

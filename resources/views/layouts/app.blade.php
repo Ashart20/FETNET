@@ -68,6 +68,7 @@
                         </summary>
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
                             <li><a href="{{ route('fakultas.rooms') }}" @if(request()->routeIs('fakultas.rooms')) class="active" @endif>Manajemen Ruangan</a></li>
+                            <li><a href="{{ route('fakultas.preferred-rooms') }}" @if(request()->routeIs('fakultas.preferred-rooms')) class="active" @endif>Preferensi Ruangan Aktivitas</a></li>
                             <li><a href="{{ route('fakultas.room-constraints') }}" @if(request()->routeIs('fakultas.room-constraints')) class="active" @endif>Batasan Waktu Ruangan</a></li>
                         </ul>
                     </details>
@@ -102,10 +103,31 @@
                 </li>
                 @endrole
 
-                {{-- LINK UMUM (Jadwal Utama) --}}
-                <li><a href="{{ route('hasil.fet') }}" @if(request()->routeIs('hasil.fet')) class="active" @endif>
-                        <x-mary-icon name="o-calendar-days" /> Jadwal Utama
-                    </a></li>
+                {{-- LINK JADWAL UNTUK FAKULTAS --}}
+                @role('fakultas')
+                <li>
+                    <a href="{{ route('fakultas.schedules.index') }}" @if(request()->routeIs('fakultas.schedules.index')) class="active" @endif>
+                        <x-mary-icon name="o-calendar-days" />
+                        Jadwal Utama
+                    </a>
+                </li>
+                {{-- Tambahkan link untuk halaman Generate Jadwal di sini juga --}}
+                <li>
+                    <a href="{{ route('fakultas.generate.index') }}" @if(request()->routeIs('fakultas.generate.index')) class="active" @endif>
+                        <x-mary-icon name="o-rocket-launch" />
+                        Generate Jadwal
+                    </a>
+                </li>
+                @endrole
+
+                @role('prodi')
+                <li>
+                    <a href="{{ route('hasil.fet') }}" @if(request()->routeIs('hasil.fet')) class="active" @endif>
+                        <x-mary-icon name="o-calendar-days" />
+                        Jadwal Utama
+                    </a>
+                </li>
+                @endrole
             @endauth
         </ul>
     </div>

@@ -10,6 +10,7 @@ use App\Livewire\Fakultas\Dashboard as FakultasDashboard;
 use App\Livewire\Fakultas\ManageProdi;
 use App\Livewire\Fakultas\ManageRooms;
 use App\Livewire\Fakultas\ManageRoomConstraints;
+
 use App\Livewire\Prodi\Dashboard as ProdiDashboard;
 use App\Livewire\Prodi\ManageTeachers;
 use App\Livewire\Prodi\ManageSubjects;
@@ -44,6 +45,10 @@ Route::middleware(['auth', 'role:fakultas'])->prefix('fakultas')->name('fakultas
     Route::get('/prodi', ManageProdi::class)->name('prodi');
     Route::get('/ruangan', ManageRooms::class)->name('rooms');
     Route::get('/batasan-ruangan', ManageRoomConstraints::class)->name('room-constraints');
+    Route::get('/preferensi-ruangan', \App\Livewire\Fakultas\ManageActivityPreferredRooms::class)->name('preferred-rooms');
+    Route::get('/generate-jadwal', [\App\Http\Controllers\Fakultas\GenerateController::class, 'index'])->name('generate.index');
+    Route::post('/generate-jadwal', [\App\Http\Controllers\Fakultas\GenerateController::class, 'generate'])->name('generate.store');
+    Route::get('/jadwal', \App\Livewire\Fakultas\ViewSchedules::class)->name('schedules.index');
 });
 
 // ==========================================================
@@ -57,7 +62,6 @@ Route::middleware(['auth', 'role:prodi'])->prefix('prodi')->name('prodi.')->grou
     Route::get('/aktivitas', ManageActivities::class)->name('activities');
     Route::get('/batasan-dosen', ManageTeacherConstraints::class)->name('teacher-constraints');
     Route::get('/batasan-mahasiswa', ManageStudentGroupConstraints::class)->name('student-group-constraints');
-    Route::post('/generate', [JadwalGenerationController::class, 'generate'])->name('generate');
 });
 
 // ==========================================================

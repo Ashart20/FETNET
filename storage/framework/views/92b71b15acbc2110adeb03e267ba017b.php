@@ -85,27 +85,6 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
             </div>
 
-            
-            <div>
-                <label for="preferred_room_ids" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Preferensi Ruangan (Opsional):</label>
-                <div wire:ignore>
-                    <select id="select-rooms" wire:model="preferred_room_ids" multiple
-                            placeholder="Ketik untuk mencari ruangan..."
-                            class="tom-select-class"> 
-                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($room->id); ?>"><?php echo e($room->nama_ruangan); ?></option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
-                    </select>
-                </div>
-                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['preferred_room_ids'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> <span class="text-red-500 text-xs"><?php echo e($message); ?></span> <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
-            </div>
 
 
             <div class="flex justify-end pt-4 space-x-2">
