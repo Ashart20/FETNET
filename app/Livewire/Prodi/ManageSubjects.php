@@ -9,12 +9,16 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SubjectsImport;
+use App\Exports\SubjectTemplateExport; // Asumsikan kelas ini ada atau akan dibuat
 use Maatwebsite\Excel\Validators\ValidationException;
 use Maatwebsite\Excel\Excel as ExcelType;
+use Illuminate\Support\Facades\Storage; // Digunakan untuk mengunduh file
+use Mary\Traits\Toast; // Import Mary UI Toast trait
+
 
 class ManageSubjects extends Component
 {
-    use WithPagination,  WithFileUploads;
+    use WithPagination,  WithFileUploads, Toast; // Tambahkan Toast trait
 
     // Properti untuk form modal
     public ?int $subjectId = null;
@@ -22,7 +26,7 @@ class ManageSubjects extends Component
     public string $kode_matkul = '';
     public ?int $sks = null;
     public $file;
-    public bool $isModalOpen = false;
+    public bool $subjectModal = false; // Ganti isModalOpen menjadi subjectModal
 
     /**
      * Mendefinisikan aturan validasi secara dinamis.
@@ -53,6 +57,20 @@ class ManageSubjects extends Component
         'sks.integer'          => 'SKS harus berupa angka.',
     ];
 
+    /**
+     * Mendefinisikan header untuk tabel Mary UI.
+     * Mirip dengan manage-rooms.php
+     */
+    public function headers(): array
+    {
+        return [
+            ['key' => 'nama_matkul', 'label' => 'Nama Mata Kuliah'],
+            ['key' => 'kode_matkul', 'label' => 'Kode'],
+            ['key' => 'sks', 'label' => 'SKS'],
+            ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
+        ];
+    }
+
     public function render()
     {
         $subjects = Subject::where('prodi_id', auth()->user()->prodi_id)
@@ -63,7 +81,6 @@ class ManageSubjects extends Component
             'subjects' => $subjects
         ])->layout('layouts.app');
     }
-    // app/Livewire/Prodi/ManageSubjects.php
 
     public function updatedFile()
     {
@@ -71,9 +88,7 @@ class ManageSubjects extends Component
 
         try {
             Excel::import(new SubjectsImport(auth()->user()->prodi_id), $this->file);
-
-            session()->flash('message', 'Semua data mata kuliah berhasil diimpor.');
-
+            $this->success('Semua data mata kuliah berhasil diimpor.', position: 'toast-bottom'); // Gunakan Toast
             $this->reset('file');
 
         } catch (ValidationException $e) {
@@ -82,16 +97,41 @@ class ManageSubjects extends Component
             foreach ($failures as $failure) {
                 $errorMessages[] = "Baris ke-{$failure->row()}: " . implode(', ', $failure->errors());
             }
-            session()->flash('error', "Impor Gagal. Terdapat beberapa kesalahan:\n" . implode("\n", $errorMessages));
+            $this->error('Impor Gagal. Ditemukan kesalahan:', implode("<br>", $errorMessages), timeout: 10000); // Gunakan Toast
         } catch (\Exception $e) {
-            session()->flash('error', 'Impor Gegal. Pastikan format dan header file Excel Anda sudah benar. Error: ' . $e->getMessage());
+            $this->error('Impor Gagal.', 'Pastikan format dan header file Excel Anda sudah benar. Error: ' . $e->getMessage(), timeout: 10000); // Gunakan Toast
         }
     }
+
+    /**
+     * Metode untuk mengunduh template Excel.
+     * Mirip dengan manage-rooms.php
+     */
+    public function downloadTemplate()
+    {
+        $filename = 'templates/template_matkul.xlsx';
+        $disk = 'local'; // storage/app
+
+        // Data contoh untuk template Mata Kuliah
+        $data = [
+            ['nama_matkul', 'kode_matkul', 'sks'], // Header
+            ['Algoritma dan Struktur Data', 'IF101', 3],
+            ['Basis Data', 'IF202', 4],
+        ];
+
+        // Buat file menggunakan Export Class yang baru (SubjectTemplateExport)
+        Excel::store(new SubjectTemplateExport($data), $filename, $disk);
+
+        // Unduh file menggunakan Storage facade
+        return Storage::disk($disk)->download($filename);
+    }
+
     public function deleteAllSubjects()
     {
         Subject::where('prodi_id', auth()->user()->prodi_id)->delete();
-        session()->flash('message', 'Semua data mata kuliah telah berhasil dihapus.');
+        $this->warning('Semua data mata kuliah telah berhasil dihapus.'); // Gunakan Toast
     }
+
     public function create()
     {
         $this->resetInputFields();
@@ -105,7 +145,8 @@ class ManageSubjects extends Component
 
         Subject::updateOrCreate(['id' => $this->subjectId], $validatedData);
 
-        session()->flash('message', $this->subjectId ? 'Data Mata Kuliah Berhasil Diperbarui.' : 'Data Mata Kuliah Berhasil Ditambahkan.');
+        $message = $this->subjectId ? 'Data Mata Kuliah Berhasil Diperbarui.' : 'Data Mata Kuliah Berhasil Ditambahkan.';
+        $this->success($message); // Gunakan Toast
         $this->closeModal();
     }
 
@@ -123,20 +164,24 @@ class ManageSubjects extends Component
 
     public function delete($id)
     {
-        Subject::where('prodi_id', auth()->user()->prodi_id)->findOrFail($id)->delete();
-        session()->flash('message', 'Data Mata Kuliah Berhasil Dihapus.');
+        try {
+            Subject::where('prodi_id', auth()->user()->prodi_id)->findOrFail($id)->delete();
+            $this->warning('Data Mata Kuliah Berhasil Dihapus.'); // Gunakan Toast
+        } catch (\Exception $e) {
+            $this->error('Gagal menghapus mata kuliah. Mungkin terhubung dengan data lain.'); // Gunakan Toast
+        }
     }
 
-    public function openModal() { $this->isModalOpen = true; }
+    public function openModal() { $this->subjectModal = true; } // Ganti isModalOpen
 
     public function closeModal() {
-        $this->isModalOpen = false;
+        $this->subjectModal = false; // Ganti isModalOpen
         $this->resetInputFields();
     }
 
     private function resetInputFields()
     {
-        $this->reset();
+        $this->reset(); // Mereset semua properti, termasuk file
         $this->resetErrorBag();
     }
 }

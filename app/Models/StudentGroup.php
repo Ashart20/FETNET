@@ -17,7 +17,7 @@ class StudentGroup extends Model
         'jumlah_mahasiswa',
         'prodi_id',
         'angkatan',
-        'parent_id', // <-- TAMBAHKAN INI
+        'parent_id',
     ];
 
     /**
@@ -43,5 +43,9 @@ class StudentGroup extends Model
     public function childrenRecursive(): HasMany
     {
         return $this->hasMany(StudentGroup::class, 'parent_id')->with('childrenRecursive');
+    }
+    public function students(): HasMany
+    {
+        return $this->hasMany(User::class);
     }
 }

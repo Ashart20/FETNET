@@ -2,76 +2,107 @@
 
 namespace App\Livewire\Prodi;
 
-use App\Models\StudentGroup;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
+use App\Models\StudentGroup;
+use Livewire\WithPagination;
+use Livewire\Attributes\Rule;
+use Mary\Traits\Toast;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule as ValidationRule;
 
 class ManageStudentGroups extends Component
 {
-    // Properti untuk data
-    public $groups;
+    use WithPagination, Toast;
 
-    // Properti untuk form modal
     public ?int $studentGroupId = null;
-    public ?int $parentId = null; // Untuk menyimpan parent saat menambah sub-kelompok
 
-    public string $nama_kelompok = '';
-    public string $kode_kelompok = '';
-    public ?int $jumlah_mahasiswa = null;
+    // PERBAIKAN: Gunakan nama_kelompok sesuai DB
+    #[Rule('required|string|max:255')]
+    public string $nama_kelompok = ''; // Diubah dari $name
+
+    #[Rule('required|string|max:255')] // Validasi string karena di DB string
     public string $angkatan = '';
+
+    #[Rule('nullable|exists:student_groups,id', message: 'Parent group tidak valid.')]
+    public ?int $parent_id = null;
 
     public bool $isModalOpen = false;
 
-    /**
-     * Aturan validasi dinamis yang benar untuk data hierarkis.
-     */
+    public Collection $parentGroups;
+
     public function rules()
     {
         return [
-            // Nama kelompok harus unik HANYA di dalam parent yang sama.
-            'nama_kelompok' => [
-                'required', 'string', 'min:3',
-                Rule::unique('student_groups')
-                    ->where('prodi_id', auth()->user()->prodi_id)
-                    ->where('parent_id', $this->parentId)
-                    ->ignore($this->studentGroupId),
+            // PERBAIKAN: Validasi unik untuk nama_kelompok
+            'nama_kelompok' => [ // Diubah dari 'name'
+                'required',
+                'string',
+                'max:255',
+                ValidationRule::unique('student_groups')->where(function ($query) {
+                    return $query->where('prodi_id', auth()->user()->prodi_id)
+                        ->where('angkatan', $this->angkatan)
+                        ->where('parent_id', $this->parent_id);
+                })->ignore($this->studentGroupId),
             ],
-            'kode_kelompok'    => 'nullable|string|max:15',
-            'jumlah_mahasiswa' => 'nullable|integer|min:0',
-            'angkatan'         => 'required|string|max:255',
+            'angkatan' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:student_groups,id',
         ];
     }
 
     protected $messages = [
-        'nama_kelompok.required' => 'Nama kelompok/tingkat wajib diisi.',
-        'nama_kelompok.unique'   => 'Nama ini sudah digunakan pada level yang sama.',
-        'angkatan.required'      => 'Angkatan wajib diisi.',
+        'nama_kelompok.required' => 'Nama kelompok mahasiswa wajib diisi.', // Diubah dari 'name.required'
+        'nama_kelompok.unique'   => 'Nama kelompok ini sudah ada di angkatan dan level ini.', // Diubah dari 'name.unique'
+        'angkatan.required'     => 'Angkatan wajib diisi.',
+        'angkatan.string'       => 'Angkatan harus berupa teks.',
+        'parent_id.exists'      => 'Kelompok induk tidak valid.',
     ];
+
 
     public function mount()
     {
-        $this->loadGroups();
+        $this->angkatan = date('Y');
+        $this->loadParentGroups();
     }
 
-    public function loadGroups()
+    public function headers(): array
     {
-        // Ambil hanya level teratas (parent_id is null) dan muat semua turunannya secara rekursif
-        $this->groups = StudentGroup::where('prodi_id', auth()->user()->prodi_id)
-            ->whereNull('parent_id')
-            ->with('childrenRecursive')
-            ->orderBy('nama_kelompok')
-            ->get();
+        return [
+            ['key' => 'nama_kelompok', 'label' => 'Nama Kelompok'], // Diubah dari 'name'
+            ['key' => 'angkatan', 'label' => 'Angkatan'],
+            ['key' => 'parent_group_name', 'label' => 'Bagian dari'],
+            ['key' => 'students_count', 'label' => 'Jml. Mhs'],
+            ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
+        ];
     }
+
 
     public function render()
     {
-        return view('livewire.prodi.manage-student-groups')->layout('layouts.app');
+        $prodiId = auth()->user()->prodi_id;
+
+        $studentGroups = StudentGroup::where('prodi_id', $prodiId)
+            ->with('parent')
+            ->withCount('students')
+            ->orderBy('angkatan', 'desc')
+            ->orderBy('parent_id')
+            ->orderBy('nama_kelompok') // PERBAIKAN: Urutkan berdasarkan nama_kelompok
+            ->paginate(10);
+
+        $studentGroups->getCollection()->transform(function ($group) {
+            $group->parent_group_name = $group->parent ? $group->parent->nama_kelompok . ' (' . $group->parent->angkatan . ')' : 'Utama'; // PERBAIKAN
+            return $group;
+        });
+
+
+        return view('livewire.prodi.manage-student-groups', [
+            'studentGroups' => $studentGroups,
+        ])->layout('layouts.app');
     }
 
-    public function create($parentId = null)
+    public function create()
     {
         $this->resetInputFields();
-        $this->parentId = $parentId;
+        $this->angkatan = date('Y');
         $this->openModal();
     }
 
@@ -79,51 +110,108 @@ class ManageStudentGroups extends Component
     {
         $validatedData = $this->validate();
         $validatedData['prodi_id'] = auth()->user()->prodi_id;
-        $validatedData['parent_id'] = $this->parentId;
 
-        StudentGroup::updateOrCreate(['id' => $this->studentGroupId], $validatedData);
+        // PERBAIKAN: Pastikan Anda mengisi nama_kelompok
+        $dataToStore = [
+            'nama_kelompok' => $validatedData['nama_kelompok'],
+            'angkatan' => $validatedData['angkatan'],
+            'parent_id' => $validatedData['parent_id'],
+            'prodi_id' => $validatedData['prodi_id'],
+        ];
+        // Tambahkan kolom lain jika ada di $fillable dan tidak null
+        if (isset($validatedData['kode_kelompok'])) {
+            $dataToStore['kode_kelompok'] = $validatedData['kode_kelompok'];
+        }
+        if (isset($validatedData['jumlah_mahasiswa'])) {
+            $dataToStore['jumlah_mahasiswa'] = $validatedData['jumlah_mahasiswa'];
+        } else {
+            $dataToStore['jumlah_mahasiswa'] = 0; // Default jika tidak ada input
+        }
 
-        session()->flash('message', $this->studentGroupId ? 'Data berhasil diperbarui.' : 'Data berhasil ditambahkan.');
+
+        StudentGroup::updateOrCreate(['id' => $this->studentGroupId], $dataToStore);
+
+        $this->toast(type: 'success', title: $this->studentGroupId ? 'Data Kelompok Mahasiswa Berhasil Diperbarui.' : 'Data Kelompok Mahasiswa Berhasil Ditambahkan.');
         $this->closeModal();
-        $this->loadGroups(); // Muat ulang data pohon
     }
 
     public function edit($id)
     {
-        $group = StudentGroup::where('prodi_id', auth()->user()->prodi_id)->findOrFail($id);
+        $prodiId = auth()->user()->prodi_id;
+        $group = StudentGroup::where('prodi_id', $prodiId)->findOrFail($id);
 
         $this->studentGroupId = $id;
-        $this->parentId = $group->parent_id;
+        $this->nama_kelompok = $group->nama_kelompok; // Diubah dari $name
         $this->angkatan = $group->angkatan;
-        $this->nama_kelompok = $group->nama_kelompok;
-        $this->kode_kelompok = $group->kode_kelompok;
-        $this->jumlah_mahasiswa = $group->jumlah_mahasiswa;
+        $this->parent_id = $group->parent_id;
+        // Jika Anda juga mengelola kode_kelompok atau jumlah_mahasiswa di form edit:
+        // $this->kode_kelompok = $group->kode_kelompok;
+        // $this->jumlah_mahasiswa = $group->jumlah_mahasiswa;
 
         $this->openModal();
     }
 
     public function delete($id)
     {
-        // FindOrFail akan otomatis 404 jika tidak ditemukan
-        $group = StudentGroup::where('prodi_id', auth()->user()->prodi_id)->with('childrenRecursive')->findOrFail($id);
+        try {
+            $prodiId = auth()->user()->prodi_id;
+            $group = StudentGroup::where('prodi_id', $prodiId)->findOrFail($id);
 
-        // Hapus semua turunan (sub-kelompok) terlebih dahulu secara rekursif
-        $group->childrenRecursive()->delete();
-        $group->delete();
+            if ($group->children()->exists()) {
+                $this->error('Gagal menghapus kelompok. Kelompok ini memiliki sub-kelompok.');
+                return;
+            }
 
-        session()->flash('message', 'Data dan semua sub-kelompoknya berhasil dihapus.');
-        $this->loadGroups(); // Muat ulang data pohon
+            if ($group->activities()->exists()) {
+                $this->error('Gagal menghapus kelompok. Kelompok ini terkait dengan aktivitas yang ada.');
+                return;
+            }
+
+            if ($group->students()->exists()) {
+                $this->error('Gagal menghapus kelompok. Kelompok ini masih memiliki mahasiswa terdaftar.');
+                return;
+            }
+
+            $group->delete();
+            $this->toast(type: 'warning', title: 'Data Kelompok Mahasiswa Berhasil Dihapus.');
+        } catch (\Exception $e) {
+            $this->error('Terjadi kesalahan saat menghapus kelompok. ' . $e->getMessage());
+        }
     }
 
-    public function openModal() { $this->isModalOpen = true; }
+    public function openModal() {
+        $this->isModalOpen = true;
+        $this->loadParentGroups();
+    }
+
     public function closeModal() {
         $this->isModalOpen = false;
         $this->resetInputFields();
     }
+
     private function resetInputFields()
     {
-        $this->reset();
+        $this->reset(['studentGroupId', 'nama_kelompok', 'parent_id']); // Diubah dari 'name'
+        $this->angkatan = date('Y');
         $this->resetErrorBag();
-        $this->loadGroups(); // Pastikan data tree selalu fresh saat reset
+    }
+
+    private function loadParentGroups()
+    {
+        $prodiId = auth()->user()->prodi_id;
+        $this->parentGroups = StudentGroup::where('prodi_id', $prodiId)
+            ->when($this->studentGroupId, function ($query) {
+                $query->where('id', '!=', $this->studentGroupId);
+            })
+            ->where(function($query) {
+                $query->whereNull('parent_id')
+                    ->orWhereHas('children');
+            })
+            ->orderBy('angkatan', 'desc') // Mengurutkan berdasarkan angkatan
+            ->orderBy('nama_kelompok') // Mengurutkan berdasarkan nama_kelompok
+            ->get();
+
+        // Mengubah nama opsi agar sesuai dengan nama_kelompok dan angkatan
+        $this->parentGroups->prepend(new StudentGroup(['id' => null, 'nama_kelompok' => 'Tidak Ada (Kelompok Utama)', 'angkatan' => '']));
     }
 }
