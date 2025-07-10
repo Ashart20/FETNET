@@ -27,7 +27,7 @@
                     <x-mary-alert :description="'Menambahkan Sub-item di bawah: <strong>' . (\App\Models\StudentGroup::find($parentId)->nama_kelompok ?? '') . '</strong>'" class="alert-info" />
                 @endif
                 <x-mary-input label="Angkatan" wire:model="angkatan" placeholder="Contoh: 2023" class="input-bordered" />
-                <x-mary-input label="Nama (Tingkat/Kelompok/Sub)" wire:model="nama_kelompok" placeholder="Contoh: TE 01" class="input-bordered" />
+                <x-mary-input label="Nama (Tingkat/Kelompok/Sub)" wire:model="nama_kelompok" placeholder="Contoh: TE-23/TE01-23," class="input-bordered" />
                 <x-mary-input label="Kode (Opsional)" wire:model="kode_kelompok" class="input-bordered" />
                 <x-mary-input label="Jumlah Mahasiswa" wire:model="jumlah_mahasiswa" type="number" class="input-bordered" />
             </div>

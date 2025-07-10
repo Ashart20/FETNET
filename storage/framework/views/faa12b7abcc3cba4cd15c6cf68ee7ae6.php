@@ -9,7 +9,6 @@
 <?php endif; ?>
 <?php $component->withAttributes(['wire:submit' => 'store']); ?>
     <div class="space-y-4">
-        
         <?php if (isset($component)) { $__componentOriginalf51438a7488970badd535e5f203e0c1b = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalf51438a7488970badd535e5f203e0c1b = $attributes; } ?>
 <?php $component = Mary\View\Components\Input::resolve(['label' => 'Nama Mata Kuliah'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -72,7 +71,7 @@
 <?php endif; ?>
     </div>
 
-    
+
      <?php $__env->slot('actions', null, []); ?> 
         <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>

@@ -93,7 +93,6 @@
 
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">
-                            
                             <!--[if BLOCK]><![endif]--><?php $__empty_2 = true; $__currentLoopData = $item->activity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $studentGroup): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
                                 <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>

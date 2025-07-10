@@ -75,7 +75,7 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Table::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_student_group_names', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?> 
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_student_group_names', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
             <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $activity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
@@ -264,7 +264,7 @@
 
                 <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Tag Aktivitas (Opsional)','options' => $activityTags,'optionLabel' => 'name','placeholder' => '-- Tidak ada --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Select::resolve(['label' => 'Tag Aktivitas (Wajib)','options' => $activityTags,'optionLabel' => 'name','placeholder' => '-- Tidak ada --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -291,7 +291,7 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Input::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'name','placeholder' => 'Contoh: Kuliah Gabungan A']); ?>
+<?php $component->withAttributes(['wire:model' => 'name','placeholder' => '...']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalf51438a7488970badd535e5f203e0c1b)): ?>

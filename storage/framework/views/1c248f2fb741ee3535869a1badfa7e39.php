@@ -47,7 +47,6 @@
                     Pastikan semua data di setiap prodi (dosen, matkul, aktivitas, dan batasan) sudah lengkap. Proses ini akan berjalan di latar belakang.
                 </p>
 
-                
                 <?php if(session('status')): ?>
                     <?php if (isset($component)) { $__componentOriginalc667a2ae20740422749e04d86ccbd727 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalc667a2ae20740422749e04d86ccbd727 = $attributes; } ?>

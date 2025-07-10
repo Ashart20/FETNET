@@ -77,6 +77,7 @@ class ManageActivities extends Component
         // Ambil data lain yang dibutuhkan
         $this->subjects = Subject::where('prodi_id', $prodi->id)->orderBy('nama_matkul')->get();
         $this->allStudentGroups = StudentGroup::where('prodi_id', $prodi->id)
+            ->whereDoesntHave('children')
             ->orderBy('nama_kelompok')
             ->get();
         $this->activityTags = ActivityTag::orderBy('name')->get();

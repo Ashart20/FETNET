@@ -60,7 +60,7 @@
                                         </svg>
                                     </div>
 
-                                    div wire:loading.remove wire:target="toggleConstraint({{ $day->id }}, {{ $slot->id }})">
+                                    <div wire:loading.remove wire:target="toggleConstraint({{ $day->id }}, {{ $slot->id }})">
                                         @if($isConstrained)
                                             <span class="font-bold text-lg text-red-900 dark:text-red-200">X</span>
                                         @endif

@@ -10,7 +10,7 @@
 
         {{-- Tabel Data --}}
         <x-mary-table :headers="$headers" :rows="$activities" with-pagination>
-            @scope('cell_student_group_names', $activity) {{-- Perubahan: Menggunakan key baru untuk kolom kelompok --}}
+            @scope('cell_student_group_names', $activity)
             @forelse($activity->studentGroups as $group)
                 <x-mary-badge :value="$group->nama_kelompok" class="badge-neutral mr-1 mb-1" />
             @empty
@@ -43,8 +43,8 @@
                                 multiple {{-- Penting: Aktifkan mode multi-pilih --}}
                                 placeholder="-- Pilih Kelompok --" />
 
-                <x-mary-select label="Tag Aktivitas (Opsional)" wire:model="activity_tag_id" :options="$activityTags" option-label="name" placeholder="-- Tidak ada --" />
-                <x-mary-input label="Nama Aktivitas (Opsional)" wire:model="name" placeholder="Contoh: Kuliah Gabungan A" />
+                <x-mary-select label="Tag Aktivitas (Wajib)" wire:model="activity_tag_id" :options="$activityTags" option-label="name" placeholder="-- Tidak ada --" />
+                <x-mary-input label="Nama Aktivitas (Opsional)" wire:model="name" placeholder="..." />
 
             </div>
 

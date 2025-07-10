@@ -63,7 +63,7 @@
                             <th>Jam</th>
                             <th>Mata Kuliah</th>
                             <th>Dosen</th>
-                            <th>Kelas</th> 
+                            <th>Kelas</th>
                             <th>Ruangan</th>
                         </tr>
                         </thead>
@@ -80,7 +80,6 @@
 
                                 </td>
                                 <td>
-                                    
                                     <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $schedule->activity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $studentGroup): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                         <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>

@@ -1,4 +1,4 @@
-    <!--[if BLOCK]><![endif]--><?php if($link): ?>
+    <?php if($link): ?>
         <a href="<?php echo $link; ?>"
     <?php else: ?>
         <button
@@ -29,12 +29,12 @@
     >
 
         <!-- SPINNER LEFT -->
-        <!--[if BLOCK]><![endif]--><?php if($spinner && !$iconRight): ?>
+        <?php if($spinner && !$iconRight): ?>
             <span wire:loading wire:target="<?php echo e($spinnerTarget()); ?>" class="loading loading-spinner w-5 h-5"></span>
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?>
 
         <!-- ICON -->
-        <!--[if BLOCK]><![endif]--><?php if($icon): ?>
+        <?php if($icon): ?>
             <span class="block" <?php if($spinner): ?> wire:loading.class="hidden" wire:target="<?php echo e($spinnerTarget()); ?>" <?php endif; ?>>
                 <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
@@ -57,24 +57,24 @@
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
 <?php endif; ?>
             </span>
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?>
 
         <!-- LABEL / SLOT -->
-        <!--[if BLOCK]><![endif]--><?php if($label): ?>
+        <?php if($label): ?>
             <span class="<?php echo \Illuminate\Support\Arr::toCssClasses(["hidden lg:block" => $responsive ]); ?>">
                 <?php echo e($label); ?>
 
             </span>
-            <!--[if BLOCK]><![endif]--><?php if(strlen($badge ?? '') > 0): ?>
+            <?php if(strlen($badge ?? '') > 0): ?>
                 <span class="badge badge-sm <?php echo e($badgeClasses); ?>"><?php echo e($badge); ?></span>
-            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+            <?php endif; ?>
         <?php else: ?>
             <?php echo e($slot); ?>
 
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?>
 
         <!-- ICON RIGHT -->
-        <!--[if BLOCK]><![endif]--><?php if($iconRight): ?>
+        <?php if($iconRight): ?>
             <span class="block" <?php if($spinner): ?> wire:loading.class="hidden" wire:target="<?php echo e($spinnerTarget()); ?>" <?php endif; ?>>
                 <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
@@ -97,15 +97,15 @@
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
 <?php endif; ?>
             </span>
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?>
 
         <!-- SPINNER RIGHT -->
-        <!--[if BLOCK]><![endif]--><?php if($spinner && $iconRight): ?>
+        <?php if($spinner && $iconRight): ?>
             <span wire:loading wire:target="<?php echo e($spinnerTarget()); ?>" class="loading loading-spinner w-5 h-5"></span>
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?>
 
-    <!--[if BLOCK]><![endif]--><?php if(!$link): ?>
+    <?php if(!$link): ?>
         </button>
     <?php else: ?>
         </a>
-    <?php endif; ?><!--[if ENDBLOCK]><![endif]--><?php /**PATH /home/ashart20/FETNET/storage/framework/views/19941b006c7ea0157bf75eceb29fabe5.blade.php ENDPATH**/ ?>
+    <?php endif; ?><?php /**PATH /home/ashart20/FETNET/storage/framework/views/19941b006c7ea0157bf75eceb29fabe5.blade.php ENDPATH**/ ?>

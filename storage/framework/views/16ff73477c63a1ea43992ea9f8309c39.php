@@ -22,7 +22,7 @@
 <?php endif; ?>
 
     <div class="p-4">
-        
+
         <?php if (isset($component)) { $__componentOriginal6f99ffca722ef3c8789c4087c5ac9f0d = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal6f99ffca722ef3c8789c4087c5ac9f0d = $attributes; } ?>
 <?php $component = Mary\View\Components\Header::resolve(['title' => 'Manajemen Data Mata Kuliah','subtitle' => 'Kelola semua mata kuliah untuk prodi Anda.'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -233,7 +233,6 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Modal::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['wire:model' => 'subjectModal']); ?>
-        
         <?php echo $__env->make('livewire.prodi.subject-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

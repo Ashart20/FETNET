@@ -43,7 +43,6 @@
         <div><?php echo e($activity->prodi->nama_prodi ?? 'N/A'); ?></div>
         <?php }); ?>
 
-        
         <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_student_group_names', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
         <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $activity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
@@ -187,7 +186,6 @@
                 Mengatur preferensi untuk:
                 <span class="font-bold text-primary"><?php echo e($selectedActivity->subject->nama_matkul ?? 'N/A'); ?></span>
                 -
-                
                 <span class="text-sm">
                     <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $selectedActivity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <?php echo e($group->nama_kelompok); ?><?php echo e(!$loop->last ? ', ' : ''); ?>
