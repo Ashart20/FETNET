@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::table('master_ruangans', function (Blueprint $table) {
-            // Tambahkan kolom tipe setelah kapasitas
             $table->string('tipe')->default('KELAS_TEORI')->after('kapasitas');
         });
     }

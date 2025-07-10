@@ -81,8 +81,8 @@ class GenerateFacultyTimetableJob implements ShouldQueue
         if ($process->successful()) {
             Log::info("[Prodi: {$prodi->kode}] Engine FET berhasil dijalankan.");
 
-            // [PERBAIKAN UTAMA] Tentukan path ke file HASIL yang benar, dengan memperhitungkan subfolder
-            $inputFileNameWithoutExt = pathinfo($inputFilePath, PATHINFO_FILENAME); // cth: input_prodi_E3434_1752134779
+
+            $inputFileNameWithoutExt = pathinfo($inputFilePath, PATHINFO_FILENAME);
 
             $outputSubdirectory = "{$outputDir}/timetables/{$inputFileNameWithoutExt}";
             $outputFileName = "{$inputFileNameWithoutExt}_data_and_timetable.fet";

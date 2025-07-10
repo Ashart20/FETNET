@@ -20,7 +20,7 @@ class Schedule extends Model
         'day_id',
     ];
 
-    // Ganti 'room_id' ke 'master_ruangan_id' jika nama kolom di tabel Anda berbeda
+
     public function room(): BelongsTo
     {
         return $this->belongsTo(MasterRuangan::class, 'room_id');

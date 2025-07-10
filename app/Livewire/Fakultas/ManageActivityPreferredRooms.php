@@ -29,15 +29,22 @@ class ManageActivityPreferredRooms extends Component
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'subject.nama_matkul', 'label' => 'Mata Kuliah'],
             ['key' => 'prodi.nama_prodi', 'label' => 'Prodi'],
-            ['key' => 'studentGroup.nama_kelompok', 'label' => 'Kelompok'],
+            ['key' => 'student_group_names', 'label' => 'Kelompok Mahasiswa'], // PERUBAHAN: Gunakan key baru
             ['key' => 'preferred_rooms', 'label' => 'Preferensi Ruangan', 'sortable' => false],
             ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
         ];
     }
 
+
+    public function getStudentGroupNamesAttribute(Activity $activity): string
+    {
+        return $activity->studentGroups->pluck('nama_kelompok')->implode(', ');
+    }
+
     public function editPreferences(Activity $activity): void
     {
-        $this->selectedActivity = $activity;
+        // PERUBAHAN: Pastikan studentGroups juga dimuat saat edit
+        $this->selectedActivity = $activity->load('studentGroups'); //
         $this->selectedRooms = $activity->preferredRooms()->pluck('master_ruangan_id')->toArray();
         $this->preferenceModal = true;
     }
@@ -64,9 +71,9 @@ class ManageActivityPreferredRooms extends Component
 
     public function render()
     {
-        // Fakultas bisa melihat semua aktivitas
-        $activities = Activity::with(['subject', 'prodi', 'studentGroup', 'preferredRooms'])
-            ->latest()
+
+        $activities = Activity::with(['subject', 'prodi', 'studentGroups', 'preferredRooms']) //
+        ->latest()
             ->paginate(15);
 
         return view('livewire.fakultas.manage-activity-preferred-rooms', [

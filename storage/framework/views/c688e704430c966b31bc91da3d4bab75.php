@@ -245,7 +245,6 @@
                         Jadwal Utama
                     </a>
                 </li>
-                
                 <li>
                     <a href="<?php echo e(route('fakultas.generate.index')); ?>" <?php if(request()->routeIs('fakultas.generate.index')): ?> class="active" <?php endif; ?>>
                         <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
@@ -327,7 +326,7 @@
 <?php endif; ?>
 
         <?php if(auth()->guard()->check()): ?>
-            
+
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost">
                     

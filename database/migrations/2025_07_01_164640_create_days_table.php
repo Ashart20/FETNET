@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('days', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique(); // Contoh: Senin, Selasa
-            // PERBAIKAN: Hapus timestamps karena ini data statis.
+
         });
     }
 

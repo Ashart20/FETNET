@@ -33,36 +33,28 @@ class FetFileGeneratorService
      */
     public function generateForProdi(Prodi $prodi, ?string $customFilePath = null): string
     {
-        // === Langkah 1: Ambil semua data yang diperlukan dari database ===
+
         $data = $this->fetchDataForProdi($prodi);
 
-        // === Langkah 2: Buat struktur dasar XML (file .fet) ===
         $xml = new SimpleXMLElement('<fet version="7.2.5"></fet>');
-        // Penyesuaian: Menambahkan tag <Mode>
         $xml->addChild('Mode', 'Official');
         $xml->addChild('Institution_Name', 'FPTK UPI - ' . htmlspecialchars($prodi->nama_prodi));
         $xml->addChild('Comments', 'Dibuat secara otomatis oleh sistem penjadwalan pada ' . now());
-
-        // === Langkah 3: Isi XML dengan data yang sudah diambil ===
         $this->addDeclarations($xml, $data);
         $this->addConstraints($xml, $data);
 
-        // Menambahkan node kosong di akhir jika diperlukan
         $xml->addChild('Timetable_Generation_Options_List');
 
-        // === Langkah 4: Simpan file XML yang sudah diformat ===
         return $this->saveXmlToFile($xml, $prodi, $customFilePath);
     }
 
     /**
      * Mengambil data dari database.
      */
-    // app/Services/FetFileGeneratorService.php
     private function fetchDataForProdi(Prodi $prodi): array
     {
         $prodiId = $prodi->id;
 
-        // [1] Logika pengambilan dosen berdasarkan cluster
         $teachersQuery = Teacher::query();
         if ($prodi->cluster_id) {
             $prodiIdsInCluster = Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
@@ -70,35 +62,37 @@ class FetFileGeneratorService
                 $query->whereIn('prodis.id', $prodiIdsInCluster);
             });
         } else {
-            // Fallback jika tidak ada cluster, ambil dosen dari prodi saat ini saja
             $teachersQuery->whereHas('prodis', function ($query) use ($prodiId) {
                 $query->where('prodis.id', $prodiId);
             });
         }
 
-        // [2] Ambil grup mahasiswa dari prodi saat ini saja
+        $activities = Activity::where('prodi_id', $prodiId)
+            ->with(['teachers', 'subject', 'studentGroups', 'activityTag', 'preferredRooms'])
+            ->get();
+
+
         $studentGroups = StudentGroup::where('prodi_id', $prodiId)
             ->with('childrenRecursive')
             ->whereNull('parent_id')
             ->get();
 
         return [
-            'teachers' => $teachersQuery->distinct()->get(), // Ambil data dosen yang sudah difilter
+            'teachers' => $teachersQuery->distinct()->get(),
             'subjects' => Subject::where('prodi_id', $prodiId)->get(),
-            'activities' => Activity::where('prodi_id', $prodiId)
-                ->with(['teachers', 'subject', 'studentGroup', 'activityTag', 'preferredRooms'])
-                ->get(),
+            'activities' => $activities,
             'rooms' => MasterRuangan::with('building')->get(),
             'buildings' => Building::all(),
             'days' => Day::orderBy('id', 'asc')->get(),
             'timeSlots' => TimeSlot::orderBy('start_time')->get(),
             'teacherConstraints' => TeacherTimeConstraint::whereHas('teacher', function ($q) use ($teachersQuery) {
-                $q->whereIn('id', $teachersQuery->pluck('id')); // Ambil batasan dari semua dosen di cluster
+                $q->whereIn('id', $teachersQuery->pluck('id'));
             })->with(['teacher', 'day', 'timeSlot'])->get(),
             'roomConstraints' => RoomTimeConstraint::with(['masterRuangan', 'day', 'timeSlot'])->get(),
             'studentGroupConstraints' => StudentGroupTimeConstraint::whereHas('studentGroup', fn($q) => $q->where('prodi_id', $prodiId))->with(['studentGroup', 'day', 'timeSlot'])->get(),
             'activityTags' => ActivityTag::all(),
             'studentGroups' => $studentGroups,
+
         ];
     }
 
@@ -112,7 +106,7 @@ class FetFileGeneratorService
         $this->addSubjectsList($xml, $data['subjects']);
         $this->addActivityTagsList($xml, $data['activityTags']);
         $this->addTeachersList($xml, $data['teachers']);
-        $this->addStudentsList($xml, $data['studentGroups']); // Menggunakan data hierarkis
+        $this->addStudentsList($xml, $data['studentGroups']);
         $this->addActivitiesList($xml, $data['activities']);
         $this->addBuildingsList($xml, $data['buildings']);
         $this->addRoomsList($xml, $data['rooms']);
@@ -127,7 +121,6 @@ class FetFileGeneratorService
         $this->addSpaceConstraints($xml, $data);
     }
 
-    // --- METODE PEMBUATAN DEKLARASI (DISESUAIKAN) ---
 
     private function addDaysList(SimpleXMLElement $xml, Collection $days): void
     {
@@ -136,7 +129,7 @@ class FetFileGeneratorService
         foreach ($days as $day) {
             $dayNode = $list->addChild('Day');
             $dayNode->addChild('Name', htmlspecialchars($day->name));
-            $dayNode->addChild('Long_Name', ''); // Penyesuaian
+            $dayNode->addChild('Long_Name', '');
         }
     }
 
@@ -147,7 +140,7 @@ class FetFileGeneratorService
         foreach ($timeSlots as $slot) {
             $hourNode = $list->addChild('Hour');
             $hourNode->addChild('Name', date('H:i', strtotime($slot->start_time)));
-            $hourNode->addChild('Long_Name', ''); // Penyesuaian
+            $hourNode->addChild('Long_Name', '');
         }
     }
 
@@ -156,7 +149,6 @@ class FetFileGeneratorService
         $list = $xml->addChild('Subjects_List');
         foreach ($subjects as $subject) {
             $node = $list->addChild('Subject');
-            // Penyesuaian: <Name> menggunakan nama matkul, sesuai contoh.
             $node->addChild('Name', htmlspecialchars($subject->nama_matkul));
             $node->addChild('Long_Name', '');
             $node->addChild('Code', '');
@@ -170,7 +162,6 @@ class FetFileGeneratorService
         foreach ($tags as $tag) {
             $node = $list->addChild('Activity_Tag');
             $node->addChild('Name', htmlspecialchars($tag->name));
-            // Penyesuaian
             $node->addChild('Long_Name', '');
             $node->addChild('Code', '');
             $node->addChild('Printable', 'true');
@@ -183,9 +174,7 @@ class FetFileGeneratorService
         $list = $xml->addChild('Teachers_List');
         foreach ($teachers as $teacher) {
             $node = $list->addChild('Teacher');
-            // Identifier tetap KODE DOSEN karena unik
             $node->addChild('Name', htmlspecialchars($teacher->kode_dosen));
-            // Penyesuaian: Tambah tag-tag kosong sesuai struktur
             $node->addChild('Long_Name', htmlspecialchars($teacher->nama_dosen));
             $node->addChild('Code', '');
             $node->addChild('Target_Number_of_Hours', '0');
@@ -195,10 +184,7 @@ class FetFileGeneratorService
     }
 
     /**
-     * PERUBAHAN BESAR: Membuat struktur Students_List secara hierarkis/rekursif.
-     * Asumsi: Model StudentGroup memiliki relasi parent-child.
-     * - `parent_id` di tabel `student_groups`
-     * - Relasi di model: `public function childrenRecursive() { return $this->hasMany(StudentGroup::class, 'parent_id')->with('childrenRecursive'); }`
+     * Membuat struktur Students_List secara hierarkis/rekursif.
      */
     private function addStudentsList(SimpleXMLElement $xml, Collection $years): void
     {
@@ -230,7 +216,6 @@ class FetFileGeneratorService
 
         if ($group->childrenRecursive->isNotEmpty()) {
             foreach ($group->childrenRecursive as $subgroup) {
-                // Di FET, level setelah Group adalah Subgroup.
                 $subgroupNode = $groupNode->addChild('Subgroup');
                 $subgroupNode->addChild('Name', htmlspecialchars($subgroup->nama_kelompok));
                 $subgroupNode->addChild('Long_Name', '');
@@ -242,31 +227,39 @@ class FetFileGeneratorService
     }
 
 
+    /**
+     * Perubahan: Memperbarui cara StudentGroups diaktivitas direferensikan.
+     * Sekarang akan menambahkan multiple <Students> tag jika diperlukan.
+     */
     private function addActivitiesList(SimpleXMLElement $xml, Collection $activities): void
     {
         $activitiesList = $xml->addChild('Activities_List');
         foreach ($activities as $activity) {
-            if ($activity->teachers->isEmpty() || !$activity->subject || !$activity->studentGroup) {
+            // Perubahan: Cek studentGroups (plural)
+            if ($activity->teachers->isEmpty() || !$activity->subject || $activity->studentGroups->isEmpty()) {
                 Log::warning("Melewati Aktivitas ID: {$activity->id} karena data Dosen/Matkul/Kelompok tidak lengkap.");
                 continue;
             }
 
             $activityNode = $activitiesList->addChild('Activity');
 
-            // Referensi Dosen tetap menggunakan KODE DOSEN
             foreach($activity->teachers as $teacher) {
                 $activityNode->addChild('Teacher', htmlspecialchars($teacher->kode_dosen));
             }
-            // Penyesuaian: Referensi Matkul menggunakan NAMA MATKUL
             $activityNode->addChild('Subject', htmlspecialchars($activity->subject->nama_matkul));
-            $activityNode->addChild('Students', htmlspecialchars($activity->studentGroup->nama_kelompok));
+
+            // PERUBAHAN UTAMA: Tambahkan multiple <Students> tag untuk setiap grup siswa
+            foreach ($activity->studentGroups as $studentGroup) {
+                $activityNode->addChild('Students', htmlspecialchars($studentGroup->nama_kelompok));
+            }
 
             $activityNode->addChild('Duration', $activity->duration);
             $activityNode->addChild('Total_Duration', $activity->duration);
             $activityNode->addChild('Id', $activity->id);
             $activityNode->addChild('Activity_Group_Id', 0);
             $activityNode->addChild('Active', 'true');
-            $activityNode->addChild('Comments', '');
+            $activityNode->addChild('Comments', htmlspecialchars($activity->name ?? $activity->subject->nama_matkul . ' (' . $activity->studentGroups->pluck('nama_kelompok')->implode(', ') . ')'));
+
 
             if ($activity->activityTag) {
                 $activityNode->addChild('Activity_Tag', htmlspecialchars($activity->activityTag->name));
@@ -280,7 +273,6 @@ class FetFileGeneratorService
         foreach ($buildings as $building) {
             $node = $list->addChild('Building');
             $node->addChild('Name', htmlspecialchars($building->code)); // Menggunakan kode gedung
-            // Penyesuaian
             $node->addChild('Long_Name', '');
             $node->addChild('Code', '');
             $node->addChild('Comments', '');
@@ -293,7 +285,6 @@ class FetFileGeneratorService
         foreach ($rooms as $room) {
             $node = $list->addChild('Room');
             $node->addChild('Name', htmlspecialchars($room->nama_ruangan));
-            // Penyesuaian
             $node->addChild('Long_Name', '');
             $node->addChild('Code', '');
             $node->addChild('Building', htmlspecialchars($room->building->code ?? ''));
@@ -303,7 +294,6 @@ class FetFileGeneratorService
         }
     }
 
-    // --- METODE CONSTRAINTS (PENYESUAIAN IDENTIFIER) ---
 
     private function addTimeConstraints(SimpleXMLElement $xml, array $data): void
     {
@@ -402,7 +392,7 @@ class FetFileGeneratorService
 
     private function addActivityPreferredRooms(SimpleXMLElement $spaceList, Collection $activities, Collection $allRooms): void
     {
-        // 1. Pramuat semua tipe ruangan yang kita butuhkan untuk efisiensi
+
         $labRooms = $allRooms->where('tipe', 'LABORATORIUM');
         $theoryRooms = $allRooms->where('tipe', 'KELAS_TEORI');
 
@@ -427,7 +417,6 @@ class FetFileGeneratorService
                 continue;
             }
 
-            // 3. Buat blok XML Constraint seperti biasa menggunakan data $preferredRooms
             $cNode = $spaceList->addChild('ConstraintActivityPreferredRooms');
             $cNode->addChild('Weight_Percentage', '95');
             $cNode->addChild('Activity_Id', $activity->id);

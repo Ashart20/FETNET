@@ -24,8 +24,8 @@ class ManageStudentGroupConstraints extends Component
         $prodiId = auth()->user()->prodi_id;
         // Ambil data kelompok secara hierarkis untuk dropdown
         $this->studentGroups = StudentGroup::where('prodi_id', $prodiId)
-            ->whereNull('parent_id') // Mulai dari level atas
-            ->with('childrenRecursive') // Muat semua turunannya
+            ->whereNull('parent_id')
+            ->with('childrenRecursive')
             ->orderBy('nama_kelompok')
             ->get();
 
@@ -59,7 +59,6 @@ class ManageStudentGroupConstraints extends Component
             return;
         }
 
-        // Peningkatan Keamanan: Pastikan user hanya bisa mengubah grup di prodinya
         $group = StudentGroup::where('prodi_id', auth()->user()->prodi_id)->find($this->selectedStudentGroupId);
         if (!$group) {
             abort(403, 'Akses ditolak.');
@@ -67,7 +66,6 @@ class ManageStudentGroupConstraints extends Component
 
         $key = $dayId . '-' . $timeSlotId;
 
-        // Perbaikan Efisiensi: Cek dari array, bukan query ke DB
         if (isset($this->constraints[$key])) {
             StudentGroupTimeConstraint::destroy($this->constraints[$key]['id']);
             session()->flash('message', 'Batasan waktu berhasil dihapus.');

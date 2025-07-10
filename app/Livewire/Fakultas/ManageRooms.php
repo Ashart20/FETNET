@@ -37,12 +37,12 @@ class ManageRooms extends Component
     public string $lantai = '';
 
     #[Rule('required|integer|min:1')]
-    public int $kapasitas = 10; // Beri nilai default
+    public int $kapasitas = 10;
 
     #[Rule('required|string|in:KELAS_TEORI,LABORATORIUM,AUDITORIUM')]
     public string $tipe = 'KELAS_TEORI';
 
-    public ?int $roomId = null; // Gunakan tipe data nullable
+    public ?int $roomId = null;
 
     // Properti untuk data dropdown
     public Collection $buildings;
@@ -54,7 +54,7 @@ class ManageRooms extends Component
     #[Rule('required|string|unique:buildings,code', message: 'Kode gedung ini sudah ada.')]
     public string $newBuildingCode = '';
 
-    // 3. Ganti properti isModalOpen dengan ini untuk kontrol modal Mary UI
+
     public bool $roomModal = false;
     public $file;
     /**
@@ -163,11 +163,10 @@ class ManageRooms extends Component
 
         MasterRuangan::updateOrCreate(['id' => $this->roomId], $validatedData);
 
-        // 5. Gunakan notifikasi Toast dari Mary UI
         $message = $this->roomId ? 'Data Ruangan Berhasil Diperbarui.' : 'Data Ruangan Berhasil Ditambahkan.';
         $this->success($message);
 
-        $this->closeModal(); // Tutup modal setelah berhasil
+        $this->closeModal();
     }
 
     public function addNewBuilding(): void
@@ -183,10 +182,10 @@ class ManageRooms extends Component
         ]);
 
         $this->loadBuildings();
-        $this->building_id = $building->id; // Langsung pilih gedung yang baru dibuat
+        $this->building_id = $building->id;
         $this->reset(['newBuildingName', 'newBuildingCode']);
 
-        // 6. Gunakan Toast untuk feedback
+
         $this->info('Gedung baru berhasil ditambahkan!', position: 'toast-bottom');
     }
 
@@ -201,7 +200,7 @@ class ManageRooms extends Component
         $this->lantai = $room->lantai;
         $this->kapasitas = $room->kapasitas;
 
-        $this->roomModal = true; // Buka modal Mary UI
+        $this->roomModal = true;
     }
 
     public function delete(int $id): void
@@ -214,7 +213,7 @@ class ManageRooms extends Component
         }
     }
 
-    // Cukup ganti nama method agar lebih deskriptif
+
     public function closeModal(): void
     {
         $this->roomModal = false;
@@ -223,7 +222,7 @@ class ManageRooms extends Component
 
     private function resetInputFields(): void
     {
-        $this->resetExcept('buildings'); // Jangan reset data dropdown
+        $this->resetExcept('buildings');
         $this->resetErrorBag();
     }
 

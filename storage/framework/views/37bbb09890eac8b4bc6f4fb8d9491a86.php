@@ -63,7 +63,7 @@
                             <th>Jam</th>
                             <th>Mata Kuliah</th>
                             <th>Dosen</th>
-                            <th>Kelas</th>
+                            <th>Kelas</th> 
                             <th>Ruangan</th>
                         </tr>
                         </thead>
@@ -80,16 +80,18 @@
 
                                 </td>
                                 <td>
-                                    <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+                                    
+                                    <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $schedule->activity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $studentGroup): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
-<?php $component = Mary\View\Components\Badge::resolve(['value' => $schedule->activity->studentGroup->nama_kelompok ?? 'N/A'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => $studentGroup->nama_kelompok] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-badge'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'badge-neutral']); ?>
+<?php $component->withAttributes(['class' => 'badge-neutral mr-1 mb-1']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
@@ -100,6 +102,28 @@
 <?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
 <?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
 <?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => 'N/A (Kelompok tidak ditemukan)'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'badge-error']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $attributes = $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                 </td>
                                 <td><?php echo e($schedule->room->nama_ruangan ?? '-'); ?></td>
                             </tr>

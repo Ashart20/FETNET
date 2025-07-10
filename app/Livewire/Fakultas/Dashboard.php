@@ -23,7 +23,6 @@ class Dashboard extends Component
 
     public function render(): View
     {
-        // PERBAIKAN: Hapus awalan "view:"
         return view('livewire.fakultas.dashboard')
             ->layout('layouts.app');
     }

@@ -17,7 +17,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // PERBAIKAN: Tambahkan logika untuk membatalkan migrasi.
             $table->dropForeign(['student_group_id']);
             $table->dropColumn('student_group_id');
         });

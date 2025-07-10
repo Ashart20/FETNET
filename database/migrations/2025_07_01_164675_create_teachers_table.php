@@ -14,8 +14,8 @@ return new class extends Migration
     {
         Schema::create('teachers', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_dosen'); // <-- UBAH INI
-            $table->string('kode_dosen')->unique(); // <-- UBAH INI
+            $table->string('nama_dosen');
+            $table->string('kode_dosen')->unique();
             //$table->foreignId('prodi_id')->constrained('prodis')->onDelete('cascade');
             $table->timestamps();
         });

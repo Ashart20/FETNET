@@ -5,14 +5,11 @@
     <div class="p-6 lg:p-8">
         {{-- Header halaman --}}
         <x-mary-header title="Manajemen Ruangan" subtitle="Kelola semua ruangan untuk penjadwalan." />
-
-        {{-- [PERUBAHAN 1]: Tombol-tombol aksi dikelompokkan di sini --}}
         <div class="my-3 flex flex-wrap gap-2">
             <x-mary-button label="Tambah Ruangan" icon="o-plus" class="btn-primary" @click="$wire.create()" />
             <x-mary-button label="Unduh Template Excel" icon="o-document-arrow-down" class="btn-secondary" wire:click="downloadTemplate" spinner />
         </div>
 
-        {{-- Tabel untuk menampilkan data ruangan (Tidak ada perubahan di sini) --}}
         <x-mary-table :headers="$this->headers()" :rows="$rooms" with-pagination>
             {{-- Menggunakan relasi untuk menampilkan nama gedung --}}
             @scope('cell_building.name', $room)
@@ -33,13 +30,11 @@
             @endscope
         </x-mary-table>
 
-        {{-- [PERUBAHAN 2]: Bagian khusus untuk Impor Excel ditambahkan di bawah tabel --}}
         <div class="my-6 p-4 bg-white dark:bg-gray-800/50 shadow-sm rounded-xl border dark:border-gray-700">
             <h3 class="font-semibold text-gray-900 dark:text-white">Impor Data dari Excel</h3>
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Unggah file .xlsx dengan header: `nama_ruangan`, `kode_ruangan`, `kode_gedung`, `lantai`, `kapasitas`, `tipe`.</p>
 
             <div class="mt-4">
-                {{-- Input ini sekarang langsung memicu proses impor saat file dipilih --}}
                 <x-mary-file wire:model.live="file" label="Pilih File Excel" hint="Hanya .xlsx" spinner />
 
                 {{-- Indikator loading saat file sedang di-upload dan diproses --}}
@@ -53,7 +48,6 @@
 
     </div>
 
-    {{-- Modal Form (Tidak ada perubahan, hanya dipastikan ada) --}}
     <x-mary-modal wire:model="roomModal" title="{{ $roomId ? 'Edit' : 'Tambah' }} Ruangan" separator>
         <x-mary-form wire:submit="store">
             <div class="space-y-4">

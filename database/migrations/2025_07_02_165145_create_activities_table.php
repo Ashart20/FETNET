@@ -11,8 +11,6 @@ return new class extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
 
-            // PERBAIKAN: Hapus 'teacher_id' dari sini.
-
             $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade');
             $table->foreignId('student_group_id')->constrained('student_groups')->onDelete('cascade');
             $table->foreignId('activity_tag_id')->nullable()->constrained('activity_tags')->onDelete('set null');

@@ -16,9 +16,6 @@ return new class extends Migration
 
             // Dosen mana yang dibatasi
             $table->foreignId('teacher_id')->constrained('teachers')->onDelete('cascade');
-
-            // Kapan dibatasinya (
-            //        // database/migrations/xxxx_create_teacher_time_constrmenggunakan tabel yang sudah ada)
             $table->foreignId('day_id')->constrained('days')->onDelete('cascade');
             $table->foreignId('time_slot_id')->constrained('time_slots')->onDelete('cascade');
 

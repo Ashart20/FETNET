@@ -11,7 +11,6 @@
                     Pastikan semua data di setiap prodi (dosen, matkul, aktivitas, dan batasan) sudah lengkap. Proses ini akan berjalan di latar belakang.
                 </p>
 
-                {{-- PERBAIKAN: Menggunakan slot komponen untuk kontrol warna teks yang lebih baik --}}
                 @if (session('status'))
                     <x-mary-alert icon="o-information-circle" class="alert-info mb-4">
                         <span class="text-white">{{ session('status') }}</span>

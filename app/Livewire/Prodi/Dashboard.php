@@ -23,7 +23,7 @@ class Dashboard extends Component
         }
 
         $totalDosen = 0;
-        // Jika prodi tergabung dalam cluster
+
         if ($prodi->cluster_id) {
             // [1] Dapatkan semua ID prodi dalam cluster yang sama
             $prodiIdsInCluster = Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');

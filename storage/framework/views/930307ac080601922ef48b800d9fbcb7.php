@@ -75,6 +75,52 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Table::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_student_group_names', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?> 
+            <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $activity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => $group->nama_kelompok] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'badge-neutral mr-1 mb-1']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $attributes = $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => 'Tidak ada kelompok'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'badge-error']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $attributes = $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+            <?php }); ?>
+
             <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('actions', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
             <div class="flex gap-2">
                 <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
@@ -153,7 +199,6 @@
 <?php endif; ?>
 <?php $component->withAttributes(['wire:submit' => 'store']); ?>
             <div class="space-y-4">
-                
                 <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
 <?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Dosen','options' => $teachers,'optionLabel' => 'nama_dosen','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -194,26 +239,29 @@
 <?php $component = $__componentOriginald64144c2287634503c73cd4803d6e578; ?>
 <?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
 <?php endif; ?>
-                <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Kelompok Mahasiswa','options' => $studentGroups,'optionLabel' => 'nama_kelompok','placeholder' => '-- Pilih --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-select'); ?>
+
+
+                <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
+<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Kelompok Mahasiswa','options' => $allStudentGroups,'optionLabel' => 'nama_kelompok','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-choices'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Select::ignoredParameterNames()); ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'student_group_id']); ?>
+<?php $component->withAttributes(['wire:model' => 'selectedStudentGroupIds','multiple' => true,'placeholder' => '-- Pilih Kelompok --']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginald64144c2287634503c73cd4803d6e578)): ?>
-<?php $attributes = $__attributesOriginald64144c2287634503c73cd4803d6e578; ?>
-<?php unset($__attributesOriginald64144c2287634503c73cd4803d6e578); ?>
+<?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
+<?php $attributes = $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
+<?php unset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginald64144c2287634503c73cd4803d6e578)): ?>
-<?php $component = $__componentOriginald64144c2287634503c73cd4803d6e578; ?>
-<?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
+<?php if (isset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
+<?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
+<?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
 <?php endif; ?>
+
                 <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
 <?php $component = Mary\View\Components\Select::resolve(['label' => 'Tag Aktivitas (Opsional)','options' => $activityTags,'optionLabel' => 'name','placeholder' => '-- Tidak ada --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -234,6 +282,27 @@
 <?php $component = $__componentOriginald64144c2287634503c73cd4803d6e578; ?>
 <?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
 <?php endif; ?>
+                <?php if (isset($component)) { $__componentOriginalf51438a7488970badd535e5f203e0c1b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf51438a7488970badd535e5f203e0c1b = $attributes; } ?>
+<?php $component = Mary\View\Components\Input::resolve(['label' => 'Nama Aktivitas (Opsional)'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Input::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model' => 'name','placeholder' => 'Contoh: Kuliah Gabungan A']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf51438a7488970badd535e5f203e0c1b)): ?>
+<?php $attributes = $__attributesOriginalf51438a7488970badd535e5f203e0c1b; ?>
+<?php unset($__attributesOriginalf51438a7488970badd535e5f203e0c1b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf51438a7488970badd535e5f203e0c1b)): ?>
+<?php $component = $__componentOriginalf51438a7488970badd535e5f203e0c1b; ?>
+<?php unset($__componentOriginalf51438a7488970badd535e5f203e0c1b); ?>
+<?php endif; ?>
+
             </div>
 
              <?php $__env->slot('actions', null, []); ?> 

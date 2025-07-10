@@ -9,16 +9,16 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SubjectsImport;
-use App\Exports\SubjectTemplateExport; // Asumsikan kelas ini ada atau akan dibuat
+use App\Exports\SubjectTemplateExport;
 use Maatwebsite\Excel\Validators\ValidationException;
 use Maatwebsite\Excel\Excel as ExcelType;
-use Illuminate\Support\Facades\Storage; // Digunakan untuk mengunduh file
-use Mary\Traits\Toast; // Import Mary UI Toast trait
+use Illuminate\Support\Facades\Storage;
+use Mary\Traits\Toast;
 
 
 class ManageSubjects extends Component
 {
-    use WithPagination,  WithFileUploads, Toast; // Tambahkan Toast trait
+    use WithPagination,  WithFileUploads, Toast;
 
     // Properti untuk form modal
     public ?int $subjectId = null;
@@ -26,7 +26,7 @@ class ManageSubjects extends Component
     public string $kode_matkul = '';
     public ?int $sks = null;
     public $file;
-    public bool $subjectModal = false; // Ganti isModalOpen menjadi subjectModal
+    public bool $subjectModal = false;
 
     /**
      * Mendefinisikan aturan validasi secara dinamis.
@@ -34,7 +34,6 @@ class ManageSubjects extends Component
     public function rules()
     {
         return [
-            // PERBAIKAN: Validasi unique sekarang ada di nama_matkul, bukan kode_matkul
             'nama_matkul' => [
                 'required',
                 'string',
@@ -172,16 +171,16 @@ class ManageSubjects extends Component
         }
     }
 
-    public function openModal() { $this->subjectModal = true; } // Ganti isModalOpen
+    public function openModal() { $this->subjectModal = true; }
 
     public function closeModal() {
-        $this->subjectModal = false; // Ganti isModalOpen
+        $this->subjectModal = false;
         $this->resetInputFields();
     }
 
     private function resetInputFields()
     {
-        $this->reset(); // Mereset semua properti, termasuk file
+        $this->reset();
         $this->resetErrorBag();
     }
 }

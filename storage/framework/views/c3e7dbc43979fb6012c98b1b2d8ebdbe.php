@@ -44,8 +44,50 @@
         <?php }); ?>
 
         
-        <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_studentGroup___nama_kelompok', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
-        <div><?php echo e($activity->studentGroup->nama_kelompok ?? 'N/A'); ?></div>
+        <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_student_group_names', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+        <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $activity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => $group->nama_kelompok] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'badge-neutral mr-1 mb-1']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $attributes = $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+            <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => 'N/A (Kelompok tidak ditemukan)'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'badge-error']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $attributes = $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         <?php }); ?>
 
         
@@ -145,7 +187,15 @@
                 Mengatur preferensi untuk:
                 <span class="font-bold text-primary"><?php echo e($selectedActivity->subject->nama_matkul ?? 'N/A'); ?></span>
                 -
-                <span class="text-sm"><?php echo e($selectedActivity->studentGroup->nama_kelompok ?? 'N/A'); ?></span>
+                
+                <span class="text-sm">
+                    <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $selectedActivity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <?php echo e($group->nama_kelompok); ?><?php echo e(!$loop->last ? ', ' : ''); ?>
+
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        N/A (Kelompok tidak ditemukan)
+                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                </span>
             </p>
             <?php if (isset($component)) { $__componentOriginal6bfd0631c6b8a47111403266db046f63 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal6bfd0631c6b8a47111403266db046f63 = $attributes; } ?>

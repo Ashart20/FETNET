@@ -111,7 +111,6 @@
                         Jadwal Utama
                     </a>
                 </li>
-                {{-- Tambahkan link untuk halaman Generate Jadwal di sini juga --}}
                 <li>
                     <a href="{{ route('fakultas.generate.index') }}" @if(request()->routeIs('fakultas.generate.index')) class="active" @endif>
                         <x-mary-icon name="o-rocket-launch" />
@@ -136,7 +135,7 @@
         <x-mary-theme-toggle class="btn btn-ghost btn-circle" />
 
         @auth
-            {{-- PERBAIKAN DI SINI: Avatar Sederhana dengan Nama Pengguna --}}
+
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost">
                     {{-- Tampilkan nama pengguna yang sedang login --}}

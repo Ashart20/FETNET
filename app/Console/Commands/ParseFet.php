@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use SimpleXMLElement;
 
 class ParseFet extends Command
 {
@@ -38,16 +39,17 @@ class ParseFet extends Command
             }
 
             DB::transaction(function () use ($xml) {
-                // 1. Persiapan: Hapus data lama dan pramuat data master
+
                 if (!$this->option('no-cleanup')) {
                     $this->cleanupOldSchedule();
                 }
                 $daysMap = Day::all()->keyBy('name');
                 $timeSlotsMap = TimeSlot::all()->keyBy(fn($slot) => date('H:i', strtotime($slot->start_time)));
                 $roomsMap = MasterRuangan::all()->keyBy('nama_ruangan');
-                $activitiesMap = Activity::with('teachers', 'subject', 'studentGroup')->get()->keyBy('id');
+                // PERUBAHAN UTAMA: Mengubah 'studentGroup' menjadi 'studentGroups'
+                $activitiesMap = Activity::with('teachers', 'subject', 'studentGroups')->get()->keyBy('id'); // Perubahan
 
-                // 2. PERUBAHAN UTAMA: Buat Peta Penempatan dari Constraint Lists
+
                 $timePlacements = $this->buildTimePlacements($xml);
                 $roomPlacements = $this->buildRoomPlacements($xml);
 
@@ -56,7 +58,7 @@ class ParseFet extends Command
                 $importedCount = 0;
                 $skippedCount = 0;
 
-                // 3. Loop utama melalui SEMUA aktivitas yang ada di file
+
                 foreach ($xml->Activities_List->Activity ?? [] as $activityXml) {
                     $activityId = (int)$activityXml->Id;
 
@@ -90,6 +92,7 @@ class ParseFet extends Command
                             'time_slot_id'     => $timeSlot->id,
                             'day_id'           => $day->id,
                         ]);
+
 
                         if ($schedule && $activity->teachers->isNotEmpty()) {
                             $schedule->teachers()->sync($activity->teachers->pluck('id'));
@@ -139,12 +142,10 @@ class ParseFet extends Command
 
     /**
      * Membuat kamus [activity_id => room_name] dari constraint ruang.
-     * ASUMSI: Struktur constraint ruang mirip dengan constraint waktu.
      */
     private function buildRoomPlacements(\SimpleXMLElement $xml): array
     {
         $placements = [];
-        // Perhatikan nama constraint ini mungkin berbeda di file Anda. Sesuaikan jika perlu.
         foreach($xml->Space_Constraints_List->ConstraintActivityPreferredRoom ?? [] as $c) {
             $placements[(int)$c->Activity_Id] = (string)$c->Room;
         }

@@ -68,9 +68,7 @@ Route::middleware(['auth', 'role:prodi'])->prefix('prodi')->name('prodi.')->grou
 // GRUP RUTE UNTUK MAHASISWA
 // ==========================================================
 Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-    // Ganti 'ProdiDashboard' dengan Dasbor Mahasiswa jika sudah dibuat
     Route::get('/dashboard', MahasiswaDashboard::class)->name('dashboard');
-    // Contoh: Route::get('/jadwal-saya', LihatJadwalMahasiswa::class)->name('jadwal.saya');
 });
 
 

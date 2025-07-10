@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
             $table->string('nama_matkul');
-            $table->string('kode_matkul'); // Sebaiknya tidak unique secara global jika tidak perlu
+            $table->string('kode_matkul');
             $table->integer('sks');
-            $table->text('comments')->nullable(); // <-- TAMBAHKAN INI (sesuai contoh .fet)
+            $table->text('comments')->nullable();
 
             $table->foreignId('prodi_id')
                 ->constrained('prodis')
@@ -21,8 +21,6 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // KUNCI PERBAIKAN: Membuat nama matkul unik untuk setiap prodi.
-            // Mencegah ada 2 matkul "Kalkulus" di prodi yang sama.
             $table->unique(['nama_matkul', 'prodi_id']);
         });
     }

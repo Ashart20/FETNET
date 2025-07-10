@@ -77,7 +77,7 @@ class GenerateFetFileJob implements ShouldQueue
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            // Melempar kembali exception akan menyebabkan job ini ditandai sebagai 'failed'.
+
             throw $e;
         }
     }
@@ -158,8 +158,7 @@ class GenerateFetFileJob implements ShouldQueue
      */
     public function failed(Throwable $exception): void
     {
-        // Method ini akan dipanggil jika job gagal setelah semua percobaan (`$tries`).
-        // Berguna untuk mengirim notifikasi ke admin.
+
         Log::critical("GenerateFetFileJob untuk Prodi {$this->prodi->nama_prodi} TELAH GAGAL PERMANEN.", [
             'exception_message' => $exception->getMessage(),
         ]);

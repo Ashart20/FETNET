@@ -16,9 +16,12 @@
         <div>{{ $activity->prodi->nama_prodi ?? 'N/A' }}</div>
         @endscope
 
-        {{-- Scope untuk menampilkan nama kelompok mahasiswa --}}
-        @scope('cell_studentGroup.nama_kelompok', $activity)
-        <div>{{ $activity->studentGroup->nama_kelompok ?? 'N/A' }}</div>
+        @scope('cell_student_group_names', $activity)
+        @forelse($activity->studentGroups as $group)
+            <x-mary-badge :value="$group->nama_kelompok" class="badge-neutral mr-1 mb-1" />
+        @empty
+            <x-mary-badge value="N/A (Kelompok tidak ditemukan)" class="badge-error" />
+        @endforelse
         @endscope
 
         {{-- Scope untuk menampilkan preferensi ruangan dengan badge --}}
@@ -36,14 +39,20 @@
         @endscope
     </x-mary-table>
 
-    {{-- Modal Pengaturan Preferensi (tidak ada perubahan di sini) --}}
+    {{-- Modal Pengaturan Preferensi --}}
     <x-mary-modal wire:model="preferenceModal" title="Atur Preferensi Ruangan" separator>
         @if($selectedActivity)
             <p class="mb-4">
                 Mengatur preferensi untuk:
                 <span class="font-bold text-primary">{{ $selectedActivity->subject->nama_matkul ?? 'N/A' }}</span>
                 -
-                <span class="text-sm">{{ $selectedActivity->studentGroup->nama_kelompok ?? 'N/A' }}</span>
+                <span class="text-sm">
+                    @forelse($selectedActivity->studentGroups as $group)
+                        {{ $group->nama_kelompok }}{{ !$loop->last ? ', ' : '' }}
+                    @empty
+                        N/A (Kelompok tidak ditemukan)
+                    @endforelse
+                </span>
             </p>
             <x-mary-form wire:submit="savePreferences">
                 <x-mary-choices

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('nama_ruangan');
             $table->string('kode_ruangan')->unique();
 
-            // PERBAIKAN: Gunakan foreignId untuk relasi ke tabel 'buildings'
+
             $table->foreignId('building_id')->nullable()->constrained('buildings')->onDelete('set null');
 
             $table->string('lantai');

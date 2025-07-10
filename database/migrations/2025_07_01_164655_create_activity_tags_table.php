@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // database/migrations/xxxx_create_activity_tags_table.php
+
         Schema::create('activity_tags', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique(); // Contoh: PRAKTIKUM, PILIHAN

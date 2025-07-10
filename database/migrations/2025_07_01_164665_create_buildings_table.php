@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // database/migrations/xxxx_create_buildings_table.php
+
         Schema::create('buildings', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique(); // Contoh: "Gedung A", "Gedung B"

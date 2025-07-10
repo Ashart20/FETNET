@@ -13,7 +13,6 @@ return new class extends Migration
             $table->string('name'); // Contoh: '07:00'
             $table->time('start_time');
             $table->time('end_time');
-            // PERBAIKAN: Hapus timestamps agar sesuai dengan model.
         });
     }
 

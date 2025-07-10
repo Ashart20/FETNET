@@ -31,8 +31,6 @@
         </x-mary-table>
 
         {{-- Modal untuk form tambah/edit --}}
-        {{-- Di dalam file .../manage-prodi.blade.php --}}
-
         <x-mary-modal wire:model="prodiModal" title="{{ $prodiId ? 'Edit' : 'Tambah' }} Prodi & User" separator>
             <x-mary-form wire:submit="store">
                 {{-- Gunakan Grid untuk membagi form menjadi 2 kolom --}}
@@ -49,7 +47,6 @@
                             @if(session('cluster-message'))
                                 <x-mary-alert :description="session('cluster-message')" icon="o-check-circle" class="alert-success text-xs" />
                             @endif
-                            {{-- Dibuat vertikal agar lebih rapi --}}
                             <x-mary-input wire:model="newClusterName" label="Nama Cluster Baru" placeholder="Contoh:Departemen Pendidikan Elektro" />
                             <x-mary-input wire:model="newClusterCode" label="Kode Cluster Baru" placeholder="Contoh: DPTE" />
                             <x-mary-button label="Simpan Cluster" wire:click="addNewCluster" class="btn-primary btn-sm w-full" spinner="addNewCluster" />

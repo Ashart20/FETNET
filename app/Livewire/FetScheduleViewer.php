@@ -36,7 +36,6 @@ class FetScheduleViewer extends Component
 
     /**
      * Listener untuk event broadcast.
-     * Menggunakan atribut #[On] dari Livewire 3.
      */
     #[On(ScheduleDataUpdatedEvent::class)]
     public function refreshScheduleData(): void
@@ -58,15 +57,11 @@ class FetScheduleViewer extends Component
         $this->daftarRuangan = MasterRuangan::orderBy('nama_ruangan')->pluck('nama_ruangan')->toArray();
 
         $this->daftarKelas = StudentGroup::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))
-            ->whereNotNull('parent_id')
             ->orderBy('nama_kelompok')
             ->pluck('nama_kelompok')
-            ->toArray();
+            ->toArray(); //
         $this->daftarMatkul = Subject::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))->orderBy('nama_matkul')->pluck('nama_matkul')->toArray();
-
-        // PERBAIKAN DI SINI
         $this->daftarDosen = Teacher::when($prodiId, function ($query) use ($prodiId) {
-            // Ambil dosen yang memiliki relasi dengan prodi yang sedang login
             $query->whereHas('prodis', function ($subQuery) use ($prodiId) {
                 $subQuery->where('prodis.id', $prodiId);
             });
@@ -94,32 +89,29 @@ class FetScheduleViewer extends Component
         $user = Auth::user();
         $prodiId = $user?->prodi_id;
         $studentGroupId = $user?->student_group_id;
-
-        // Eager load semua relasi yang dibutuhkan untuk performa optimal
         $query = Schedule::query()->with([
-            'day', 'timeSlot', 'room', 'activity.subject', 'activity.studentGroup', 'activity.teachers'
+            'day', 'timeSlot', 'room', 'activity.subject', 'activity.studentGroups', 'activity.teachers' //
         ]);
 
         // Terapkan filter berdasarkan peran pengguna
         if ($user->hasRole('prodi') && $prodiId) {
             $query->whereHas('activity.subject', fn($q) => $q->where('prodi_id', $prodiId));
         } elseif ($user->hasRole('mahasiswa') && $studentGroupId) {
-            $query->whereHas('activity.studentGroup', fn($q) => $q->where('id', $studentGroupId));
+            $query->whereHas('activity.studentGroups', fn($q) => $q->where('id', $studentGroupId)); // Perubahan
         }
 
         // Terapkan filter dari dropdown
         $query->when($this->filterHari, fn($q, $val) => $q->whereHas('day', fn($sub) => $sub->where('name', $val)));
         $query->when($this->filterRuangan, fn($q, $val) => $q->whereHas('room', fn($sub) => $sub->where('nama_ruangan', $val)));
         $query->when($this->filterDosen, fn($q, $val) => $q->whereHas('activity.teachers', fn($sub) => $sub->where('nama_dosen', $val)));
-        $query->when($this->filterKelas, fn($q, $val) => $q->whereHas('activity.studentGroup', fn($sub) => $sub->where('nama_kelompok', $val)));
+        $query->when($this->filterKelas, fn($q, $val) => $q->whereHas('activity.studentGroups', fn($sub) => $sub->where('nama_kelompok', $val))); // Perubahan
         $query->when($this->filterMatkul, fn($q, $val) => $q->whereHas('activity.subject', fn($sub) => $sub->where('nama_matkul', $val)));
 
-        // Urutkan hasil akhir agar lebih rapi
         $jadwal = $query->join('days', 'schedules.day_id', '=', 'days.id')
             ->join('time_slots', 'schedules.time_slot_id', '=', 'time_slots.id')
             ->orderBy('days.id')
             ->orderBy('time_slots.start_time')
-            ->select('schedules.*') // Penting untuk menghindari konflik nama kolom
+            ->select('schedules.*')
             ->paginate(25);
 
         return view('livewire.fet-schedule-viewer', [

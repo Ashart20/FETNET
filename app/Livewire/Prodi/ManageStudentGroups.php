@@ -5,11 +5,11 @@ namespace App\Livewire\Prodi;
 use App\Models\StudentGroup;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
-use Mary\Traits\Toast; // Jangan lupa use Toast
+use Mary\Traits\Toast;
 
 class ManageStudentGroups extends Component
 {
-    use Toast; // Aktifkan Toast
+    use Toast;
 
     public $groups;
 
@@ -21,7 +21,6 @@ class ManageStudentGroups extends Component
     public ?int $jumlah_mahasiswa = null;
     public string $angkatan = '';
 
-    // PERUBAHAN: Ganti nama properti untuk kontrol modal
     public bool $studentGroupModal = false;
 
     public function rules()

@@ -3,7 +3,7 @@
     <x-mary-toast />
 
     <div class="p-4">
-        {{-- 1. Gunakan Header dari Mary UI --}}
+
         <x-mary-header title="Manajemen Data Mata Kuliah" subtitle="Kelola semua mata kuliah untuk prodi Anda.">
             <x-slot:actions>
                 {{-- 2. Kelompokkan semua tombol aksi di sini --}}
@@ -38,7 +38,6 @@
 
     {{-- Modal Form --}}
     <x-mary-modal wire:model="subjectModal" title="{{ $subjectId ? 'Edit Mata Kuliah' : 'Tambah Mata Kuliah' }}" separator>
-        {{-- Include modal content. Pastikan input di dalamnya sudah menggunakan `input-bordered` --}}
         @include('livewire.prodi.subject-modal')
     </x-mary-modal>
 </div>

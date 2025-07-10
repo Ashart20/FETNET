@@ -6,7 +6,7 @@
     </div>
 
     @if($schedules->isNotEmpty())
-        {{-- Kelompokkan jadwal berdasarkan hari secara manual di view --}}
+        {{-- Kelompokkan jadwal berdasarkan hari secara manually di view --}}
         @foreach($schedules->groupBy('day.name') as $day => $daySchedules)
             <x-mary-card :title="$day" class="shadow-sm mb-6">
                 <div class="overflow-x-auto">
@@ -32,7 +32,11 @@
                                     {!! $schedule->activity->teachers->pluck('nama_dosen')->implode('<br>') !!}
                                 </td>
                                 <td>
-                                    <x-mary-badge :value="$schedule->activity->studentGroup->nama_kelompok ?? 'N/A'" class="badge-neutral" />
+                                    @forelse($schedule->activity->studentGroups as $studentGroup)
+                                        <x-mary-badge :value="$studentGroup->nama_kelompok" class="badge-neutral mr-1 mb-1" />
+                                    @empty
+                                        <x-mary-badge value="N/A (Kelompok tidak ditemukan)" class="badge-error" />
+                                    @endforelse
                                 </td>
                                 <td>{{ $schedule->room->nama_ruangan ?? '-' }}</td>
                             </tr>

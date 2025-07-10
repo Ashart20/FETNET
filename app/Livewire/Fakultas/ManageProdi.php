@@ -45,12 +45,11 @@ class ManageProdi extends Component
 
     public function loadClusters(): void
     {
-        // Asumsi user fakultas tidak terikat prodi, jadi kita ambil semua cluster
-        // Jika cluster harus terikat user, gunakan: Cluster::where('user_id', auth()->id())->...
+
         $this->clusters = Cluster::orderBy('name')->get();
     }
 
-    // Method untuk mendefinisikan header tabel Merry UI
+
     public function headers(): array
     {
         return [
@@ -68,7 +67,7 @@ class ManageProdi extends Component
         ])->layout('layouts.app');
     }
 
-    // Method untuk menambah cluster baru dari dalam modal
+
     public function addNewCluster(): void
     {
         $validated = $this->validate([
@@ -76,7 +75,7 @@ class ManageProdi extends Component
             'newClusterCode' => ['required', 'string', 'max:10', Rule::unique('clusters', 'code')->where('user_id', auth()->id())],
         ]);
 
-        // PERBAIKAN: Hapus tanda komentar dari baris user_id
+
         $cluster = Cluster::create([
             'name' => $validated['newClusterName'],
             'code' => $validated['newClusterCode'],

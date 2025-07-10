@@ -13,8 +13,7 @@ class Activity extends Model
 
     protected $fillable = [
         'subject_id',
-        'student_group_id',
-        'activity_tag_id', // <-- TAMBAHKAN: Ini dibutuhkan
+        'activity_tag_id',
         'duration',
         'prodi_id',
     ];
@@ -40,12 +39,11 @@ class Activity extends Model
     {
         return $this->belongsTo(Subject::class);
     }
-
-    public function studentGroup(): BelongsTo
+    public function studentGroups(): BelongsToMany
     {
-        return $this->belongsTo(StudentGroup::class);
-    }
 
+        return $this->belongsToMany(StudentGroup::class, 'activity_student_group');
+    }
     public function activityTag(): BelongsTo
     {
         return $this->belongsTo(ActivityTag::class);
