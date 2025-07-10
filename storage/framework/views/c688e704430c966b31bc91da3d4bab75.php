@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+
+    <!DOCTYPE html>
 <html lang="id" data-theme="light">
 <head>
     <meta charset="utf-8">
@@ -24,8 +26,21 @@
         <ul class="menu menu-horizontal px-1">
             <?php if(auth()->guard()->check()): ?>
                 
-                <li><a href="<?php echo e(route('fakultas.dashboard')); ?>" <?php if(request()->routeIs('fakultas.dashboard')): ?> class="active" <?php endif; ?>>
-                        <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+                <li>
+                    <?php
+                        $dashboardRouteName = '';
+                        if (auth()->user()->hasRole('fakultas')) {
+                            $dashboardRouteName = 'fakultas.dashboard';
+                        } elseif (auth()->user()->hasRole('prodi')) {
+                            $dashboardRouteName = 'prodi.dashboard';
+                        } elseif (auth()->user()->hasRole('mahasiswa')) {
+                            $dashboardRouteName = 'mahasiswa.dashboard';
+                        }
+                    ?>
+
+                    <?php if($dashboardRouteName): ?>
+                        <a href="<?php echo e(route($dashboardRouteName)); ?>" <?php if(request()->routeIs($dashboardRouteName)): ?> class="active" <?php endif; ?>>
+                            <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
 <?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-home'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-icon'); ?>
@@ -45,7 +60,33 @@
 <?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
 <?php endif; ?> Dashboard
-                    </a></li>
+                        </a>
+                    <?php else: ?>
+                        
+                        <a href="/dashboard" class="btn btn-ghost">
+                            <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-home'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-icon'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?> Dashboard (Default)
+                        </a>
+                    <?php endif; ?>
+                </li>
 
                 
                 <?php if (\Illuminate\Support\Facades\Blade::check('role', 'fakultas')): ?>
@@ -226,11 +267,11 @@
 <?php endif; ?>
 
         <?php if(auth()->guard()->check()): ?>
+            
             <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                    <div class="w-10 rounded-full">
-                        <img alt="Avatar" src="https://ui.mary-ui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                    </div>
+                <div tabindex="0" role="button" class="btn btn-ghost">
+                    
+                    <span><?php echo e(Auth::user()->name); ?></span>
                 </div>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[20] p-2 shadow bg-base-100 rounded-box w-52">
                     <li><a href="<?php echo e(route('profile.edit')); ?>">Profil</a></li>

@@ -231,4 +231,5 @@ class ManageRooms extends Component
     {
         $this->buildings = Building::orderBy('name')->get();
     }
+
 }

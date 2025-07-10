@@ -23,7 +23,9 @@ class ManageTeacherConstraints extends Component
     public function mount(): void
     {
         $prodiId = auth()->user()->prodi_id;
-        $this->teachers = Teacher::where('prodi_id', $prodiId)->orderBy('nama_dosen')->get();
+        $this->teachers = Teacher::whereHas('prodis', function ($query) use ($prodiId) {
+            $query->where('prodis.id', $prodiId);
+        })->orderBy('nama_dosen')->get();
         $this->days = Day::orderBy('id')->get(); // Pastikan urutan hari benar
         $this->timeSlots = TimeSlot::orderBy('start_time')->get();
 

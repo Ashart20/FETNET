@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+{{-- ashart20/fetnet/FETNET-f0e9b4000a74552ad1e6adafe3c041322f28764b/resources/views/layouts/app.blade.php --}}
+
+    <!DOCTYPE html>
 <html lang="id" data-theme="light">
 <head>
     <meta charset="utf-8">
@@ -22,10 +24,30 @@
         {{-- Menu Manual dengan komponen Mary UI --}}
         <ul class="menu menu-horizontal px-1">
             @auth
-                {{-- LINK UMUM --}}
-                <li><a href="{{ route('fakultas.dashboard') }}" @if(request()->routeIs('fakultas.dashboard')) class="active" @endif>
-                        <x-mary-icon name="o-home" /> Dashboard
-                    </a></li>
+                {{-- LINK UMUM - DASHBOARD DINAMIS --}}
+                <li>
+                    @php
+                        $dashboardRouteName = '';
+                        if (auth()->user()->hasRole('fakultas')) {
+                            $dashboardRouteName = 'fakultas.dashboard';
+                        } elseif (auth()->user()->hasRole('prodi')) {
+                            $dashboardRouteName = 'prodi.dashboard';
+                        } elseif (auth()->user()->hasRole('mahasiswa')) {
+                            $dashboardRouteName = 'mahasiswa.dashboard';
+                        }
+                    @endphp
+
+                    @if ($dashboardRouteName)
+                        <a href="{{ route($dashboardRouteName) }}" @if(request()->routeIs($dashboardRouteName)) class="active" @endif>
+                            <x-mary-icon name="o-home" /> Dashboard
+                        </a>
+                    @else
+                        {{-- Fallback jika user tidak memiliki peran dashboard yang terdefinisi --}}
+                        <a href="/dashboard" class="btn btn-ghost">
+                            <x-mary-icon name="o-home" /> Dashboard (Default)
+                        </a>
+                    @endif
+                </li>
 
                 {{-- MENU FAKULTAS --}}
                 @role('fakultas')
@@ -80,7 +102,7 @@
                 </li>
                 @endrole
 
-                {{-- LINK UMUM --}}
+                {{-- LINK UMUM (Jadwal Utama) --}}
                 <li><a href="{{ route('hasil.fet') }}" @if(request()->routeIs('hasil.fet')) class="active" @endif>
                         <x-mary-icon name="o-calendar-days" /> Jadwal Utama
                     </a></li>
@@ -92,11 +114,11 @@
         <x-mary-theme-toggle class="btn btn-ghost btn-circle" />
 
         @auth
+            {{-- PERBAIKAN DI SINI: Avatar Sederhana dengan Nama Pengguna --}}
             <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                    <div class="w-10 rounded-full">
-                        <img alt="Avatar" src="https://ui.mary-ui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                    </div>
+                <div tabindex="0" role="button" class="btn btn-ghost">
+                    {{-- Tampilkan nama pengguna yang sedang login --}}
+                    <span>{{ Auth::user()->name }}</span>
                 </div>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[20] p-2 shadow bg-base-100 rounded-box w-52">
                     <li><a href="{{ route('profile.edit') }}">Profil</a></li>

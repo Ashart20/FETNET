@@ -51,7 +51,10 @@ class ManageActivities extends Component
     public function mount()
     {
         $prodiId = auth()->user()->prodi_id;
-        $this->teachers = Teacher::where('prodi_id', $prodiId)->orderBy('nama_dosen')->get();
+
+        $this->teachers = Teacher::whereHas('prodis', function ($query) use ($prodiId) {
+            $query->where('prodis.id', $prodiId);
+        })->orderBy('nama_dosen')->get();
         $this->subjects = Subject::where('prodi_id', $prodiId)->orderBy('nama_matkul')->get();
         $this->studentGroups = StudentGroup::where('prodi_id', $prodiId)
             ->whereNotNull('parent_id')
