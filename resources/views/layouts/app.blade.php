@@ -1,6 +1,4 @@
-{{-- ashart20/fetnet/FETNET-f0e9b4000a74552ad1e6adafe3c041322f28764b/resources/views/layouts/app.blade.php --}}
-
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id" data-theme="light">
 <head>
     <meta charset="utf-8">
@@ -115,6 +113,12 @@
                     <a href="{{ route('fakultas.generate.index') }}" @if(request()->routeIs('fakultas.generate.index')) class="active" @endif>
                         <x-mary-icon name="o-rocket-launch" />
                         Generate Jadwal
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('fakultas.conflict.index') }}" @if(request()->routeIs('fakultas.conflict.index')) class="active" @endif>
+                        <x-mary-icon name="o-shield-check" />
+                        Pengecekan Konflik
                     </a>
                 </li>
                 @endrole

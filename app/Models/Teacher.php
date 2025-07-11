@@ -28,4 +28,8 @@ class Teacher extends Model
     {
         return $this->belongsToMany(Activity::class, 'activity_teacher');
     }
+    public function schedules(): BelongsToMany
+    {
+        return $this->belongsToMany(Schedule::class, 'schedule_teacher');
+    }
 }

@@ -9,19 +9,27 @@ use Illuminate\Support\Facades\Auth;
 
 class GenerateController extends Controller
 {
+    /**
+     * Menampilkan halaman untuk memulai proses generate.
+     */
     public function index()
     {
         return view('livewire.fakultas.generate.index');
     }
 
+    /**
+     * Memulai proses generate jadwal untuk seluruh fakultas.
+     */
     public function generate(Request $request)
     {
-        $user = Auth::user(); // Dapatkan user fakultas yang sedang login
+        // Dapatkan pengguna yang sedang login untuk referensi/logging jika diperlukan.
+        $user = Auth::user();
 
-        // Memanggil Job dengan mengirimkan user fakultas
+        // Memanggil Job. Job ini sekarang akan menangani seluruh proses untuk fakultas.
         GenerateFacultyTimetableJob::dispatch($user);
 
+        // Memberikan feedback ke pengguna.
         return redirect()->route('fakultas.generate.index')
-            ->with('status', 'Proses pembuatan jadwal untuk seluruh prodi telah dimulai. Ini mungkin memakan waktu beberapa menit. Anda bisa memeriksa halaman "Jadwal Utama" secara berkala.');
+            ->with('status', 'Proses pembuatan jadwal untuk seluruh fakultas telah dimulai. Ini mungkin memakan waktu beberapa menit. Anda bisa memeriksa halaman "Jadwal Utama" secara berkala untuk melihat hasilnya.');
     }
 }

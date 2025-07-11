@@ -9,6 +9,7 @@ use App\Livewire\Guide;
 use App\Livewire\Fakultas\Dashboard as FakultasDashboard;
 use App\Livewire\Fakultas\ManageProdi;
 use App\Livewire\Fakultas\ManageRooms;
+use App\Livewire\Fakultas\ConflictChecker;
 use App\Livewire\Fakultas\ManageRoomConstraints;
 
 use App\Livewire\Prodi\Dashboard as ProdiDashboard;
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'role:fakultas'])->prefix('fakultas')->name('fakultas
     Route::get('/generate-jadwal', [\App\Http\Controllers\Fakultas\GenerateController::class, 'index'])->name('generate.index');
     Route::post('/generate-jadwal', [\App\Http\Controllers\Fakultas\GenerateController::class, 'generate'])->name('generate.store');
     Route::get('/jadwal', \App\Livewire\Fakultas\ViewSchedules::class)->name('schedules.index');
+    Route::get('/conflict-check', ConflictChecker::class)->name('conflict.index');
 });
 
 // ==========================================================
