@@ -36,7 +36,7 @@ class SubjectsImport implements ToCollection, WithHeadingRow
                     'nama_matkul' => $row['nama_matkul'],
                     // Data ini HANYA akan digunakan jika record BARU dibuat:
                     'sks'         => $row['sks'],
-                    'semester'         => $row['semester'],
+                    'semester'    => $row['semester'],
                 ]
             );
         }
