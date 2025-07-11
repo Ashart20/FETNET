@@ -31,9 +31,7 @@
     <x-mary-modal wire:model="activityModal" title="{{ $activityId ? 'Edit' : 'Tambah' }} Aktivitas" separator>
         <x-mary-form wire:submit="store">
             <div class="space-y-4">
-                <x-mary-choices label="Pilih Dosen" wire:model="teacher_ids" :options="$teachers" option-label="nama_dosen" searchable />
                 <x-mary-select label="Pilih Mata Kuliah" wire:model="subject_id" :options="$subjects" option-label="nama_matkul" placeholder="-- Pilih --" />
-
 
                 <x-mary-choices label="Pilih Kelompok Mahasiswa"
                                 wire:model="selectedStudentGroupIds"
@@ -42,7 +40,7 @@
                                 searchable
                                 multiple {{-- Penting: Aktifkan mode multi-pilih --}}
                                 placeholder="-- Pilih Kelompok --" />
-
+                <x-mary-choices label="Pilih Dosen" wire:model="teacher_ids" :options="$teachers" option-label="nama_dosen" searchable />
                 <x-mary-select label="Tag Aktivitas (Wajib)" wire:model="activity_tag_id" :options="$activityTags" option-label="name" placeholder="-- Tidak ada --" />
                 <x-mary-input label="Nama Aktivitas (Opsional)" wire:model="name" placeholder="..." />
 

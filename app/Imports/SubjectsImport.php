@@ -30,12 +30,13 @@ class SubjectsImport implements ToCollection, WithHeadingRow
                 [
                     // Kondisi untuk mencari:
                     'prodi_id'    => $this->prodiId,
-                    'nama_matkul' => $row['nama_matkul'],
+                    'kode_matkul' => $row['kode_matkul'],
                 ],
                 [
+                    'nama_matkul' => $row['nama_matkul'],
                     // Data ini HANYA akan digunakan jika record BARU dibuat:
-                    'kode_matkul' => $row['kode_matkul'],
                     'sks'         => $row['sks'],
+                    'semester'         => $row['semester'],
                 ]
             );
         }

@@ -72,7 +72,7 @@ class ManageTeachers extends Component
         }
 
 
-        $teachers = $teachersQuery->latest('teachers.created_at')->paginate(10);
+        $teachers = $teachersQuery->orderBy('kode_dosen')->paginate(100);
 
         // Mengirimkan data headers ke view
         return view('livewire.prodi.manage-teachers', [
