@@ -48,4 +48,9 @@ class StudentGroup extends Model
     {
         return $this->hasMany(User::class);
     }
+    public function prodi(): BelongsTo
+    {
+        return $this->belongsTo(Prodi::class);
+    }
+
 }
