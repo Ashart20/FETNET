@@ -68,71 +68,78 @@
 <?php endif; ?>
 
         
-        <?php if (isset($component)) { $__componentOriginal8fbd727209323874b055feef49197909 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal8fbd727209323874b055feef49197909 = $attributes; } ?>
-<?php $component = Mary\View\Components\Table::resolve(['headers' => $headers,'rows' => $teachers,'withPagination' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-table'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Table::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-            
-            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('actions', function($teacher) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
-            <div class="flex space-x-2">
-                <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
-<?php $component = Mary\View\Components\Button::resolve(['icon' => 'o-pencil','tooltip' => 'Edit'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['@click' => '$wire.edit('.e($teacher->id).')','class' => 'btn-sm btn-warning']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-                <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
-<?php $component = Mary\View\Components\Button::resolve(['icon' => 'o-trash','tooltip' => 'Hapus'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:click' => 'delete('.e($teacher->id).')','wire:confirm' => 'PERHATIAN!|Anda yakin ingin menghapus data dosen ini?|Aksi ini tidak bisa dibatalkan.','class' => 'btn-sm btn-error']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
+        
+        <!--[if BLOCK]><![endif]--><?php if($teachers->isNotEmpty()): ?>
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <!-- head -->
+                    <thead>
+                    <tr>
+                        <th rowsapn="2">No.</th>
+                        <th rowsapn="2">Code</th>
+                        <th rowsapn="2">Name</th>
+                        <th colspan="5" class="text-center">Beban (SKS)</th>
+
+                        <th rowsapn="2">Action</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3"></th>
+                        <!--[if BLOCK]><![endif]--><?php if(!is_null(auth()->user()->prodi->cluster)): ?>
+                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = auth()->user()->prodi->cluster->prodis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prodi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <th class="text-center"><?php echo e($prodi->nama_prodi); ?></th>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                        <th class="text-center">
+                            Jumlah
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- row 1 -->
+                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $teachers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $teacher): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr>
+                            <td>
+                                <?php echo e($index+1); ?>.
+                            </td>
+                            <td>
+                                <?php echo e($teacher->kode_dosen); ?>
+
+                            </td>
+                            <td>
+                                <?php echo e($teacher->nama_dosen); ?>
+
+                            </td>
+                            <?php ($totalSKS = null); ?>
+                            <!--[if BLOCK]><![endif]--><?php if(!is_null(auth()->user()->prodi->cluster)): ?>
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = auth()->user()->prodi->cluster->prodis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prodi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <td class="text-center">
+                                        <?php ($sks = null); ?>
+                                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $teacher->activities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $activity): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <!--[if BLOCK]><![endif]--><?php if($activity->prodi->id == $prodi->id): ?>
+                                                <?php ($sks = $sks + $activity->subject->sks); ?>
+                                                <?php ($totalSKS = $totalSKS + $activity->subject->sks); ?>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                                        <?php echo e($sks); ?>
+
+                                    </td>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            <td class="text-center">
+                                <?php echo e($totalSKS); ?>
+
+                            </td>
+                            <td>
+
+                            </td>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                    </tbody>
+                </table>
             </div>
-            <?php }); ?>
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal8fbd727209323874b055feef49197909)): ?>
-<?php $attributes = $__attributesOriginal8fbd727209323874b055feef49197909; ?>
-<?php unset($__attributesOriginal8fbd727209323874b055feef49197909); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal8fbd727209323874b055feef49197909)): ?>
-<?php $component = $__componentOriginal8fbd727209323874b055feef49197909; ?>
-<?php unset($__componentOriginal8fbd727209323874b055feef49197909); ?>
-<?php endif; ?>
+        <?php else: ?>
+            There is no data
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     </div>
 
     
