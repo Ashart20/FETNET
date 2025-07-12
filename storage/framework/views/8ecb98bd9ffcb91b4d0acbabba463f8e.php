@@ -1,3 +1,15 @@
+<?php
+    /**
+     * @var \Illuminate\Database\Eloquent\Collection $rooms
+     * @var \Illuminate\Database\Eloquent\Collection $days
+     * @var \Illuminate\Database\Eloquent\Collection $timeSlots
+     * @var array $constraints
+     * @var int|null $selectedRoomId
+     * @var int|null $highlightedDayId
+     * @var int|null $highlightedTimeSlotId
+     */
+?>
+
 <div>
     <?php if (isset($component)) { $__componentOriginal2aca76be1376419dfd37220f36011753 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal2aca76be1376419dfd37220f36011753 = $attributes; } ?>
@@ -19,7 +31,6 @@
 <?php $component = $__componentOriginal2aca76be1376419dfd37220f36011753; ?>
 <?php unset($__componentOriginal2aca76be1376419dfd37220f36011753); ?>
 <?php endif; ?>
-    
     <?php if (isset($component)) { $__componentOriginal7f194736b6f6432dc38786f292496c34 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal7f194736b6f6432dc38786f292496c34 = $attributes; } ?>
 <?php $component = Mary\View\Components\Card::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -39,7 +50,7 @@
         <div class="my-4">
             <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Dosen','options' => $teachers,'optionValue' => 'id','optionLabel' => 'nama_dosen','placeholder' => '-- Pilih Dosen --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Dosen','options' => $teachers,'optionValue' => 'id','optionLabel' => 'full_name','placeholder' => '-- Pilih Dosen --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -214,7 +225,6 @@
                 <table class="min-w-full border-collapse table-fixed">
                     <thead>
                     <tr>
-                        
                         <th class="p-2 border border-base-300 bg-base-200 w-32">Waktu</th>
 
                         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $days; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -242,7 +252,6 @@
                                     $isHighlighted = ($highlightedDayId == $day->id || $highlightedTimeSlotId == $slot->id);
                                 ?>
 
-                                
                                 <td wire:click="toggleConstraint(<?php echo e($day->id); ?>, <?php echo e($slot->id); ?>)"
                                     class="p-2 border border-base-300 cursor-pointer transition-colors
                                     <?php if($isHighlighted): ?>

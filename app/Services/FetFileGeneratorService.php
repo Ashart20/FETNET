@@ -173,7 +173,7 @@ class FetFileGeneratorService
             $node = $list->addChild('Teacher');
             $node->addChild('Name', htmlspecialchars($teacher->kode_dosen));
             $node->addChild('Long_Name', htmlspecialchars($teacher->nama_dosen));
-            $node->addChild('Code', '');
+            $node->addChild('Code', htmlspecialchars($teacher->kode_univ));
             $node->addChild('Target_Number_of_Hours', '0');
             $node->addChild('Qualified_Subjects');
             $node->addChild('Comments', '');

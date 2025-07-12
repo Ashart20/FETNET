@@ -76,7 +76,7 @@
                                     <div class="text-xs text-gray-500"><?php echo e($schedule->activity->subject->kode_matkul ?? ''); ?></div>
                                 </td>
                                 <td>
-                                    <?php echo $schedule->activity->teachers->pluck('nama_dosen')->implode('<br>'); ?>
+                                    <?php echo $schedule->activity->teachers->pluck('full_name')->implode('<br>'); ?>
 
                                 </td>
                                 <td>

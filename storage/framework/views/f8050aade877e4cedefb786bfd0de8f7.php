@@ -1,3 +1,15 @@
+<?php
+    /**
+     * @var \Illuminate\Database\Eloquent\Collection $rooms
+     * @var \Illuminate\Database\Eloquent\Collection $days
+     * @var \Illuminate\Database\Eloquent\Collection $timeSlots
+     * @var array $constraints
+     * @var int|null $selectedRoomId
+     * @var int|null $highlightedDayId
+     * @var int|null $highlightedTimeSlotId
+     */
+?>
+
 <div>
     <?php if (isset($component)) { $__componentOriginal2aca76be1376419dfd37220f36011753 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal2aca76be1376419dfd37220f36011753 = $attributes; } ?>
@@ -36,7 +48,6 @@
         <p class="mt-2 text-base-content/70">Pilih kelompok mahasiswa, lalu klik pada slot waktu untuk menandainya sebagai 'waktu istirahat/terlarang' (merah).</p>
 
         <div class="my-4">
-            
             <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
 <?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Kelompok Mahasiswa','options' => $studentGroupsForDropdown,'placeholder' => '-- Pilih Kelompok --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>

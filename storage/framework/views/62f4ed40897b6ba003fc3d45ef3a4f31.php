@@ -182,10 +182,8 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Form::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['wire:submit' => 'store']); ?>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-1 gap-7">
 
-                    
                     <div class="space-y-4">
                         <?php if (isset($component)) { $__componentOriginal6f99ffca722ef3c8789c4087c5ac9f0d = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal6f99ffca722ef3c8789c4087c5ac9f0d = $attributes; } ?>
@@ -217,6 +215,26 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Input::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['wire:model' => 'nama_prodi']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf51438a7488970badd535e5f203e0c1b)): ?>
+<?php $attributes = $__attributesOriginalf51438a7488970badd535e5f203e0c1b; ?>
+<?php unset($__attributesOriginalf51438a7488970badd535e5f203e0c1b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf51438a7488970badd535e5f203e0c1b)): ?>
+<?php $component = $__componentOriginalf51438a7488970badd535e5f203e0c1b; ?>
+<?php unset($__componentOriginalf51438a7488970badd535e5f203e0c1b); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginalf51438a7488970badd535e5f203e0c1b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf51438a7488970badd535e5f203e0c1b = $attributes; } ?>
+<?php $component = Mary\View\Components\Input::resolve(['label' => 'Abbreviation'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Input::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model' => 'abbreviation','placeholder' => 'Contoh: TE']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalf51438a7488970badd535e5f203e0c1b)): ?>
@@ -359,7 +377,6 @@
 
                     </div>
 
-                    
                     <div class="space-y-4">
                         <?php if (isset($component)) { $__componentOriginal6f99ffca722ef3c8789c4087c5ac9f0d = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal6f99ffca722ef3c8789c4087c5ac9f0d = $attributes; } ?>

@@ -23,6 +23,7 @@ class ManageProdi extends Component
     public string $nama_prodi = '';
     public string $kode = '';
     public $cluster_id = '';
+    public ?string $abbreviation = '';
 
     // Properti untuk User Prodi
     public ?int $userId = null;
@@ -45,15 +46,14 @@ class ManageProdi extends Component
 
     public function loadClusters(): void
     {
-
         $this->clusters = Cluster::orderBy('name')->get();
     }
-
 
     public function headers(): array
     {
         return [
             ['key' => 'nama_prodi', 'label' => 'Nama Prodi'],
+            ['key' => 'abbreviation', 'label' => 'Singkatan'],
             ['key' => 'kode', 'label' => 'Kode'],
             ['key' => 'cluster.name', 'label' => 'Cluster'],
             ['key' => 'users', 'label' => 'User Terdaftar', 'sortable' => false],
@@ -67,14 +67,12 @@ class ManageProdi extends Component
         ])->layout('layouts.app');
     }
 
-
     public function addNewCluster(): void
     {
         $validated = $this->validate([
             'newClusterName' => ['required', 'string', Rule::unique('clusters', 'name')->where('user_id', auth()->id())],
             'newClusterCode' => ['required', 'string', 'max:10', Rule::unique('clusters', 'code')->where('user_id', auth()->id())],
         ]);
-
 
         $cluster = Cluster::create([
             'name' => $validated['newClusterName'],
@@ -100,6 +98,7 @@ class ManageProdi extends Component
             'nama_prodi' => ['required', 'string', 'min:3'],
             'kode'       => ['required', 'string', 'max:10', Rule::unique('prodis')->ignore($this->prodiId)],
             'cluster_id' => ['nullable', 'exists:clusters,id'],
+            'abbreviation' => 'nullable|string|max:50',
             'name'       => ['required', 'string'],
             'email'      => ['required', 'email', Rule::unique('users')->ignore($this->userId)],
             'password'   => [$this->prodiId ? 'nullable' : 'required', 'min:8'],
@@ -109,6 +108,7 @@ class ManageProdi extends Component
             $prodiData = [
                 'nama_prodi' => $validatedData['nama_prodi'],
                 'kode'       => $validatedData['kode'],
+                'abbreviation' => $validatedData['abbreviation'],
                 'cluster_id' => $validatedData['cluster_id'] ?: null,
             ];
             $prodi = Prodi::updateOrCreate(['id' => $this->prodiId], $prodiData);
@@ -140,6 +140,7 @@ class ManageProdi extends Component
         $this->prodiId = $prodi->id;
         $this->nama_prodi = $prodi->nama_prodi;
         $this->kode = $prodi->kode;
+        $this->abbreviation = $prodi->abbreviation; // <-- PENAMBAHAN DI SINI
         $this->cluster_id = $prodi->cluster_id;
 
         if ($user) {

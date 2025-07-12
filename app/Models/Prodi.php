@@ -13,7 +13,7 @@ class Prodi extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_prodi', 'kode', 'cluster_id'];
+    protected $fillable = ['nama_prodi', 'kode', 'cluster_id' , 'abbreviation',];
 
     public function cluster(): BelongsTo
     {

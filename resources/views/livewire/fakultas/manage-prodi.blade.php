@@ -33,13 +33,12 @@
         {{-- Modal untuk form tambah/edit --}}
         <x-mary-modal wire:model="prodiModal" title="{{ $prodiId ? 'Edit' : 'Tambah' }} Prodi & User" separator>
             <x-mary-form wire:submit="store">
-                {{-- Gunakan Grid untuk membagi form menjadi 2 kolom --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-1 gap-7">
 
-                    {{-- KOLOM KIRI: Detail Program Studi --}}
                     <div class="space-y-4">
                         <x-mary-header title="Detail Program Studi" size="text-lg" with-separator />
                         <x-mary-input label="Nama Prodi" wire:model="nama_prodi" />
+                        <x-mary-input label="Abbreviation" wire:model="abbreviation" placeholder="Contoh: TE" />
                         <x-mary-input label="Kode Prodi" wire:model="kode" />
                         {{-- Form kecil untuk menambah cluster baru --}}
                         <div class="p-4 border rounded-lg dark:border-gray-700 space-y-3">
@@ -58,7 +57,6 @@
 
                     </div>
 
-                    {{-- KOLOM KANAN: Akun User Admin Prodi --}}
                     <div class="space-y-4">
                         <x-mary-header title="Akun User Admin Prodi" size="text-lg" with-separator />
                         <x-mary-input label="Nama User" wire:model="name" />

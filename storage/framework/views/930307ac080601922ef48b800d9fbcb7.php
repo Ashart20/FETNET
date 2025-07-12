@@ -199,26 +199,6 @@
 <?php endif; ?>
 <?php $component->withAttributes(['wire:submit' => 'store']); ?>
             <div class="space-y-4">
-                <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
-<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Dosen','options' => $teachers,'optionLabel' => 'nama_dosen','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-choices'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'teacher_ids']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
-<?php $attributes = $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
-<?php unset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
-<?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
-<?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
-<?php endif; ?>
                 <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
 <?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Mata Kuliah','options' => $subjects,'optionLabel' => 'nama_matkul','placeholder' => '-- Pilih --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -240,7 +220,6 @@
 <?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
 <?php endif; ?>
 
-
                 <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
 <?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Kelompok Mahasiswa','options' => $allStudentGroups,'optionLabel' => 'nama_kelompok','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -261,7 +240,26 @@
 <?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
 <?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
 <?php endif; ?>
-
+                <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
+<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Dosen','options' => $teachers,'optionLabel' => 'nama_dosen','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-choices'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model' => 'teacher_ids']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
+<?php $attributes = $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
+<?php unset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
+<?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
+<?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
+<?php endif; ?>
                 <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
 <?php $component = Mary\View\Components\Select::resolve(['label' => 'Tag Aktivitas (Wajib)','options' => $activityTags,'optionLabel' => 'name','placeholder' => '-- Tidak ada --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>

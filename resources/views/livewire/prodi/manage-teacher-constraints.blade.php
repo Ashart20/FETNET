@@ -20,7 +20,7 @@
         <p class="mt-2 text-base-content/70">Pilih dosen, lalu klik pada slot waktu untuk menandainya sebagai 'tidak tersedia' (merah). Klik pada header hari atau jam untuk menyorotnya.</p>
 
         <div class="my-4">
-            <x-mary-select label="Pilih Dosen" wire:model.live="selectedTeacherId" :options="$teachers" option-value="id" option-label="nama_dosen" placeholder="-- Pilih Dosen --" />
+            <x-mary-select label="Pilih Dosen" wire:model.live="selectedTeacherId" :options="$teachers" option-value="id" option-label="full_name" placeholder="-- Pilih Dosen --" />
         </div>
 
         {{-- Panel Aksi untuk Kolom HARI yang Disorot --}}

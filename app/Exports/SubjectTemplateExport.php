@@ -30,6 +30,6 @@ class SubjectTemplateExport implements FromCollection, WithHeadings
     public function headings(): array
     {
 
-        return ['nama_matkul', 'kode_matkul', 'sks'];
+        return ['nama_matkul', 'kode_matkul', 'sks', 'semester'];
     }
 }

@@ -29,7 +29,7 @@
                                     <div class="text-xs text-gray-500">{{ $schedule->activity->subject->kode_matkul ?? '' }}</div>
                                 </td>
                                 <td>
-                                    {!! $schedule->activity->teachers->pluck('nama_dosen')->implode('<br>') !!}
+                                    {!! $schedule->activity->teachers->pluck('full_name')->implode('<br>') !!}
                                 </td>
                                 <td>
                                     @forelse($schedule->activity->studentGroups as $studentGroup)

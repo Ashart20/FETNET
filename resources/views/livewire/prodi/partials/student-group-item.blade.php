@@ -1,24 +1,46 @@
-<div class="py-2 {{ $level > 0 ? 'ml-'.($level * 4) : '' }}">
-    <div class="flex items-center justify-between p-2 rounded-md hover:bg-base-200">
-        {{-- Informasi Grup --}}
-        <div class="flex-1">
-            <span class="font-semibold">{{ $group->nama_kelompok }}</span>
-            <span class="text-xs opacity-60 ml-2">(Angkatan: {{ $group->angkatan }})</span>
+{{--
+    File: resources/views/livewire/prodi/partials/student-group-item.blade.php
+
+    Komponen rekursif untuk menampilkan setiap kelompok dan sub-kelompoknya.
+--}}
+
+<div class="py-2" style="padding-left: {{ $level * 25 }}px;">
+    <div class="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50">
+
+        {{-- Bagian Kiri: Nama Kelompok dan Jumlah Mahasiswa --}}
+        <div class="flex items-center gap-3">
+            <span class="font-semibold text-gray-700 dark:text-gray-300">{{ $group->nama_kelompok }}</span>
+
+            {{-- PERUBAHAN DI SINI: Tampilkan badge jumlah mahasiswa jika ada --}}
+            @if($group->jumlah_mahasiswa > 0)
+                <x-mary-badge :value="$group->jumlah_mahasiswa" class="badge-primary badge-sm" icon="o-users" />
+            @endif
         </div>
 
-        {{-- Tombol Aksi menggunakan Mary UI --}}
-        <div class="flex items-center space-x-1">
-            @if($level < 2) {{-- Batas kedalaman 3 level (0, 1, 2) --}}
-            <x-mary-button wire:click="create({{ $group->id }})" icon="o-plus" class="btn-xs btn-success btn-ghost" tooltip-left="Tambah Sub" />
-            @endif
-            <x-mary-button wire:click="edit({{ $group->id }})" icon="o-pencil" class="btn-xs btn-warning btn-ghost" tooltip-left="Edit" />
-            <x-mary-button wire:click="delete({{ $group->id }})" wire:confirm="Yakin menghapus '{{ $group->nama_kelompok }}' dan semua sub-kelompoknya?" icon="o-trash" class="btn-xs btn-error btn-ghost" tooltip-left="Hapus" />
+        {{-- Bagian Kanan: Tombol Aksi --}}
+        <div class="flex items-center gap-2">
+            <x-mary-button
+                icon="o-pencil"
+                @click="$wire.edit({{ $group->id }})"
+                class="btn-xs btn-ghost text-yellow-500"
+                tooltip="Edit" />
+            <x-mary-button
+                icon="o-plus"
+                @click="$wire.create({{ $group->id }})"
+                class="btn-xs btn-ghost text-green-500"
+                tooltip="Tambah Sub-item" />
+            <x-mary-button
+                icon="o-trash"
+                wire:click="delete({{ $group->id }})"
+                wire:confirm="Yakin ingin menghapus '{{ $group->nama_kelompok }}' beserta semua sub-kelompoknya?"
+                class="btn-xs btn-ghost text-red-500"
+                tooltip="Hapus" />
         </div>
     </div>
 
-    {{-- Panggil komponen ini lagi untuk setiap turunan (children) --}}
-    @if($group->childrenRecursive->isNotEmpty())
-        <div class="border-l-2 border-base-300">
+    {{-- Panggil komponen ini lagi untuk setiap anak (children) --}}
+    @if($group->childrenRecursive && $group->childrenRecursive->isNotEmpty())
+        <div class="mt-1 border-l border-gray-200 dark:border-gray-700">
             @foreach($group->childrenRecursive as $child)
                 @include('livewire.prodi.partials.student-group-item', ['group' => $child, 'level' => $level + 1])
             @endforeach

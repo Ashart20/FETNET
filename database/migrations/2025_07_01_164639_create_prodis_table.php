@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_prodi');
             $table->string('kode')->unique();
+            $table->string('abbreviation', 50)->nullable();
             $table->timestamps();
         });
     }
