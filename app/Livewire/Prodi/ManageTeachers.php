@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Prodi;
 
-// Namespace dan Class yang diperlukan
 use App\Models\Prodi;
 use App\Models\Teacher;
 use App\Exports\TeacherTemplateExport;
@@ -18,8 +17,11 @@ use Mary\Traits\Toast;
 
 class ManageTeachers extends Component
 {
-    // Menggunakan traits untuk fungsionalitas tambahan
+
     use WithPagination, Toast, WithFileUploads;
+
+    // Properti untuk mengontrol tampilan
+    public string $viewMode = 'manage';
 
     // Properti untuk data di form modal
     public ?int $teacherId = null;
@@ -49,7 +51,6 @@ class ManageTeachers extends Component
                 'required',
                 'string',
                 'max:20',
-                // Pastikan kode dosen unik di seluruh tabel, kecuali untuk ID saat ini
                 Rule::unique('teachers')->ignore($this->teacherId),
             ],
             'title_depan' => 'nullable|string|max:50',
@@ -77,7 +78,7 @@ class ManageTeachers extends Component
     }
 
     /**
-     * Pesan validasi kustom agar lebih ramah pengguna.
+     * Pesan validasi kustom.
      */
     protected $messages = [
         'required' => ':attribute wajib diisi.',
@@ -86,42 +87,42 @@ class ManageTeachers extends Component
     ];
 
     /**
-     * Mendefinisikan header untuk komponen tabel MaryUI.
+     * Mendefinisikan header untuk tabel di mode manajemen.
      */
     public function headers(): array
     {
         return [
             ['key' => 'kode_dosen', 'label' => 'Kode Dosen'],
             ['key' => 'nama_dosen', 'label' => 'Nama Lengkap Dosen', 'sortable' => true],
-            ['key' => 'kode_univ', 'label' => 'Kode Universitas'],
-            ['key' => 'employee_id', 'label' => 'Employee Id'],
+            ['key' => 'email', 'label' => 'Email'],
+            ['key' => 'nomor_hp', 'label' => 'No. HP'],
             ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
         ];
     }
 
     /**
-     * Merender komponen, mengambil data dosen sesuai prodi pengguna.
+     * Merender komponen, mengambil data sesuai mode yang aktif.
      */
     public function render()
     {
         $currentProdi = auth()->user()->prodi;
-        $teachersQuery = Teacher::query();
+
+        $teachersQuery = Teacher::query()
+            ->with(['activities.subject', 'activities.prodi']);
 
         if ($currentProdi) {
-            // Jika prodi tergabung dalam cluster, tampilkan semua dosen dalam cluster tsb.
+            // Logika untuk cluster prodi
             if ($currentProdi->cluster_id) {
                 $prodiIdsInCluster = Prodi::where('cluster_id', $currentProdi->cluster_id)->pluck('id');
                 $teachersQuery->whereHas('prodis', function ($query) use ($prodiIdsInCluster) {
                     $query->whereIn('prodis.id', $prodiIdsInCluster);
                 })->distinct();
             } else {
-                // Jika tidak, tampilkan hanya dosen dari prodi tersebut.
                 $teachersQuery->whereHas('prodis', function ($query) use ($currentProdi) {
                     $query->where('prodis.id', $currentProdi->id);
                 });
             }
         } else {
-            // Jika pengguna tidak memiliki prodi, jangan tampilkan data apa pun.
             $teachersQuery->whereRaw('1 = 0');
         }
 
@@ -134,17 +135,23 @@ class ManageTeachers extends Component
     }
 
     /**
-     * Menyimpan data dosen (baik membuat baru atau memperbarui).
+     * Mengubah mode tampilan antara 'manage' dan 'report'.
+     */
+    public function setViewMode(string $mode)
+    {
+        $this->viewMode = $mode;
+        $this->resetPage(); // Reset paginasi setiap kali beralih mode
+    }
+
+    /**
+     * Menyimpan data dosen (membuat baru atau memperbarui).
      */
     public function store()
     {
         $validatedData = $this->validate();
         $prodiId = auth()->user()->prodi_id;
 
-        // Buat atau update data di tabel 'teachers'
         $teacher = Teacher::updateOrCreate(['id' => $this->teacherId], $validatedData);
-
-        // Sinkronkan dosen dengan prodi saat ini tanpa melepaskan dari prodi lain
         $teacher->prodis()->syncWithoutDetaching([$prodiId]);
 
         $this->toast(type: 'success', title: $this->teacherId ? 'Data Dosen Berhasil Diperbarui.' : 'Data Dosen Berhasil Ditambahkan.');
@@ -152,12 +159,11 @@ class ManageTeachers extends Component
     }
 
     /**
-     * Menyiapkan form modal untuk mengedit data dosen yang ada.
+     * Menyiapkan form modal untuk mengedit data.
      */
     public function edit($id)
     {
-        $prodiId = auth()->user()->prodi_id;
-        $teacher = Teacher::whereHas('prodis', fn($q) => $q->where('prodis.id', $prodiId))->findOrFail($id);
+        $teacher = Teacher::whereHas('prodis', fn($q) => $q->where('prodis.id', auth()->user()->prodi_id))->findOrFail($id);
 
         $this->teacherId = $id;
         $this->nama_dosen = $teacher->nama_dosen;
@@ -173,19 +179,14 @@ class ManageTeachers extends Component
     }
 
     /**
-     * Menghapus relasi dosen dari prodi saat ini.
-     * Jika dosen tidak lagi terikat pada prodi mana pun, data dosen akan dihapus permanen.
+     * Menghapus relasi dosen dari prodi dan menghapus data dosen jika tidak terikat prodi lain.
      */
     public function delete($id)
     {
         try {
-            $prodiId = auth()->user()->prodi_id;
-            $teacher = Teacher::whereHas('prodis', fn($q) => $q->where('prodis.id', $prodiId))->findOrFail($id);
+            $teacher = Teacher::whereHas('prodis', fn($q) => $q->where('prodis.id', auth()->user()->prodi_id))->findOrFail($id);
+            $teacher->prodis()->detach(auth()->user()->prodi_id);
 
-            // Lepaskan dosen dari prodi saat ini
-            $teacher->prodis()->detach($prodiId);
-
-            // Jika dosen tidak lagi memiliki relasi dengan prodi lain, hapus datanya.
             if ($teacher->prodis()->count() === 0) {
                 $teacher->delete();
             }
@@ -200,17 +201,12 @@ class ManageTeachers extends Component
      */
     public function updatedFile()
     {
-        $this->validate([
-            'file' => 'required|mimes:xlsx|max:10240', // Maks 10MB
-        ]);
+        $this->validate(['file' => 'required|mimes:xlsx|max:10240']);
 
         try {
-            // Gunakan class import yang sudah direvisi
             Excel::import(new TeachersImport(auth()->user()->prodi_id), $this->file);
-
             $this->success('Semua data dosen berhasil diimpor.', position: 'toast-bottom');
             $this->reset('file');
-
         } catch (ValidationException $e) {
             $failures = $e->failures();
             $errorMessages = [];
@@ -230,22 +226,18 @@ class ManageTeachers extends Component
     {
         $filename = 'templates/template_data_dosen.xlsx';
         $disk = 'local';
-
         $data = [
-            // Header (ini akan digunakan oleh class Export)
             ['nama_dosen', 'kode_dosen', 'title_depan', 'title_belakang', 'kode_univ', 'employee_id', 'email', 'nomor_hp'],
-            // Contoh data
-            ['Budi Setiawan', 'BDS', 'Dr.', 'M.Kom.', 'E1234', 'NIP001', 'budi.s@upi.edu', '081234567890'],
-            ['Siti Aminah', 'STA', '', 'S.Pd., M.Pd.', 'E2345', 'NIP002', 'siti.a@upi.edu', '089876543210'],
+            ['Budi Setiawan', 'BDS', 'Dr.', 'M.Kom.', '0123456789', 'NIP001', 'budi.s@example.ac.id', '081234567890'],
+            ['Siti Aminah', 'STA', '', 'S.Pd., M.Pd.', '0987654321', 'NIP002', 'siti.a@example.ac.id', '089876543210'],
         ];
 
         Excel::store(new TeacherTemplateExport($data), $filename, $disk);
-
         return Storage::disk($disk)->download($filename);
     }
 
     /**
-     * Fungsi helper untuk membuka modal dan mereset input fields.
+     * Fungsi-fungsi helper untuk UI.
      */
     public function create()
     {
@@ -261,7 +253,7 @@ class ManageTeachers extends Component
 
     private function resetInputFields()
     {
-        $this->reset();
+        $this->resetExcept('viewMode'); // Jangan reset viewMode
         $this->resetErrorBag();
     }
 }

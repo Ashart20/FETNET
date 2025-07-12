@@ -369,4 +369,4 @@
 <?php $component = $__componentOriginal89a573612f1f1cb2dd9fc072235d4356; ?>
 <?php unset($__componentOriginal89a573612f1f1cb2dd9fc072235d4356); ?>
 <?php endif; ?>
-</div><?php /**PATH /home/ashart20/FETNET/resources/views/livewire/prodi/manage-activities.blade.php ENDPATH**/ ?>
+</div><?php /**PATH /Volumes/EXCHANGE/WebDev/FetAS/resources/views/livewire/prodi/manage-activities.blade.php ENDPATH**/ ?>

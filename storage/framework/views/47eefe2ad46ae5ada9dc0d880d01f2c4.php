@@ -25,7 +25,7 @@
         
         <?php if (isset($component)) { $__componentOriginal6f99ffca722ef3c8789c4087c5ac9f0d = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal6f99ffca722ef3c8789c4087c5ac9f0d = $attributes; } ?>
-<?php $component = Mary\View\Components\Header::resolve(['title' => 'Manajemen Data Dosen','subtitle' => 'Kelola semua data dosen di program studi Anda.'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Header::resolve(['title' => 'Data Dosen','subtitle' => 'Manajemen data dan laporan beban SKS.','separator' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-header'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -45,8 +45,77 @@
 <?php endif; ?>
 
         
-        <div class="my-3 flex flex-wrap gap-2">
-            <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+        <div class="my-4">
+            <?php if (isset($component)) { $__componentOriginal04627fcb0bca4a40e5e6a695e202d6e4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal04627fcb0bca4a40e5e6a695e202d6e4 = $attributes; } ?>
+<?php $component = Mary\View\Components\Tabs::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-tabs'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Tabs::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model.live' => 'viewMode']); ?>
+                <?php if (isset($component)) { $__componentOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb = $attributes; } ?>
+<?php $component = Mary\View\Components\Tab::resolve(['name' => 'manage','label' => 'Mode Manajemen','icon' => 'o-table-cells'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-tab'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Tab::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb)): ?>
+<?php $attributes = $__attributesOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb; ?>
+<?php unset($__attributesOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb)): ?>
+<?php $component = $__componentOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb; ?>
+<?php unset($__componentOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb); ?>
+<?php endif; ?>
+                <?php if (isset($component)) { $__componentOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb = $attributes; } ?>
+<?php $component = Mary\View\Components\Tab::resolve(['name' => 'report','label' => 'Laporan SKS','icon' => 'o-chart-bar-square'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-tab'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Tab::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb)): ?>
+<?php $attributes = $__attributesOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb; ?>
+<?php unset($__attributesOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb)): ?>
+<?php $component = $__componentOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb; ?>
+<?php unset($__componentOriginalb493c5e8eb9746e55ffcf8e6d36bf5cb); ?>
+<?php endif; ?>
+             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal04627fcb0bca4a40e5e6a695e202d6e4)): ?>
+<?php $attributes = $__attributesOriginal04627fcb0bca4a40e5e6a695e202d6e4; ?>
+<?php unset($__attributesOriginal04627fcb0bca4a40e5e6a695e202d6e4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal04627fcb0bca4a40e5e6a695e202d6e4)): ?>
+<?php $component = $__componentOriginal04627fcb0bca4a40e5e6a695e202d6e4; ?>
+<?php unset($__componentOriginal04627fcb0bca4a40e5e6a695e202d6e4); ?>
+<?php endif; ?>
+        </div>
+
+        
+
+        
+        <!--[if BLOCK]><![endif]--><?php if($viewMode === 'manage'): ?>
+            <div class="space-y-6">
+                
+                <div class="flex flex-wrap gap-2">
+                    <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
 <?php $component = Mary\View\Components\Button::resolve(['label' => 'Tambah Dosen','icon' => 'o-plus'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-button'); ?>
@@ -66,7 +135,7 @@
 <?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
 <?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
 <?php endif; ?>
-            <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+                    <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
 <?php $component = Mary\View\Components\Button::resolve(['label' => 'Unduh Template Excel','icon' => 'o-document-arrow-down','spinner' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-button'); ?>
@@ -86,10 +155,10 @@
 <?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
 <?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
 <?php endif; ?>
-        </div>
+                </div>
 
-        
-        <?php if (isset($component)) { $__componentOriginal8fbd727209323874b055feef49197909 = $component; } ?>
+                
+                <?php if (isset($component)) { $__componentOriginal8fbd727209323874b055feef49197909 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal8fbd727209323874b055feef49197909 = $attributes; } ?>
 <?php $component = Mary\View\Components\Table::resolve(['headers' => $headers,'rows' => $teachers,'withPagination' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-table'); ?>
@@ -99,16 +168,13 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Table::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-            
-            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_nama_dosen', function($teacher) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
-            <?php echo e($teacher->title_depan); ?> <?php echo e($teacher->nama_dosen); ?> <?php echo e($teacher->title_belakang); ?>
+                    <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_nama_dosen', function($teacher) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+                    <?php echo e($teacher->full_name); ?>
 
-            <?php }); ?>
-
-            
-            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('actions', function($teacher) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
-            <div class="flex space-x-2">
-                <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+                    <?php }); ?>
+                    <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('actions', function($teacher) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+                    <div class="flex space-x-2">
+                        <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
 <?php $component = Mary\View\Components\Button::resolve(['icon' => 'o-pencil','tooltip' => 'Edit'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-button'); ?>
@@ -128,7 +194,7 @@
 <?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
 <?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
 <?php endif; ?>
-                <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+                        <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
 <?php $component = Mary\View\Components\Button::resolve(['icon' => 'o-trash','tooltip' => 'Hapus'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-button'); ?>
@@ -137,7 +203,7 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:click' => 'delete('.e($teacher->id).')','wire:confirm' => 'PERHATIAN!|Anda yakin ingin menghapus dosen ini dari prodi Anda?|Aksi ini tidak bisa dibatalkan.','class' => 'btn-sm btn-error']); ?>
+<?php $component->withAttributes(['wire:click' => 'delete('.e($teacher->id).')','wire:confirm' => 'PERHATIAN!|Anda yakin ingin menghapus dosen ini dari prodi Anda?','class' => 'btn-sm btn-error']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
@@ -148,9 +214,9 @@
 <?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
 <?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
 <?php endif; ?>
-            </div>
-            <?php }); ?>
-         <?php echo $__env->renderComponent(); ?>
+                    </div>
+                    <?php }); ?>
+                 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal8fbd727209323874b055feef49197909)): ?>
 <?php $attributes = $__attributesOriginal8fbd727209323874b055feef49197909; ?>
@@ -161,15 +227,14 @@
 <?php unset($__componentOriginal8fbd727209323874b055feef49197909); ?>
 <?php endif; ?>
 
-        
-        <div class="my-6 p-4 bg-white dark:bg-gray-800/50 shadow-sm rounded-xl border dark:border-gray-700">
-            <h3 class="font-semibold text-gray-900 dark:text-white">Impor Data Dosen dari Excel</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Unggah file .xlsx dengan header: `nama_dosen`, `kode_dosen`, `title_depan`, `title_belakang`, `kode_univ`, `employee_id`, `email`, `nomor_hp`.
-            </p>
-
-            <div class="mt-4">
-                <?php if (isset($component)) { $__componentOriginal34d3cad3f3cac9fafaaed454c83e534d = $component; } ?>
+                
+                <div class="p-4 bg-white dark:bg-gray-800/50 shadow-sm rounded-xl border dark:border-gray-700">
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Impor Data Dosen dari Excel</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Unggah file .xlsx untuk menambah atau memperbarui data dosen secara massal.
+                    </p>
+                    <div class="mt-4">
+                        <?php if (isset($component)) { $__componentOriginal34d3cad3f3cac9fafaaed454c83e534d = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal34d3cad3f3cac9fafaaed454c83e534d = $attributes; } ?>
 <?php $component = Mary\View\Components\File::resolve(['label' => 'Pilih File Excel','hint' => 'Hanya .xlsx'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-file'); ?>
@@ -189,14 +254,91 @@
 <?php $component = $__componentOriginal34d3cad3f3cac9fafaaed454c83e534d; ?>
 <?php unset($__componentOriginal34d3cad3f3cac9fafaaed454c83e534d); ?>
 <?php endif; ?>
-
-                
-                <div wire:loading wire:target="file" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    Mengunggah dan memproses file...
+                    </div>
                 </div>
             </div>
-        </div>
 
+            
+        <?php elseif($viewMode === 'report'): ?>
+            <!--[if BLOCK]><![endif]--><?php if($teachers->isNotEmpty()): ?>
+                <div class="overflow-x-auto rounded-lg border dark:border-gray-700">
+                    <table class="table table-zebra table-pin-rows">
+                        <thead class="bg-gray-100 dark:bg-gray-800">
+                        <tr>
+                            <th rowspan="2" class="w-1">No.</th>
+                            <th rowspan="2">Kode</th>
+                            <th rowspan="2">Nama Dosen</th>
+                            <th colspan="<?php echo e(auth()->user()->prodi->cluster->prodis->count() ?? 1); ?>" class="text-center border-x dark:border-gray-700">Beban Mengajar (SKS)</th>
+                            <th rowspan="2" class="text-center">Total</th>
+                        </tr>
+                        <tr>
+                            <!--[if BLOCK]><![endif]--><?php if(auth()->user()->prodi?->cluster): ?>
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = auth()->user()->prodi->cluster->prodis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prodi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <th class="text-center border-x dark:border-gray-700"><?php echo e($prodi->nama_prodi); ?></th>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php else: ?>
+                                <th class="text-center border-x dark:border-gray-700"><?php echo e(auth()->user()->prodi->nama_prodi); ?></th>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $teachers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $teacher): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <tr>
+                                <td><?php echo e($teachers->firstItem() + $index); ?>.</td>
+                                <td><?php echo e($teacher->kode_dosen); ?></td>
+                                <td><?php echo e($teacher->full_name); ?></td>
+
+                                <?php ($totalSKS = 0); ?>
+                                <!--[if BLOCK]><![endif]--><?php if(auth()->user()->prodi?->cluster): ?>
+                                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = auth()->user()->prodi->cluster->prodis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prodi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <td class="text-center border-x dark:border-gray-700">
+                                            <?php ($sksPerProdi = $teacher->activities->where('prodi_id', $prodi->id)->sum('subject.sks')); ?>
+                                            <?php echo e($sksPerProdi > 0 ? $sksPerProdi : '-'); ?>
+
+                                            <?php ($totalSKS += $sksPerProdi); ?>
+                                        </td>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                                <?php else: ?>
+                                    <td class="text-center border-x dark:border-gray-700">
+                                        <?php ($sksPerProdi = $teacher->activities->where('prodi_id', auth()->user()->prodi_id)->sum('subject.sks')); ?>
+                                        <?php echo e($sksPerProdi > 0 ? $sksPerProdi : '-'); ?>
+
+                                        <?php ($totalSKS += $sksPerProdi); ?>
+                                    </td>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                <td class="text-center font-bold"><?php echo e($totalSKS > 0 ? $totalSKS : '-'); ?></td>
+                            </tr>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4">
+                    <?php echo e($teachers->links()); ?>
+
+                </div>
+            <?php else: ?>
+                <?php if (isset($component)) { $__componentOriginalc667a2ae20740422749e04d86ccbd727 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc667a2ae20740422749e04d86ccbd727 = $attributes; } ?>
+<?php $component = Mary\View\Components\Alert::resolve(['title' => 'Tidak ada data untuk ditampilkan.','icon' => 'o-information-circle'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-alert'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Alert::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc667a2ae20740422749e04d86ccbd727)): ?>
+<?php $attributes = $__attributesOriginalc667a2ae20740422749e04d86ccbd727; ?>
+<?php unset($__attributesOriginalc667a2ae20740422749e04d86ccbd727); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc667a2ae20740422749e04d86ccbd727)): ?>
+<?php $component = $__componentOriginalc667a2ae20740422749e04d86ccbd727; ?>
+<?php unset($__componentOriginalc667a2ae20740422749e04d86ccbd727); ?>
+<?php endif; ?>
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     </div>
 
     

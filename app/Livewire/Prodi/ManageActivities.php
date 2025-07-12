@@ -103,7 +103,7 @@ class ManageActivities extends Component
     {
         $activities = Activity::where('prodi_id', auth()->user()->prodi_id)
             ->with(['teachers', 'subject', 'studentGroups'])
-            ->latest()
+            ->orderBy('subject_id')
             ->paginate(10);
 
         return view('livewire.prodi.manage-activities', [

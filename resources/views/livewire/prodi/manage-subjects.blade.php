@@ -6,7 +6,6 @@
 
         <x-mary-header title="Manajemen Data Mata Kuliah" subtitle="Kelola semua mata kuliah untuk prodi Anda.">
             <x-slot:actions>
-                {{-- 2. Kelompokkan semua tombol aksi di sini --}}
                 <div class="flex flex-wrap gap-2">
                     <x-mary-button label="Tambah" icon="o-plus" class="btn-primary" @click="$wire.create()" />
                     <x-mary-button label="Unduh Template" icon="o-document-arrow-down" class="btn-info" wire:click="downloadTemplate" spinner />
@@ -16,7 +15,6 @@
             </x-slot:actions>
         </x-mary-header>
 
-        {{-- 3. Tabel Mary UI --}}
         <x-mary-table :headers="$this->headers()" :rows="$subjects" with-pagination striped>
             @scope('actions', $subject)
             <div class="flex gap-2">
@@ -26,7 +24,6 @@
             @endscope
         </x-mary-table>
 
-        {{-- 4. Bungkus bagian impor dengan Card --}}
         <div class="mt-8">
             <x-mary-card title="Impor Data dari Excel" icon="o-arrow-up-tray" shadow>
                 <p class="text-sm text-gray-500 -mt-2 mb-4">Unggah file `.xlsx` atau `.xls` dengan kolom: `nama_matkul`, `kode_matkul`, `sks`.</p>

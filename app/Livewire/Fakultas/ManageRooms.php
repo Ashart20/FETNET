@@ -30,7 +30,6 @@ class ManageRooms extends Component
     #[Rule]
     public string $kode_ruangan = '';
 
-    // --- PERBAIKAN 1: Validasi building_id sekarang hanya wajib jika tidak membuat gedung baru ---
     #[Rule('required_without_all:newBuildingName,newBuildingCode|exists:buildings,id', message: 'Anda harus memilih gedung atau membuat yang baru.')]
     public string $building_id = '';
 
@@ -48,7 +47,6 @@ class ManageRooms extends Component
     // Properti untuk data dropdown
     public Collection $buildings;
 
-    // --- PERBAIKAN 2: Validasi gedung baru hanya wajib jika salah satu field diisi ---
     #[Rule('required_with:newBuildingCode|string|unique:buildings,name')]
     public string $newBuildingName = '';
 
