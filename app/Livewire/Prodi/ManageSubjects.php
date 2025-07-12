@@ -67,8 +67,8 @@ class ManageSubjects extends Component
     public function headers(): array
     {
         return [
-            ['key' => 'nama_matkul', 'label' => 'Nama Mata Kuliah'],
             ['key' => 'kode_matkul', 'label' => 'Kode'],
+            ['key' => 'nama_matkul', 'label' => 'Nama Mata Kuliah'],
             ['key' => 'sks', 'label' => 'SKS'],
             ['key' => 'semester', 'label' => 'Semester'],
             ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
