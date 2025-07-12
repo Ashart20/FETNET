@@ -50,19 +50,19 @@
                 <br/>
                 <div class="flex flex-wrap -mx-3">
                     <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <x-mary-choices label="Pilih Dosen" wire:model="teacher_ids" :options="$teachers" option-label="nama_dosen" placeholder="-- Pilih Dosen --" /> searchable />
+                        <x-mary-choices label="Pilih Dosen" wire:model="teacher_ids" :options="$teachers" option-label="nama_dosen" placeholder="-- Pilih Dosen --"  searchable />
                     </div>
                 </div>
                 <br/>
                 <div class="flex flex-wrap -mx-3">
                     <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <x-mary-select label="Tag Aktivitas (Wajib)" wire:model="activity_tag_id" :options="$activityTags" option-label="name" placeholder="-- Tidak ada --" />
+                        <x-mary-select label="Tag Aktivitas (Wajib)" wire:model="activity_tag_id" :options="$activityTags" option-label="name" placeholder="-- Pilih Tag --" />
                     </div>
                 </div>
                 <br/>
                 <div class="flex flex-wrap -mx-3">
                     <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <x-mary-input label="Nama Aktivitas (Opsional)" wire:model="name" placeholder="..." />
+                        <x-mary-input label="Nama Aktivitas (Opsional)" wire:model="name" placeholder=" Tentukan nama" />
                     </div>
                 </div>
                 <br/>
