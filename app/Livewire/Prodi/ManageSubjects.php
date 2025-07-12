@@ -25,6 +25,7 @@ class ManageSubjects extends Component
     public string $nama_matkul = '';
     public string $kode_matkul = '';
     public ?int $sks = null;
+    public ?int $semester = null;
     public $file;
     public bool $subjectModal = false;
 
@@ -34,14 +35,15 @@ class ManageSubjects extends Component
     public function rules()
     {
         return [
-            'nama_matkul' => [
+            'nama_matkul' => 'required|string|max:15',
+            'kode_matkul' => [
                 'required',
                 'string',
                 'min:3',
                 Rule::unique('subjects')->where('prodi_id', auth()->user()->prodi_id)->ignore($this->subjectId),
             ],
-            'kode_matkul' => 'required|string|max:15',
             'sks' => 'required|integer|min:1|max:6',
+            'semester' => 'required|integer|min:1|max:6',
         ];
     }
 
@@ -49,11 +51,13 @@ class ManageSubjects extends Component
      * Pesan validasi kustom.
      */
     protected $messages = [
-        'nama_matkul.required' => 'Nama mata kuliah wajib diisi.',
-        'nama_matkul.unique'   => 'Nama mata kuliah ini sudah ada di prodi Anda.',
         'kode_matkul.required' => 'Kode mata kuliah wajib diisi.',
+        'kode_matkul.unique'   => 'Kode mata kuliah ini sudah ada di prodi Anda.',
+        'nama_matkul.required' => 'Kode mata kuliah wajib diisi.',
         'sks.required'         => 'Jumlah SKS wajib diisi.',
         'sks.integer'          => 'SKS harus berupa angka.',
+        'semester.required'          => 'Semester wajib diisi.',
+        'semester.integer'          => 'Semester harus berupa angka.',
     ];
 
     /**
@@ -63,9 +67,10 @@ class ManageSubjects extends Component
     public function headers(): array
     {
         return [
-            ['key' => 'nama_matkul', 'label' => 'Nama Mata Kuliah'],
             ['key' => 'kode_matkul', 'label' => 'Kode'],
+            ['key' => 'nama_matkul', 'label' => 'Nama Mata Kuliah'],
             ['key' => 'sks', 'label' => 'SKS'],
+            ['key' => 'semester', 'label' => 'Semester'],
             ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
         ];
     }
@@ -73,8 +78,9 @@ class ManageSubjects extends Component
     public function render()
     {
         $subjects = Subject::where('prodi_id', auth()->user()->prodi_id)
-            ->latest()
-            ->paginate(10);
+            ->orderBy('semester', 'asc')
+            ->orderBy('kode_matkul', 'asc')
+            ->paginate(100);
 
         return view('livewire.prodi.manage-subjects', [
             'subjects' => $subjects
@@ -157,6 +163,7 @@ class ManageSubjects extends Component
         $this->nama_matkul = $subject->nama_matkul;
         $this->kode_matkul = $subject->kode_matkul;
         $this->sks = $subject->sks;
+        $this->semester = $subject->semester;
 
         $this->openModal();
     }

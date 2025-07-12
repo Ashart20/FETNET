@@ -75,7 +75,7 @@ class ManageActivities extends Component
         }
 
         // Ambil data lain yang dibutuhkan
-        $this->subjects = Subject::where('prodi_id', $prodi->id)->orderBy('nama_matkul')->get();
+        $this->subjects = Subject::where('prodi_id', $prodi->id)->orderBy('semester')->orderBy('kode_matkul')->get();
         $this->allStudentGroups = StudentGroup::where('prodi_id', $prodi->id)
             ->whereDoesntHave('children')
             ->orderBy('nama_kelompok')
@@ -87,8 +87,9 @@ class ManageActivities extends Component
     public function headers(): array
     {
         return [
-            ['key' => 'teacher_names', 'label' => 'Dosen'],
+            ['key' => 'subject.kode_matkul', 'label' => 'Kode Mata Kuliah'],
             ['key' => 'subject.nama_matkul', 'label' => 'Mata Kuliah'],
+            ['key' => 'teacher_names', 'label' => 'Dosen'],
             ['key' => 'student_group_names', 'label' => 'Kelompok'],
             ['key' => 'duration', 'label' => 'Sesi', 'class' => 'w-1 text-center'],
         ];

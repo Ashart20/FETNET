@@ -15,6 +15,7 @@ class Subject extends Model
         'nama_matkul',
         'kode_matkul',
         'sks',
+        'semester',
         'prodi_id',
         'comments',
     ];
