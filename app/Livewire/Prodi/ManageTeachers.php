@@ -43,9 +43,9 @@ class ManageTeachers extends Component
     public function headers(): array
     {
         return [
-            ['key' => 'id', 'label' => '#', 'class' => 'w-1'],
-            ['key' => 'nama_dosen', 'label' => 'Nama Dosen'],
+            ['key' => 'id', 'label' => '#', 'class' => 'w-1 hidden'],
             ['key' => 'kode_dosen', 'label' => 'Kode Dosen'],
+            ['key' => 'nama_dosen', 'label' => 'Nama Dosen'],
         ];
     }
 
@@ -72,7 +72,7 @@ class ManageTeachers extends Component
         }
 
 
-        $teachers = $teachersQuery->orderBy('kode_dosen')->paginate(100);
+        $teachers = $teachersQuery->orderBy('kode_dosen', 'ASC)->paginate(100);
 
         // Mengirimkan data headers ke view
         return view('livewire.prodi.manage-teachers', [
