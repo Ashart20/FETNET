@@ -1,15 +1,3 @@
-<?php
-    /**
-     * @var \Illuminate\Database\Eloquent\Collection $rooms
-     * @var \Illuminate\Database\Eloquent\Collection $days
-     * @var \Illuminate\Database\Eloquent\Collection $timeSlots
-     * @var array $constraints
-     * @var int|null $selectedRoomId
-     * @var int|null $highlightedDayId
-     * @var int|null $highlightedTimeSlotId
-     */
-?>
-
 <div>
     <?php if (isset($component)) { $__componentOriginal2aca76be1376419dfd37220f36011753 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal2aca76be1376419dfd37220f36011753 = $attributes; } ?>
@@ -42,22 +30,23 @@
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
          <?php $__env->slot('title', null, []); ?> 
-            <h1 class="text-2xl font-semibold">Manajemen Batasan Waktu Ruangan</h1>
+            <h1 class="text-2xl font-semibold">Manajemen Batasan Waktu Mahasiswa</h1>
          <?php $__env->endSlot(); ?>
 
-        <p class="mt-2 text-base-content/70">Pilih ruangan, lalu klik pada slot waktu untuk menandainya sebagai 'tidak tersedia' (merah).</p>
+        <p class="mt-2 text-base-content/70">Pilih kelompok mahasiswa, lalu klik pada slot waktu untuk menandainya sebagai 'waktu istirahat/terlarang' (merah).</p>
 
         <div class="my-4">
+            
             <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Ruangan','options' => $rooms,'optionValue' => 'id','optionLabel' => 'nama_ruangan','placeholder' => '-- Pilih Ruangan --','icon' => 'o-building-office-2'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Kelompok Mahasiswa','options' => $studentGroupsForDropdown,'placeholder' => '-- Pilih Kelompok --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Select::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model.live' => 'selectedRoomId']); ?>
+<?php $component->withAttributes(['wire:model.live' => 'selectedStudentGroupId']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginald64144c2287634503c73cd4803d6e578)): ?>
@@ -71,7 +60,7 @@
         </div>
 
         
-        <!--[if BLOCK]><![endif]--><?php if($highlightedDayId && $selectedRoomId): ?>
+        <!--[if BLOCK]><![endif]--><?php if($highlightedDayId && $selectedStudentGroupId): ?>
             <div class="p-3 mb-4 rounded-lg bg-blue-500/10 flex items-center justify-between gap-4">
                 <span class="text-sm font-semibold text-blue-500">
                     Kolom hari '<?php echo e($days->find($highlightedDayId)->name); ?>' sedang disorot.
@@ -140,9 +129,7 @@
                 </div>
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-
-        
-        <!--[if BLOCK]><![endif]--><?php if($highlightedTimeSlotId && $selectedRoomId): ?>
+        <!--[if BLOCK]><![endif]--><?php if($highlightedTimeSlotId && $selectedStudentGroupId): ?>
             <div class="p-3 mb-4 rounded-lg bg-blue-500/10 flex items-center justify-between gap-4">
                 <span class="text-sm font-semibold text-blue-500">
                     <?php
@@ -215,13 +202,12 @@
                 </div>
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-
-        <div wire:loading wire:target="selectedRoomId" class="w-full text-center text-base-content/50 my-4">
+        <div wire:loading wire:target="selectedStudentGroupId" class="w-full text-center text-base-content/50 my-4">
             <p>Memuat data batasan...</p>
         </div>
 
-        <!--[if BLOCK]><![endif]--><?php if($selectedRoomId): ?>
-            <div class="overflow-x-auto" wire:loading.remove wire:target="selectedRoomId">
+        <!--[if BLOCK]><![endif]--><?php if($selectedStudentGroupId): ?>
+            <div class="overflow-x-auto" wire:loading.remove wire:target="selectedStudentGroupId">
                 <table class="min-w-full border-collapse table-fixed">
                     <thead>
                     <tr>
@@ -274,7 +260,7 @@
             </div>
         <?php else: ?>
             <div class="mt-4 p-4 border-2 border-dashed border-base-300 rounded-lg text-center">
-                <p class="text-base-content/70">Pilih sebuah ruangan untuk melihat dan mengatur batasan waktunya.</p>
+                <p class="text-base-content/70">Pilih sebuah kelompok mahasiswa untuk melihat dan mengatur batasan waktu belajarnya.</p>
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
      <?php echo $__env->renderComponent(); ?>
@@ -287,4 +273,4 @@
 <?php $component = $__componentOriginal7f194736b6f6432dc38786f292496c34; ?>
 <?php unset($__componentOriginal7f194736b6f6432dc38786f292496c34); ?>
 <?php endif; ?>
-</div><?php /**PATH /home/ashart20/FETNET/resources/views/livewire/fakultas/manage-room-constraints.blade.php ENDPATH**/ ?>
+</div><?php /**PATH /home/ashart20/FETNET/resources/views/livewire/prodi/manage-student-group-constraints.blade.php ENDPATH**/ ?>

@@ -1,15 +1,3 @@
-<?php
-    /**
-     * @var \Illuminate\Database\Eloquent\Collection $rooms
-     * @var \Illuminate\Database\Eloquent\Collection $days
-     * @var \Illuminate\Database\Eloquent\Collection $timeSlots
-     * @var array $constraints
-     * @var int|null $selectedRoomId
-     * @var int|null $highlightedDayId
-     * @var int|null $highlightedTimeSlotId
-     */
-?>
-
 <div>
     <?php if (isset($component)) { $__componentOriginal2aca76be1376419dfd37220f36011753 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal2aca76be1376419dfd37220f36011753 = $attributes; } ?>
@@ -31,6 +19,7 @@
 <?php $component = $__componentOriginal2aca76be1376419dfd37220f36011753; ?>
 <?php unset($__componentOriginal2aca76be1376419dfd37220f36011753); ?>
 <?php endif; ?>
+    
     <?php if (isset($component)) { $__componentOriginal7f194736b6f6432dc38786f292496c34 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal7f194736b6f6432dc38786f292496c34 = $attributes; } ?>
 <?php $component = Mary\View\Components\Card::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -42,22 +31,22 @@
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
          <?php $__env->slot('title', null, []); ?> 
-            <h1 class="text-2xl font-semibold">Manajemen Batasan Waktu Ruangan</h1>
+            <h1 class="text-2xl font-semibold">Manajemen Batasan Waktu Dosen</h1>
          <?php $__env->endSlot(); ?>
 
-        <p class="mt-2 text-base-content/70">Pilih ruangan, lalu klik pada slot waktu untuk menandainya sebagai 'tidak tersedia' (merah).</p>
+        <p class="mt-2 text-base-content/70">Pilih dosen, lalu klik pada slot waktu untuk menandainya sebagai 'tidak tersedia' (merah). Klik pada header hari atau jam untuk menyorotnya.</p>
 
         <div class="my-4">
             <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Ruangan','options' => $rooms,'optionValue' => 'id','optionLabel' => 'nama_ruangan','placeholder' => '-- Pilih Ruangan --','icon' => 'o-building-office-2'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Dosen','options' => $teachers,'optionValue' => 'id','optionLabel' => 'nama_dosen','placeholder' => '-- Pilih Dosen --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Select::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model.live' => 'selectedRoomId']); ?>
+<?php $component->withAttributes(['wire:model.live' => 'selectedTeacherId']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginald64144c2287634503c73cd4803d6e578)): ?>
@@ -71,7 +60,7 @@
         </div>
 
         
-        <!--[if BLOCK]><![endif]--><?php if($highlightedDayId && $selectedRoomId): ?>
+        <!--[if BLOCK]><![endif]--><?php if($highlightedDayId && $selectedTeacherId): ?>
             <div class="p-3 mb-4 rounded-lg bg-blue-500/10 flex items-center justify-between gap-4">
                 <span class="text-sm font-semibold text-blue-500">
                     Kolom hari '<?php echo e($days->find($highlightedDayId)->name); ?>' sedang disorot.
@@ -142,7 +131,7 @@
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
         
-        <!--[if BLOCK]><![endif]--><?php if($highlightedTimeSlotId && $selectedRoomId): ?>
+        <!--[if BLOCK]><![endif]--><?php if($highlightedTimeSlotId && $selectedTeacherId): ?>
             <div class="p-3 mb-4 rounded-lg bg-blue-500/10 flex items-center justify-between gap-4">
                 <span class="text-sm font-semibold text-blue-500">
                     <?php
@@ -216,16 +205,18 @@
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-        <div wire:loading wire:target="selectedRoomId" class="w-full text-center text-base-content/50 my-4">
+        <div wire:loading wire:target="selectedTeacherId" class="w-full text-center text-base-content/50 my-4">
             <p>Memuat data batasan...</p>
         </div>
 
-        <!--[if BLOCK]><![endif]--><?php if($selectedRoomId): ?>
-            <div class="overflow-x-auto" wire:loading.remove wire:target="selectedRoomId">
+        <!--[if BLOCK]><![endif]--><?php if($selectedTeacherId): ?>
+            <div class="overflow-x-auto" wire:loading.remove wire:target="selectedTeacherId">
                 <table class="min-w-full border-collapse table-fixed">
                     <thead>
                     <tr>
+                        
                         <th class="p-2 border border-base-300 bg-base-200 w-32">Waktu</th>
+
                         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $days; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <th wire:click="highlightDay(<?php echo e($day->id); ?>)"
                                 class="p-2 border border-base-300 bg-base-200 cursor-pointer hover:bg-base-300
@@ -251,6 +242,7 @@
                                     $isHighlighted = ($highlightedDayId == $day->id || $highlightedTimeSlotId == $slot->id);
                                 ?>
 
+                                
                                 <td wire:click="toggleConstraint(<?php echo e($day->id); ?>, <?php echo e($slot->id); ?>)"
                                     class="p-2 border border-base-300 cursor-pointer transition-colors
                                     <?php if($isHighlighted): ?>
@@ -274,9 +266,10 @@
             </div>
         <?php else: ?>
             <div class="mt-4 p-4 border-2 border-dashed border-base-300 rounded-lg text-center">
-                <p class="text-base-content/70">Pilih sebuah ruangan untuk melihat dan mengatur batasan waktunya.</p>
+                <p class="text-base-content/70">Pilih seorang dosen untuk melihat dan mengatur batasan waktu mengajarnya.</p>
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal7f194736b6f6432dc38786f292496c34)): ?>
@@ -287,4 +280,4 @@
 <?php $component = $__componentOriginal7f194736b6f6432dc38786f292496c34; ?>
 <?php unset($__componentOriginal7f194736b6f6432dc38786f292496c34); ?>
 <?php endif; ?>
-</div><?php /**PATH /home/ashart20/FETNET/resources/views/livewire/fakultas/manage-room-constraints.blade.php ENDPATH**/ ?>
+</div><?php /**PATH /home/ashart20/FETNET/resources/views/livewire/prodi/manage-teacher-constraints.blade.php ENDPATH**/ ?>

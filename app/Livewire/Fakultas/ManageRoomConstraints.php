@@ -8,15 +8,22 @@ use App\Models\RoomTimeConstraint;
 use App\Models\TimeSlot;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
+use Mary\Traits\Toast;
 
 class ManageRoomConstraints extends Component
 {
+    use Toast;
+
     public Collection $rooms;
     public Collection $days;
     public Collection $timeSlots;
 
     public ?int $selectedRoomId = null;
     public array $constraints = [];
+
+    // Properti untuk menyorot
+    public ?int $highlightedDayId = null;
+    public ?int $highlightedTimeSlotId = null;
 
     public function mount()
     {
@@ -28,6 +35,7 @@ class ManageRoomConstraints extends Component
 
     public function updatedSelectedRoomId($value)
     {
+        $this->resetHighlight();
         $this->loadConstraints();
     }
 
@@ -46,7 +54,7 @@ class ManageRoomConstraints extends Component
     public function toggleConstraint($dayId, $timeSlotId)
     {
         if (!$this->selectedRoomId) {
-            session()->flash('error', 'Silakan pilih ruangan terlebih dahulu.');
+            $this->error('Silakan pilih ruangan terlebih dahulu.');
             return;
         }
 
@@ -55,7 +63,7 @@ class ManageRoomConstraints extends Component
         if (isset($this->constraints[$key])) {
             if($constraint = RoomTimeConstraint::find($this->constraints[$key]['id'])) {
                 $constraint->delete();
-                session()->flash('message', 'Batasan waktu berhasil dihapus.');
+                $this->success('Batasan waktu berhasil dihapus.');
             }
         } else {
             RoomTimeConstraint::create([
@@ -63,26 +71,76 @@ class ManageRoomConstraints extends Component
                 'day_id' => $dayId,
                 'time_slot_id' => $timeSlotId,
             ]);
-            session()->flash('message', 'Batasan waktu berhasil ditambahkan.');
+            $this->success('Batasan waktu berhasil ditambahkan.');
         }
 
+        $this->resetHighlight();
         $this->loadConstraints();
     }
 
-    public function getCellClasses($dayId, $slotId): string
+    public function highlightDay($dayId): void
     {
-        if (!$this->selectedRoomId) {
-            return 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed';
+        $this->highlightedTimeSlotId = null;
+        $this->highlightedDayId = $this->highlightedDayId == $dayId ? null : $dayId;
+    }
+
+    public function highlightTimeSlot($timeSlotId): void
+    {
+        $this->highlightedDayId = null;
+        $this->highlightedTimeSlotId = $this->highlightedTimeSlotId == $timeSlotId ? null : $timeSlotId;
+    }
+
+    public function setHighlightedDayUnavailable(): void
+    {
+        if (!$this->selectedRoomId || !$this->highlightedDayId) return;
+        foreach($this->timeSlots as $slot) {
+            RoomTimeConstraint::updateOrCreate(
+                ['master_ruangan_id' => $this->selectedRoomId, 'day_id' => $this->highlightedDayId, 'time_slot_id' => $slot->id]
+            );
         }
+        $this->finalizeBatchAction('Semua slot waktu pada hari yang dipilih berhasil ditandai tidak tersedia.');
+    }
 
-        $key = $dayId . '-' . $slotId;
-        $isConstrained = isset($this->constraints[$key]);
+    public function setHighlightedDayAvailable(): void
+    {
+        if (!$this->selectedRoomId || !$this->highlightedDayId) return;
+        RoomTimeConstraint::where('master_ruangan_id', $this->selectedRoomId)
+            ->where('day_id', $this->highlightedDayId)
+            ->delete();
+        $this->finalizeBatchAction('Semua batasan pada hari yang dipilih berhasil dikosongkan.');
+    }
 
-        $baseClasses = 'cursor-pointer transition-colors';
-        $constrainedClasses = 'bg-red-200 dark:bg-red-800/60 hover:bg-red-300 dark:hover:bg-red-700';
-        $availableClasses = 'bg-green-200 dark:bg-green-800/30 hover:bg-green-300 dark:hover:bg-green-700';
+    public function setHighlightedTimeSlotUnavailable(): void
+    {
+        if (!$this->selectedRoomId || !$this->highlightedTimeSlotId) return;
+        foreach($this->days as $day) {
+            RoomTimeConstraint::updateOrCreate(
+                ['master_ruangan_id' => $this->selectedRoomId, 'day_id' => $day->id, 'time_slot_id' => $this->highlightedTimeSlotId]
+            );
+        }
+        $this->finalizeBatchAction('Semua hari pada jam yang dipilih berhasil ditandai tidak tersedia.');
+    }
 
-        return $baseClasses . ' ' . ($isConstrained ? $constrainedClasses : $availableClasses);
+    public function setHighlightedTimeSlotAvailable(): void
+    {
+        if (!$this->selectedRoomId || !$this->highlightedTimeSlotId) return;
+        RoomTimeConstraint::where('master_ruangan_id', $this->selectedRoomId)
+            ->where('time_slot_id', $this->highlightedTimeSlotId)
+            ->delete();
+        $this->finalizeBatchAction('Semua batasan pada jam yang dipilih berhasil dikosongkan.');
+    }
+
+    public function resetHighlight(): void
+    {
+        $this->highlightedDayId = null;
+        $this->highlightedTimeSlotId = null;
+    }
+
+    private function finalizeBatchAction(string $message): void
+    {
+        $this->loadConstraints();
+        $this->resetHighlight();
+        $this->success($message);
     }
 
     public function render()
