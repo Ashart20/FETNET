@@ -29,8 +29,8 @@ class RolesAndUsersSeeder extends Seeder
         // agar Anda bisa login setelah database di-refresh.
         $fakultasUser = User::create([
             'name' => 'Admin Fakultas',
-            'email' => 'fakultas@fetnet.test',
-            'password' => Hash::make('password'),
+            'email' => 'deewahyu@upi.edu',
+            'password' => Hash::make('Ddw9889##'),
         ]);
         $fakultasUser->assignRole('fakultas');
 
