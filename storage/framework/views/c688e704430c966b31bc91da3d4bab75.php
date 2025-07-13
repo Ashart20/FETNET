@@ -20,22 +20,19 @@
         </a>
     </div>
     <div class="navbar-center hidden lg:flex">
-        
         <ul class="menu menu-horizontal px-1">
             <?php if(auth()->guard()->check()): ?>
                 
                 <li>
                     <?php
-                        $dashboardRouteName = '';
-                        if (auth()->user()->hasRole('fakultas')) {
-                            $dashboardRouteName = 'fakultas.dashboard';
-                        } elseif (auth()->user()->hasRole('prodi')) {
-                            $dashboardRouteName = 'prodi.dashboard';
-                        } elseif (auth()->user()->hasRole('mahasiswa')) {
-                            $dashboardRouteName = 'mahasiswa.dashboard';
-                        }
+                        $dashboardRouteName = match(true) {
+                            auth()->user()->hasRole('fakultas') => 'fakultas.dashboard',
+                            auth()->user()->hasRole('cluster') => 'cluster.dashboard',
+                            auth()->user()->hasRole('prodi') => 'prodi.dashboard',
+                            auth()->user()->hasRole('mahasiswa') => 'mahasiswa.dashboard',
+                            default => null
+                        };
                     ?>
-
                     <?php if($dashboardRouteName): ?>
                         <a href="<?php echo e(route($dashboardRouteName)); ?>" <?php if(request()->routeIs($dashboardRouteName)): ?> class="active" <?php endif; ?>>
                             <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
@@ -59,30 +56,6 @@
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
 <?php endif; ?> Dashboard
                         </a>
-                    <?php else: ?>
-                        
-                        <a href="/dashboard" class="btn btn-ghost">
-                            <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
-<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-home'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-icon'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
-<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
-<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
-<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
-<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?> Dashboard (Default)
-                        </a>
                     <?php endif; ?>
                 </li>
 
@@ -90,10 +63,9 @@
                 <?php if (\Illuminate\Support\Facades\Blade::check('role', 'fakultas')): ?>
                 <li>
                     <details>
-                        <summary>
-                            <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+                        <summary><?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
-<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-academic-cap'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-users'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-icon'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
@@ -110,17 +82,16 @@
 <?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
 <?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?> Prodi & User
-                        </summary>
+<?php endif; ?> User & Prodi</summary>
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
+                            <li><a href="<?php echo e(route('fakultas.cluster-users')); ?>" <?php if(request()->routeIs('fakultas.cluster-users')): ?> class="active" <?php endif; ?>>Manajemen User Cluster</a></li>
                             <li><a href="<?php echo e(route('fakultas.prodi')); ?>" <?php if(request()->routeIs('fakultas.prodi')): ?> class="active" <?php endif; ?>>Manajemen Prodi</a></li>
                         </ul>
                     </details>
                 </li>
                 <li>
                     <details>
-                        <summary>
-                            <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+                        <summary><?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
 <?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-building-office'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-icon'); ?>
@@ -139,85 +110,14 @@
 <?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
 <?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?> Ruangan & Batasan
-                        </summary>
+<?php endif; ?> Ruangan</summary>
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
                             <li><a href="<?php echo e(route('fakultas.rooms')); ?>" <?php if(request()->routeIs('fakultas.rooms')): ?> class="active" <?php endif; ?>>Manajemen Ruangan</a></li>
-                            <li><a href="<?php echo e(route('fakultas.preferred-rooms')); ?>" <?php if(request()->routeIs('fakultas.preferred-rooms')): ?> class="active" <?php endif; ?>>Preferensi Ruangan Aktivitas</a></li>
                             <li><a href="<?php echo e(route('fakultas.room-constraints')); ?>" <?php if(request()->routeIs('fakultas.room-constraints')): ?> class="active" <?php endif; ?>>Batasan Waktu Ruangan</a></li>
+                            <li><a href="<?php echo e(route('fakultas.preferred-rooms')); ?>" <?php if(request()->routeIs('fakultas.preferred-rooms')): ?> class="active" <?php endif; ?>>Preferensi Ruangan Aktivitas</a></li>
                         </ul>
                     </details>
                 </li>
-                <?php endif; ?>
-
-                
-                <?php if (\Illuminate\Support\Facades\Blade::check('role', 'prodi')): ?>
-                <li>
-                    <details>
-                        <summary>
-                            <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
-<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-archive-box'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-icon'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
-<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
-<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
-<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
-<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?> Manajemen Data
-                        </summary>
-                        <ul class="p-2 bg-base-100 rounded-t-none z-20">
-                            <li><a href="<?php echo e(route('prodi.teachers')); ?>" <?php if(request()->routeIs('prodi.teachers')): ?> class="active" <?php endif; ?>>Dosen</a></li>
-                            <li><a href="<?php echo e(route('prodi.subjects')); ?>" <?php if(request()->routeIs('prodi.subjects')): ?> class="active" <?php endif; ?>>Mata Kuliah</a></li>
-                            <li><a href="<?php echo e(route('prodi.student-groups')); ?>" <?php if(request()->routeIs('prodi.student-groups')): ?> class="active" <?php endif; ?>>Kelompok Mahasiswa</a></li>
-                            <li><a href="<?php echo e(route('prodi.activities')); ?>" <?php if(request()->routeIs('prodi.activities')): ?> class="active" <?php endif; ?>>Aktivitas</a></li>
-                        </ul>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>
-                            <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
-<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-clock'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-icon'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
-<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
-<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
-<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
-<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?> Manajemen Batasan
-                        </summary>
-                        <ul class="p-2 bg-base-100 rounded-t-none z-20">
-                            <li><a href="<?php echo e(route('prodi.teacher-constraints')); ?>" <?php if(request()->routeIs('prodi.teacher-constraints')): ?> class="active" <?php endif; ?>>Batasan Dosen</a></li>
-                            <li><a href="<?php echo e(route('prodi.student-group-constraints')); ?>" <?php if(request()->routeIs('prodi.student-group-constraints')): ?> class="active" <?php endif; ?>>Batasan Mahasiswa</a></li>
-                        </ul>
-                    </details>
-                </li>
-                <?php endif; ?>
-
-                
-                <?php if (\Illuminate\Support\Facades\Blade::check('role', 'fakultas')): ?>
                 <li>
                     <a href="<?php echo e(route('fakultas.schedules.index')); ?>" <?php if(request()->routeIs('fakultas.schedules.index')): ?> class="active" <?php endif; ?>>
                         <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
@@ -239,8 +139,7 @@
 <?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
 <?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?>
-                        Jadwal Utama
+<?php endif; ?> Jadwal Utama
                     </a>
                 </li>
                 <li>
@@ -264,8 +163,7 @@
 <?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
 <?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?>
-                        Generate Jadwal
+<?php endif; ?> Generate Jadwal
                     </a>
                 </li>
                 <li>
@@ -289,13 +187,152 @@
 <?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
 <?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?> Pengecekan Konflik
+                    </a>
+                </li>
+
+                <?php endif; ?>
+
+                
+                <?php if (\Illuminate\Support\Facades\Blade::check('role', 'prodi')): ?>
+                <li>
+                    <details>
+                        <summary><?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-archive-box'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-icon'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
 <?php endif; ?>
-                        Pengecekan Konflik
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?> Manajemen Data</summary>
+                        <ul class="p-2 bg-base-100 rounded-t-none z-20">
+                            <li><a href="<?php echo e(route('prodi.teachers')); ?>" <?php if(request()->routeIs('prodi.teachers')): ?> class="active" <?php endif; ?>>Dosen</a></li>
+                            <li><a href="<?php echo e(route('prodi.subjects')); ?>" <?php if(request()->routeIs('prodi.subjects')): ?> class="active" <?php endif; ?>>Mata Kuliah</a></li>
+                            <li><a href="<?php echo e(route('prodi.student-groups')); ?>" <?php if(request()->routeIs('prodi.student-groups')): ?> class="active" <?php endif; ?>>Kelompok Mahasiswa</a></li>
+                            <li><a href="<?php echo e(route('prodi.activities')); ?>" <?php if(request()->routeIs('prodi.activities')): ?> class="active" <?php endif; ?>>Aktivitas</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <details>
+                        <summary><?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-clock'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-icon'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?> Manajemen Batasan</summary>
+                        <ul class="p-2 bg-base-100 rounded-t-none z-20">
+                            <li><a href="<?php echo e(route('prodi.teacher-constraints')); ?>" <?php if(request()->routeIs('prodi.teacher-constraints')): ?> class="active" <?php endif; ?>>Batasan Dosen</a></li>
+                            <li><a href="<?php echo e(route('prodi.student-group-constraints')); ?>" <?php if(request()->routeIs('prodi.student-group-constraints')): ?> class="active" <?php endif; ?>>Batasan Mahasiswa</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <?php endif; ?>
+
+                
+                <?php if (\Illuminate\Support\Facades\Blade::check('role', 'cluster')): ?>
+                <li>
+                    <a href="<?php echo e(route('cluster.activities')); ?>" <?php if(request()->routeIs('cluster.activities')): ?> class="active" <?php endif; ?>>
+                        <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-sparkles'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-icon'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?> Manajemen Aktivitas
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo e(route('cluster.generate')); ?>" <?php if(request()->routeIs('cluster.generate')): ?> class="active" <?php endif; ?>>
+                        <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-rocket-launch'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-icon'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?> Generate Jadwal
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo e(route('cluster.simulations.index')); ?>" <?php if(request()->routeIs('cluster.simulations.index')): ?> class="active" <?php endif; ?>>
+                        <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-presentation-chart-line'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-icon'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?> Hasil Simulasi
                     </a>
                 </li>
                 <?php endif; ?>
 
-                <?php if (\Illuminate\Support\Facades\Blade::check('role', 'prodi')): ?>
+                
+                <?php if (\Illuminate\Support\Facades\Blade::check('hasanyrole', 'prodi|mahasiswa|cluster')): ?>
                 <li>
                     <a href="<?php echo e(route('hasil.fet')); ?>" <?php if(request()->routeIs('hasil.fet')): ?> class="active" <?php endif; ?>>
                         <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
@@ -317,11 +354,11 @@
 <?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
 <?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
-<?php endif; ?>
-                        Jadwal Utama
+<?php endif; ?> Jadwal Utama
                     </a>
                 </li>
                 <?php endif; ?>
+
             <?php endif; ?>
         </ul>
     </div>
@@ -347,12 +384,9 @@
 <?php $component = $__componentOriginal96fdff35e0ddfd31ddf96c499b591184; ?>
 <?php unset($__componentOriginal96fdff35e0ddfd31ddf96c499b591184); ?>
 <?php endif; ?>
-
         <?php if(auth()->guard()->check()): ?>
-
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost">
-                    
                     <span><?php echo e(Auth::user()->name); ?></span>
                 </div>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[20] p-2 shadow bg-base-100 rounded-box w-52">
@@ -370,7 +404,7 @@
 </div>
 
 
-<main class="p-4 sm:p-6 lg:p-8">
+<main>
     <?php echo e($slot); ?>
 
 </main>

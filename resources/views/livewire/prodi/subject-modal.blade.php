@@ -3,6 +3,7 @@
         <x-mary-input label="Nama Mata Kuliah" wire:model="nama_matkul" class="input-bordered" />
         <x-mary-input label="Kode Mata Kuliah" wire:model="kode_matkul" class="input-bordered" />
         <x-mary-input label="Jumlah SKS" wire:model="sks" type="number" min="1" max="6" class="input-bordered" />
+        <x-mary-input label="Semester" wire:model="semester" type="number" class="input-bordered" />
     </div>
 
 

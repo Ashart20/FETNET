@@ -94,8 +94,8 @@ class ManageTeachers extends Component
         return [
             ['key' => 'kode_dosen', 'label' => 'Kode Dosen'],
             ['key' => 'nama_dosen', 'label' => 'Nama Lengkap Dosen', 'sortable' => true],
-            ['key' => 'email', 'label' => 'Email'],
-            ['key' => 'nomor_hp', 'label' => 'No. HP'],
+            ['key' => 'kode_univ', 'label' => 'Kode Universitas'],
+            ['key' => 'employee_id', 'label' => 'Employee ID'],
             ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
         ];
     }

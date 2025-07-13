@@ -10,6 +10,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
@@ -27,7 +28,8 @@ class User extends Authenticatable
         'email',
         'password',
         'prodi_id',
-        'student_group_id'
+        'student_group_id',
+        'cluster_id'
     ];
 
     /**
@@ -67,8 +69,8 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Prodi::class);
     }
-    public function clusters(): HasMany
+    public function cluster(): BelongsTo
     {
-        return $this->hasMany(Cluster::class);
+        return $this->belongsTo(Cluster::class);
     }
 }

@@ -88,7 +88,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">{{ $item->activity->subject->sks ?? '-' }}</td>
                         <td class="px-6 py-4 text-gray-900 dark:text-white">
-                            {!! $item->activity->teachers->pluck('nama_dosen')->implode('<br>') !!}
+                            {!! $item->activity->teachers->pluck('full_name')->implode('<br>') !!}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">
                             @forelse($item->activity->studentGroups as $studentGroup)

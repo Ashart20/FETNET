@@ -40,16 +40,6 @@
                         <x-mary-input label="Nama Prodi" wire:model="nama_prodi" />
                         <x-mary-input label="Abbreviation" wire:model="abbreviation" placeholder="Contoh: TE" />
                         <x-mary-input label="Kode Prodi" wire:model="kode" />
-                        {{-- Form kecil untuk menambah cluster baru --}}
-                        <div class="p-4 border rounded-lg dark:border-gray-700 space-y-3">
-                            <p class="text-sm font-bold text-gray-600 dark:text-gray-300">Tambah Cluster Baru</p>
-                            @if(session('cluster-message'))
-                                <x-mary-alert :description="session('cluster-message')" icon="o-check-circle" class="alert-success text-xs" />
-                            @endif
-                            <x-mary-input wire:model="newClusterName" label="Nama Cluster Baru" placeholder="Contoh:Departemen Pendidikan Elektro" />
-                            <x-mary-input wire:model="newClusterCode" label="Kode Cluster Baru" placeholder="Contoh: DPTE" />
-                            <x-mary-button label="Simpan Cluster" wire:click="addNewCluster" class="btn-primary btn-sm w-full" spinner="addNewCluster" />
-                        </div>
 
                         {{-- Dropdown Cluster Standar --}}
                         <x-mary-select label="Cluster" :options="$clusters" wire:model="cluster_id" placeholder="-- Pilih Cluster --" />

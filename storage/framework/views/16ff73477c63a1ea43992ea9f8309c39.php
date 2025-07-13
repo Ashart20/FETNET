@@ -34,7 +34,6 @@
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
              <?php $__env->slot('actions', null, []); ?> 
-                
                 <div class="flex flex-wrap gap-2">
                     <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
@@ -109,7 +108,6 @@
 <?php unset($__componentOriginal6f99ffca722ef3c8789c4087c5ac9f0d); ?>
 <?php endif; ?>
 
-        
         <?php if (isset($component)) { $__componentOriginal8fbd727209323874b055feef49197909 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal8fbd727209323874b055feef49197909 = $attributes; } ?>
 <?php $component = Mary\View\Components\Table::resolve(['headers' => $this->headers(),'rows' => $subjects,'withPagination' => true,'striped' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -175,7 +173,6 @@
 <?php unset($__componentOriginal8fbd727209323874b055feef49197909); ?>
 <?php endif; ?>
 
-        
         <div class="mt-8">
             <?php if (isset($component)) { $__componentOriginal7f194736b6f6432dc38786f292496c34 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal7f194736b6f6432dc38786f292496c34 = $attributes; } ?>

@@ -109,8 +109,6 @@
         </div>
 
         
-
-        
         <!--[if BLOCK]><![endif]--><?php if($viewMode === 'manage'): ?>
             <div class="space-y-6">
                 
@@ -341,7 +339,6 @@
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     </div>
 
-    
     <?php if (isset($component)) { $__componentOriginal89a573612f1f1cb2dd9fc072235d4356 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal89a573612f1f1cb2dd9fc072235d4356 = $attributes; } ?>
 <?php $component = Mary\View\Components\Modal::resolve(['title' => ''.e($teacherId ? 'Edit' : 'Tambah').' Data Dosen','separator' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>

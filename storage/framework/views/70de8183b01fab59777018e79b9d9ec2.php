@@ -89,7 +89,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400"><?php echo e($item->activity->subject->sks ?? '-'); ?></td>
                         <td class="px-6 py-4 text-gray-900 dark:text-white">
-                            <?php echo $item->activity->teachers->pluck('nama_dosen')->implode('<br>'); ?>
+                            <?php echo $item->activity->teachers->pluck('full_name')->implode('<br>'); ?>
 
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">

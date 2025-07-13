@@ -34,4 +34,8 @@ class Cluster extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
 }

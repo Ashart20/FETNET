@@ -9,7 +9,7 @@
 </head>
 <body class="min-h-screen font-sans antialiased bg-base-200">
 
-{{-- Workaround: Navbar manual menggunakan kelas DaisyUI --}}
+{{-- Navbar --}}
 <div class="navbar bg-base-100 shadow-md sticky top-0 z-30 px-4">
     <div class="navbar-start">
         {{-- Logo --}}
@@ -19,67 +19,70 @@
         </a>
     </div>
     <div class="navbar-center hidden lg:flex">
-        {{-- Menu Manual dengan komponen Mary UI --}}
         <ul class="menu menu-horizontal px-1">
             @auth
-                {{-- LINK UMUM - DASHBOARD DINAMIS --}}
+                {{-- LINK DASHBOARD DINAMIS --}}
                 <li>
                     @php
-                        $dashboardRouteName = '';
-                        if (auth()->user()->hasRole('fakultas')) {
-                            $dashboardRouteName = 'fakultas.dashboard';
-                        } elseif (auth()->user()->hasRole('prodi')) {
-                            $dashboardRouteName = 'prodi.dashboard';
-                        } elseif (auth()->user()->hasRole('mahasiswa')) {
-                            $dashboardRouteName = 'mahasiswa.dashboard';
-                        }
+                        $dashboardRouteName = match(true) {
+                            auth()->user()->hasRole('fakultas') => 'fakultas.dashboard',
+                            auth()->user()->hasRole('cluster') => 'cluster.dashboard',
+                            auth()->user()->hasRole('prodi') => 'prodi.dashboard',
+                            auth()->user()->hasRole('mahasiswa') => 'mahasiswa.dashboard',
+                            default => null
+                        };
                     @endphp
-
                     @if ($dashboardRouteName)
                         <a href="{{ route($dashboardRouteName) }}" @if(request()->routeIs($dashboardRouteName)) class="active" @endif>
                             <x-mary-icon name="o-home" /> Dashboard
                         </a>
-                    @else
-                        {{-- Fallback jika user tidak memiliki peran dashboard yang terdefinisi --}}
-                        <a href="/dashboard" class="btn btn-ghost">
-                            <x-mary-icon name="o-home" /> Dashboard (Default)
-                        </a>
                     @endif
                 </li>
 
-                {{-- MENU FAKULTAS --}}
+                {{-- ================= MENU FAKULTAS ================= --}}
                 @role('fakultas')
                 <li>
                     <details>
-                        <summary>
-                            <x-mary-icon name="o-academic-cap" /> Prodi & User
-                        </summary>
+                        <summary><x-mary-icon name="o-users" /> User & Prodi</summary>
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
+                            <li><a href="{{ route('fakultas.cluster-users') }}" @if(request()->routeIs('fakultas.cluster-users')) class="active" @endif>Manajemen User Cluster</a></li>
                             <li><a href="{{ route('fakultas.prodi') }}" @if(request()->routeIs('fakultas.prodi')) class="active" @endif>Manajemen Prodi</a></li>
                         </ul>
                     </details>
                 </li>
                 <li>
                     <details>
-                        <summary>
-                            <x-mary-icon name="o-building-office" /> Ruangan & Batasan
-                        </summary>
+                        <summary><x-mary-icon name="o-building-office" /> Ruangan</summary>
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
                             <li><a href="{{ route('fakultas.rooms') }}" @if(request()->routeIs('fakultas.rooms')) class="active" @endif>Manajemen Ruangan</a></li>
-                            <li><a href="{{ route('fakultas.preferred-rooms') }}" @if(request()->routeIs('fakultas.preferred-rooms')) class="active" @endif>Preferensi Ruangan Aktivitas</a></li>
                             <li><a href="{{ route('fakultas.room-constraints') }}" @if(request()->routeIs('fakultas.room-constraints')) class="active" @endif>Batasan Waktu Ruangan</a></li>
+                            <li><a href="{{ route('fakultas.preferred-rooms') }}" @if(request()->routeIs('fakultas.preferred-rooms')) class="active" @endif>Preferensi Ruangan Aktivitas</a></li>
                         </ul>
                     </details>
                 </li>
+                <li>
+                    <a href="{{ route('fakultas.schedules.index') }}" @if(request()->routeIs('fakultas.schedules.index')) class="active" @endif>
+                        <x-mary-icon name="o-calendar-days" /> Jadwal Utama
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('fakultas.generate.index') }}" @if(request()->routeIs('fakultas.generate.index')) class="active" @endif>
+                        <x-mary-icon name="o-rocket-launch" /> Generate Jadwal
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('fakultas.conflict.index') }}" @if(request()->routeIs('fakultas.conflict.index')) class="active" @endif>
+                        <x-mary-icon name="o-shield-check" /> Pengecekan Konflik
+                    </a>
+                </li>
+
                 @endrole
 
-                {{-- MENU PRODI --}}
+                {{-- ================= MENU PRODI ================= --}}
                 @role('prodi')
                 <li>
                     <details>
-                        <summary>
-                            <x-mary-icon name="o-archive-box" /> Manajemen Data
-                        </summary>
+                        <summary><x-mary-icon name="o-archive-box" /> Manajemen Data</summary>
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
                             <li><a href="{{ route('prodi.teachers') }}" @if(request()->routeIs('prodi.teachers')) class="active" @endif>Dosen</a></li>
                             <li><a href="{{ route('prodi.subjects') }}" @if(request()->routeIs('prodi.subjects')) class="active" @endif>Mata Kuliah</a></li>
@@ -90,9 +93,7 @@
                 </li>
                 <li>
                     <details>
-                        <summary>
-                            <x-mary-icon name="o-clock" /> Manajemen Batasan
-                        </summary>
+                        <summary><x-mary-icon name="o-clock" /> Manajemen Batasan</summary>
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
                             <li><a href="{{ route('prodi.teacher-constraints') }}" @if(request()->routeIs('prodi.teacher-constraints')) class="active" @endif>Batasan Dosen</a></li>
                             <li><a href="{{ route('prodi.student-group-constraints') }}" @if(request()->routeIs('prodi.student-group-constraints')) class="active" @endif>Batasan Mahasiswa</a></li>
@@ -101,48 +102,43 @@
                 </li>
                 @endrole
 
-                {{-- LINK JADWAL UNTUK FAKULTAS --}}
-                @role('fakultas')
+                {{-- ================= MENU CLUSTER (BARU) ================= --}}
+                @role('cluster')
                 <li>
-                    <a href="{{ route('fakultas.schedules.index') }}" @if(request()->routeIs('fakultas.schedules.index')) class="active" @endif>
-                        <x-mary-icon name="o-calendar-days" />
-                        Jadwal Utama
+                    <a href="{{ route('cluster.activities') }}" @if(request()->routeIs('cluster.activities')) class="active" @endif>
+                        <x-mary-icon name="o-sparkles" /> Manajemen Aktivitas
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('fakultas.generate.index') }}" @if(request()->routeIs('fakultas.generate.index')) class="active" @endif>
-                        <x-mary-icon name="o-rocket-launch" />
-                        Generate Jadwal
+                    <a href="{{ route('cluster.generate') }}" @if(request()->routeIs('cluster.generate')) class="active" @endif>
+                        <x-mary-icon name="o-rocket-launch" /> Generate Jadwal
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('fakultas.conflict.index') }}" @if(request()->routeIs('fakultas.conflict.index')) class="active" @endif>
-                        <x-mary-icon name="o-shield-check" />
-                        Pengecekan Konflik
+                    <a href="{{ route('cluster.simulations.index') }}" @if(request()->routeIs('cluster.simulations.index')) class="active" @endif>
+                        <x-mary-icon name="o-presentation-chart-line" /> Hasil Simulasi
                     </a>
                 </li>
                 @endrole
 
-                @role('prodi')
+                {{-- ================= MENU JADWAL UTAMA (UMUM) ================= --}}
+                @hasanyrole('prodi|mahasiswa|cluster')
                 <li>
                     <a href="{{ route('hasil.fet') }}" @if(request()->routeIs('hasil.fet')) class="active" @endif>
-                        <x-mary-icon name="o-calendar-days" />
-                        Jadwal Utama
+                        <x-mary-icon name="o-calendar-days" /> Jadwal Utama
                     </a>
                 </li>
-                @endrole
+                @endhasanyrole
+
             @endauth
         </ul>
     </div>
     <div class="navbar-end">
         {{-- Aksi di Kanan --}}
         <x-mary-theme-toggle class="btn btn-ghost btn-circle" />
-
         @auth
-
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost">
-                    {{-- Tampilkan nama pengguna yang sedang login --}}
                     <span>{{ Auth::user()->name }}</span>
                 </div>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[20] p-2 shadow bg-base-100 rounded-box w-52">
@@ -160,7 +156,7 @@
 </div>
 
 {{-- Konten Utama Halaman --}}
-<main class="p-4 sm:p-6 lg:p-8">
+<main>
     {{ $slot }}
 </main>
 

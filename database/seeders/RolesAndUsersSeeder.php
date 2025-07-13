@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use App\Models\User; // Pastikan untuk import User
 use App\Models\Prodi;
+use App\Models\Cluster;
 use Illuminate\Support\Facades\Hash; // Import Hash untuk password
 
 class RolesAndUsersSeeder extends Seeder
@@ -22,6 +23,7 @@ class RolesAndUsersSeeder extends Seeder
         Role::create(['name' => 'fakultas']);
         Role::create(['name' => 'prodi']);
         Role::create(['name' => 'mahasiswa']);
+        Role::firstOrCreate(['name' => 'cluster']);
         // Anda bisa tambahkan 'super-admin' jika perlu
         // Role::create(['name' => 'super-admin']);
 
