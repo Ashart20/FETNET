@@ -87,11 +87,14 @@ class ManageActivities extends Component
     public function headers(): array
     {
         return [
-            ['key' => 'subject.kode_matkul', 'label' => 'Kode Mata Kuliah'],
+            ['key' => 'subject.kode_matkul', 'label' => 'Kode','class' => 'w-2'],
             ['key' => 'subject.nama_matkul', 'label' => 'Mata Kuliah'],
+            ['key' => 'subject.semester', 'label' => 'Semester', 'class' => 'w-2 text-center'],
+            ['key' => 'duration', 'label' => 'Durasi', 'class' => 'w-2 text-center'],
+            ['key' => 'student_group_names', 'label' => 'Kelompok','class' => 'w-10 text-left'],
             ['key' => 'teacher_names', 'label' => 'Dosen'],
-            ['key' => 'student_group_names', 'label' => 'Kelompok'],
-            ['key' => 'duration', 'label' => 'Sesi', 'class' => 'w-1 text-center'],
+
+
         ];
     }
     public function getStudentGroupNamesAttribute(Activity $activity): string
