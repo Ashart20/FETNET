@@ -14,6 +14,7 @@ class Day extends Model
 
     /**
      * Nonaktifkan timestamp (created_at, updated_at) untuk model ini.
+     *
      * @var bool
      */
     public $timestamps = false;

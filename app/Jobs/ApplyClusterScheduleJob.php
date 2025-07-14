@@ -10,15 +10,16 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 
 class ApplyClusterScheduleJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected int $clusterId;
+
     protected string $simulationFolder;
 
     public function __construct(int $clusterId, string $simulationFolder)
@@ -32,8 +33,9 @@ class ApplyClusterScheduleJob implements ShouldQueue
         Log::info("MEMULAI PENERAPAN JADWAL dari simulasi '{$this->simulationFolder}' untuk Cluster ID: {$this->clusterId}.");
 
         $cluster = Cluster::find($this->clusterId);
-        if (!$cluster) {
+        if (! $cluster) {
             Log::error("Penerapan gagal: Cluster dengan ID {$this->clusterId} tidak ditemukan.");
+
             return;
         }
 
@@ -41,7 +43,7 @@ class ApplyClusterScheduleJob implements ShouldQueue
             // 1. Hapus jadwal lama (logika ini sudah benar)
             $prodiIds = $cluster->prodis->pluck('id');
             if ($prodiIds->isNotEmpty()) {
-                Log::info("Menghapus jadwal lama untuk prodi ID: " . $prodiIds->implode(', '));
+                Log::info('Menghapus jadwal lama untuk prodi ID: '.$prodiIds->implode(', '));
                 $scheduleIdsToDelete = Schedule::whereHas('activity', fn ($q) => $q->whereIn('prodi_id', $prodiIds))->pluck('id');
                 if ($scheduleIdsToDelete->isNotEmpty()) {
                     DB::table('schedule_teacher')->whereIn('schedule_id', $scheduleIdsToDelete)->delete();
@@ -60,7 +62,7 @@ class ApplyClusterScheduleJob implements ShouldQueue
                 Log::info("Memulai parsing untuk file: {$outputFilePath}");
                 Artisan::call('fet:parse', [
                     'file' => $outputFilePath,
-                    '--no-cleanup' => true
+                    '--no-cleanup' => true,
                 ]);
                 Log::info("Parsing untuk simulasi '{$this->simulationFolder}' selesai.");
             } else {
@@ -68,7 +70,7 @@ class ApplyClusterScheduleJob implements ShouldQueue
             }
 
         } catch (\Exception $e) {
-            Log::critical("GAGAL TOTAL SAAT MENERAPKAN JADWAL SIMULASI: " . $e->getMessage());
+            Log::critical('GAGAL TOTAL SAAT MENERAPKAN JADWAL SIMULASI: '.$e->getMessage());
             throw $e;
         }
     }

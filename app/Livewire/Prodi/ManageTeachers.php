@@ -2,36 +2,43 @@
 
 namespace App\Livewire\Prodi;
 
-use App\Models\Prodi;
-use App\Models\Teacher;
 use App\Exports\TeacherTemplateExport;
 use App\Imports\TeachersImport;
+use App\Models\Prodi;
+use App\Models\Teacher;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
-use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
-use Illuminate\Support\Facades\Storage;
 use Mary\Traits\Toast;
 
 class ManageTeachers extends Component
 {
-
-    use WithPagination, Toast, WithFileUploads;
+    use Toast, WithFileUploads, WithPagination;
 
     // Properti untuk mengontrol tampilan
     public string $viewMode = 'manage';
 
     // Properti untuk data di form modal
     public ?int $teacherId = null;
+
     public string $nama_dosen = '';
+
     public string $kode_dosen = '';
+
     public string $title_depan = '';
+
     public string $title_belakang = '';
+
     public string $kode_univ = '';
+
     public string $employee_id = '';
+
     public string $email = '';
+
     public string $nomor_hp = '';
 
     // Properti untuk kontrol UI
@@ -82,8 +89,8 @@ class ManageTeachers extends Component
      */
     protected $messages = [
         'required' => ':attribute wajib diisi.',
-        'unique'   => ':attribute ini sudah terdaftar.',
-        'email'    => 'Format :attribute tidak valid.',
+        'unique' => ':attribute ini sudah terdaftar.',
+        'email' => 'Format :attribute tidak valid.',
     ];
 
     /**
@@ -130,7 +137,7 @@ class ManageTeachers extends Component
 
         return view('livewire.prodi.manage-teachers', [
             'teachers' => $teachers,
-            'headers' => $this->headers()
+            'headers' => $this->headers(),
         ])->layout('layouts.app');
     }
 
@@ -163,7 +170,7 @@ class ManageTeachers extends Component
      */
     public function edit($id)
     {
-        $teacher = Teacher::whereHas('prodis', fn($q) => $q->where('prodis.id', auth()->user()->prodi_id))->findOrFail($id);
+        $teacher = Teacher::whereHas('prodis', fn ($q) => $q->where('prodis.id', auth()->user()->prodi_id))->findOrFail($id);
 
         $this->teacherId = $id;
         $this->nama_dosen = $teacher->nama_dosen;
@@ -184,7 +191,7 @@ class ManageTeachers extends Component
     public function delete($id)
     {
         try {
-            $teacher = Teacher::whereHas('prodis', fn($q) => $q->where('prodis.id', auth()->user()->prodi_id))->findOrFail($id);
+            $teacher = Teacher::whereHas('prodis', fn ($q) => $q->where('prodis.id', auth()->user()->prodi_id))->findOrFail($id);
             $teacher->prodis()->detach(auth()->user()->prodi_id);
 
             if ($teacher->prodis()->count() === 0) {
@@ -211,11 +218,11 @@ class ManageTeachers extends Component
             $failures = $e->failures();
             $errorMessages = [];
             foreach ($failures as $failure) {
-                $errorMessages[] = "Baris ke-{$failure->row()}: " . implode(', ', $failure->errors());
+                $errorMessages[] = "Baris ke-{$failure->row()}: ".implode(', ', $failure->errors());
             }
-            $this->error('Impor Gagal: Ditemukan kesalahan validasi', implode("<br>", $errorMessages), timeout: 15000);
+            $this->error('Impor Gagal: Ditemukan kesalahan validasi', implode('<br>', $errorMessages), timeout: 15000);
         } catch (\Exception $e) {
-            $this->error('Impor Gagal.', 'Pastikan format dan header file Excel Anda sudah benar. Detail: ' . $e->getMessage(), timeout: 10000);
+            $this->error('Impor Gagal.', 'Pastikan format dan header file Excel Anda sudah benar. Detail: '.$e->getMessage(), timeout: 10000);
         }
     }
 
@@ -233,6 +240,7 @@ class ManageTeachers extends Component
         ];
 
         Excel::store(new TeacherTemplateExport($data), $filename, $disk);
+
         return Storage::disk($disk)->download($filename);
     }
 

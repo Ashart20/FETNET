@@ -2,25 +2,25 @@
 
 namespace App\Livewire\Fakultas;
 
+use App\Exports\RoomTemplateExport;
+use App\Imports\RoomsImport;
 use App\Models\Building;
 use App\Models\MasterRuangan;
-use App\Imports\RoomsImport;
-use App\Exports\RoomTemplateExport;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
-use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
-use Illuminate\Support\Facades\Storage;
 use Mary\Traits\Toast;
 
 class ManageRooms extends Component
 {
-    use WithPagination;
     use Toast;
     use WithFileUploads;
+    use WithPagination;
 
     // Properti untuk form utama
     #[Rule('required|string|max:255')]
@@ -54,6 +54,7 @@ class ManageRooms extends Component
     public string $newBuildingCode = '';
 
     public bool $roomModal = false;
+
     public $file;
 
     /**
@@ -62,7 +63,7 @@ class ManageRooms extends Component
     public function rules(): array
     {
         return [
-            'kode_ruangan' => 'required|string|max:50|unique:master_ruangans,kode_ruangan,' . $this->roomId,
+            'kode_ruangan' => 'required|string|max:50|unique:master_ruangans,kode_ruangan,'.$this->roomId,
         ];
     }
 
@@ -93,6 +94,7 @@ class ManageRooms extends Component
     public function render()
     {
         $rooms = MasterRuangan::with('building')->latest()->paginate(10);
+
         return view('livewire.fakultas.manage-rooms', [
             'rooms' => $rooms,
         ])->layout('layouts.app');
@@ -111,7 +113,7 @@ class ManageRooms extends Component
 
         $finalBuildingId = $this->building_id;
 
-        if (!empty($this->newBuildingName) && !empty($this->newBuildingCode)) {
+        if (! empty($this->newBuildingName) && ! empty($this->newBuildingCode)) {
             // Buat gedung baru
             $newBuilding = Building::create([
                 'name' => $this->newBuildingName,
@@ -129,6 +131,7 @@ class ManageRooms extends Component
         // Pastikan ada ID gedung sebelum melanjutkan
         if (empty($finalBuildingId)) {
             $this->error('Gagal menyimpan.', 'Gedung tidak valid. Silakan pilih dari daftar atau buat yang baru.');
+
             return;
         }
 
@@ -136,11 +139,11 @@ class ManageRooms extends Component
         $roomData = [
             'nama_ruangan' => $this->nama_ruangan,
             'kode_ruangan' => $this->kode_ruangan,
-            'building_id'  => $finalBuildingId,
-            'lantai'       => $this->lantai,
-            'kapasitas'    => $this->kapasitas,
-            'tipe'         => $this->tipe,
-            'user_id'      => auth()->id(),
+            'building_id' => $finalBuildingId,
+            'lantai' => $this->lantai,
+            'kapasitas' => $this->kapasitas,
+            'tipe' => $this->tipe,
+            'user_id' => auth()->id(),
         ];
 
         // Buat atau perbarui data ruangan
@@ -178,18 +181,18 @@ class ManageRooms extends Component
     {
         $this->validateOnly('file');
         try {
-            Excel::import(new RoomsImport(), $this->file);
+            Excel::import(new RoomsImport, $this->file);
             $this->success('Data ruangan berhasil diimpor.', position: 'toast-bottom');
             $this->reset('file');
         } catch (ValidationException $e) {
             $failures = $e->failures();
             $errorMessages = [];
             foreach ($failures as $failure) {
-                $errorMessages[] = "Baris ke-{$failure->row()}: " . implode(', ', $failure->errors());
+                $errorMessages[] = "Baris ke-{$failure->row()}: ".implode(', ', $failure->errors());
             }
-            $this->error('Impor Gagal. Ditemukan kesalahan:', implode("<br>", $errorMessages), timeout: 10000);
+            $this->error('Impor Gagal. Ditemukan kesalahan:', implode('<br>', $errorMessages), timeout: 10000);
         } catch (\Exception $e) {
-            $this->error('Impor Gagal.', 'Pastikan format dan header file Excel Anda sudah benar. ' . $e->getMessage(), timeout: 10000);
+            $this->error('Impor Gagal.', 'Pastikan format dan header file Excel Anda sudah benar. '.$e->getMessage(), timeout: 10000);
         }
     }
 
@@ -203,6 +206,7 @@ class ManageRooms extends Component
             ['LAB ELKOM', '185', 'C', '4', 30, 'LABORATORIUM'],
         ];
         Excel::store(new RoomTemplateExport($data), $filename, $disk);
+
         return Storage::disk($disk)->download($filename);
     }
 

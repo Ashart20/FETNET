@@ -7,27 +7,35 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Mary\Traits\Toast;
-use Illuminate\View\View;
 
 class ManageClusterUsers extends Component
 {
-    use WithPagination, Toast;
+    use Toast, WithPagination;
 
     // Properti untuk Modal & Form Cluster
     public bool $clusterModal = false;
+
     public ?int $clusterId = null;
+
     public string $clusterName = '';
+
     public string $clusterCode = '';
 
     // Properti untuk Modal & Form User
     public bool $userModal = false;
+
     public ?int $userId = null;
+
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public $userClusterId = '';
 
     public Collection $clusters;
@@ -98,7 +106,7 @@ class ManageClusterUsers extends Component
             [
                 'name' => $validated['clusterName'],
                 'code' => $validated['clusterCode'],
-                'user_id' => auth()->id() // Menambahkan ID user yang sedang login
+                'user_id' => auth()->id(), // Menambahkan ID user yang sedang login
             ]
         );
 
@@ -119,6 +127,7 @@ class ManageClusterUsers extends Component
     {
         if ($cluster->prodis()->count() > 0 || $cluster->users()->role('cluster')->count() > 0) {
             $this->toast(type: 'error', title: 'Gagal!', description: 'Cluster tidak bisa dihapus karena masih memiliki prodi atau user.');
+
             return;
         }
         $cluster->delete();
@@ -136,9 +145,9 @@ class ManageClusterUsers extends Component
     public function storeUser(): void
     {
         $validated = $this->validate([
-            'name'       => ['required', 'string'],
-            'email'      => ['required', 'email', Rule::unique('users')->ignore($this->userId)],
-            'password'   => [$this->userId ? 'nullable' : 'required', 'min:8'],
+            'name' => ['required', 'string'],
+            'email' => ['required', 'email', Rule::unique('users')->ignore($this->userId)],
+            'password' => [$this->userId ? 'nullable' : 'required', 'min:8'],
             'userClusterId' => ['required', 'exists:clusters,id'],
         ]);
 
@@ -148,7 +157,7 @@ class ManageClusterUsers extends Component
             'cluster_id' => $validated['userClusterId'],
         ];
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $userData['password'] = Hash::make($validated['password']);
         }
 

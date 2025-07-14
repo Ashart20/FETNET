@@ -3,10 +3,10 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class RoomTemplateExport implements FromArray, WithHeadings, ShouldAutoSize
+class RoomTemplateExport implements FromArray, ShouldAutoSize, WithHeadings
 {
     protected $data;
 
@@ -15,18 +15,13 @@ class RoomTemplateExport implements FromArray, WithHeadings, ShouldAutoSize
         $this->data = $data;
     }
 
-    /**
-     * @return array
-     */
     public function array(): array
     {
         array_shift($this->data);
+
         return $this->data;
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -35,7 +30,7 @@ class RoomTemplateExport implements FromArray, WithHeadings, ShouldAutoSize
             'kode_gedung',
             'lantai',
             'kapasitas',
-            'tipe'
+            'tipe',
         ];
     }
 }

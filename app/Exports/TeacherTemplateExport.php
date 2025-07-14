@@ -3,10 +3,10 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class TeacherTemplateExport implements FromArray, WithHeadings, ShouldAutoSize
+class TeacherTemplateExport implements FromArray, ShouldAutoSize, WithHeadings
 {
     protected $data;
 
@@ -17,18 +17,17 @@ class TeacherTemplateExport implements FromArray, WithHeadings, ShouldAutoSize
 
     /**
      * Mengembalikan data array (tanpa header).
-     * @return array
      */
     public function array(): array
     {
         // Menghapus baris header dari data
         array_shift($this->data);
+
         return $this->data;
     }
 
     /**
      * Mendefinisikan header untuk file Excel.
-     * @return array
      */
     public function headings(): array
     {
@@ -41,7 +40,7 @@ class TeacherTemplateExport implements FromArray, WithHeadings, ShouldAutoSize
             'kode_univ',
             'employee_id',
             'email',
-            'nomor_hp'
+            'nomor_hp',
         ];
     }
 }

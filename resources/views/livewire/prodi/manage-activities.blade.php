@@ -29,6 +29,7 @@
 
     {{-- Modal Form --}}
     <x-mary-modal class="modal-lg" wire:model="activityModal" title="{{ $activityId ? 'Edit' : 'Tambah' }} Aktivitas" box-class="w-400" separator>
+<<<<<<< Updated upstream
             <div class="text-left">
                 <div class="flex flex-wrap -mx-3">
                     <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
@@ -73,7 +74,53 @@
                         <x-mary-button label="Batal" @click="$wire.closeModal()" />
                         <x-mary-button label="{{ $activityId ? 'Update' : 'Simpan' }}" wire:click="store" class="btn-primary" spinner="store" />
                     </div>
+=======
+        <div class="text-left">
+            <div class="flex flex-wrap -mx-3">
+                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
+                    <x-mary-select label="Pilih Mata Kuliah" wire:model="subject_id" :options="$subjects" option-label="nama_matkul" placeholder="-- Pilih --">
+
+                    </x-mary-select>
+>>>>>>> Stashed changes
                 </div>
             </div>
+            <br/>
+            <div class="flex flex-wrap -mx-3">
+                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
+                    <x-mary-choices label="Pilih Kelompok Mahasiswa"
+                                    wire:model="selectedStudentGroupIds"
+                                    :options="$allStudentGroups"
+                                    option-label="nama_kelompok"
+                                    searchable
+                                    multiple {{-- Penting: Aktifkan mode multi-pilih --}}
+                                    placeholder="-- Pilih Kelompok --" />
+                </div>
+            </div>
+            <br/>
+            <div class="flex flex-wrap -mx-3">
+                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
+                    <x-mary-choices label="Pilih Dosen" wire:model="teacher_ids" :options="$teachers" option-label="nama_dosen" placeholder="-- Pilih Dosen --"  searchable />
+                </div>
+            </div>
+            <br/>
+            <div class="flex flex-wrap -mx-3">
+                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
+                    <x-mary-select label="Tag Aktivitas (Wajib)" wire:model="activity_tag_id" :options="$activityTags" option-label="name" placeholder="-- Pilih Tag --" />
+                </div>
+            </div>
+            <br/>
+            <div class="flex flex-wrap -mx-3">
+                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
+                    <x-mary-input label="Nama Aktivitas (Opsional)" wire:model="name" placeholder=" Tentukan nama" />
+                </div>
+            </div>
+            <br/>
+            <div class="flex flex-wrap -mx-3">
+                <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:mb-0 xl:w-2/4">
+                    <x-mary-button label="Batal" @click="$wire.closeModal()" />
+                    <x-mary-button label="{{ $activityId ? 'Update' : 'Simpan' }}" wire:click="store" class="btn-primary" spinner="store" />
+                </div>
+            </div>
+        </div>
     </x-mary-modal>
 </div>

@@ -14,12 +14,14 @@ class MasterRuangan extends Model
     /**
      * Mendefinisikan nama tabel secara eksplisit.
      * Berguna jika nama model tidak mengikuti konvensi plural Laravel (cth: Ruangan -> ruangans).
+     *
      * @var string
      */
     protected $table = 'master_ruangans';
 
     /**
      * Kolom yang boleh diisi secara massal.
+     *
      * @var array<int, string>
      */
     protected $fillable = [

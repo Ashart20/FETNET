@@ -6,8 +6,8 @@ use App\Models\Activity;
 use App\Models\Prodi;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Component;
 use Illuminate\View\View;
+use Livewire\Component;
 
 class Dashboard extends Component
 {
@@ -31,7 +31,7 @@ class Dashboard extends Component
         ];
 
         // Jika user tidak terhubung ke cluster, jangan lakukan apa-apa
-        if (!$clusterId) {
+        if (! $clusterId) {
             return;
         }
 

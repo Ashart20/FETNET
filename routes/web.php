@@ -1,43 +1,38 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Fakultas\GenerateController as FakultasGenerateController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SimulationResultController; // <-- Import Controller Simulasi
-
 // Livewire Components
+use App\Livewire\Cluster\Dashboard as ClusterDashboard;
+use App\Livewire\Cluster\Generate\Index as ClusterGenerateIndex;
+// Fakultas Components
+use App\Livewire\Cluster\ManageActivities as ClusterManageActivities;
+use App\Livewire\Cluster\ViewSimulations;
+use App\Livewire\Fakultas\ConflictChecker;
+use App\Livewire\Fakultas\Dashboard as FakultasDashboard;
+use App\Livewire\Fakultas\ManageActivityPreferredRooms;
+use App\Livewire\Fakultas\ManageClusterUsers;
+use App\Livewire\Fakultas\ManageProdi;
+use App\Livewire\Fakultas\ManageRoomConstraints;
+use App\Livewire\Fakultas\ManageRooms;
+// Prodi Components
+use App\Livewire\Fakultas\ViewSchedules as FakultasViewSchedules;
 use App\Livewire\FetScheduleViewer;
 use App\Livewire\Guide;
-
-// Fakultas Components
-use App\Livewire\Fakultas\Dashboard as FakultasDashboard;
-use App\Livewire\Fakultas\ManageProdi;
-use App\Livewire\Fakultas\ManageRooms;
-use App\Livewire\Fakultas\ConflictChecker;
-use App\Livewire\Fakultas\ManageRoomConstraints;
-use App\Livewire\Fakultas\ManageClusterUsers;
-use App\Http\Controllers\Fakultas\GenerateController as FakultasGenerateController;
-use App\Livewire\Fakultas\ManageActivityPreferredRooms;
-use App\Livewire\Fakultas\ViewSchedules as FakultasViewSchedules;
-
-// Prodi Components
-use App\Livewire\Prodi\Dashboard as ProdiDashboard;
-use App\Livewire\Prodi\ManageTeachers;
-use App\Livewire\Prodi\ManageSubjects;
-use App\Livewire\Prodi\ManageStudentGroups;
-use App\Livewire\Prodi\ManageActivities as ProdiManageActivities;
-use App\Livewire\Prodi\ManageTeacherConstraints;
-use App\Livewire\Prodi\ManageStudentGroupConstraints;
-
-// Mahasiswa Components
 use App\Livewire\Mahasiswa\Dashboard as MahasiswaDashboard;
-
+use App\Livewire\Prodi\Dashboard as ProdiDashboard;
+use App\Livewire\Prodi\ManageActivities as ProdiManageActivities;
+use App\Livewire\Prodi\ManageStudentGroupConstraints;
+// Mahasiswa Components
+use App\Livewire\Prodi\ManageStudentGroups;
 // ==========================================================
 // CLUSTER COMPONENTS (BARU)
 // ==========================================================
-use App\Livewire\Cluster\Dashboard as ClusterDashboard;
-use App\Livewire\Cluster\ManageActivities as ClusterManageActivities;
-use App\Livewire\Cluster\Generate\Index as ClusterGenerateIndex;
-use App\Livewire\Cluster\ViewSimulations;
+use App\Livewire\Prodi\ManageSubjects;
+use App\Livewire\Prodi\ManageTeacherConstraints;
+use App\Livewire\Prodi\ManageTeachers;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,7 +48,6 @@ Route::get('/', function () {
 // Halaman Jadwal Utama (Bisa dilihat siapa saja yang sudah login)
 Route::middleware('auth')->get('/guide', Guide::class)->name('guide');
 Route::middleware('auth')->get('/hasil-fet', FetScheduleViewer::class)->name('hasil.fet');
-
 
 // ==========================================================
 // GRUP RUTE UNTUK FAKULTAS
@@ -93,7 +87,6 @@ Route::middleware(['auth', 'role:cluster'])->prefix('cluster')->name('cluster.')
         ->name('simulations.show');
 });
 
-
 // ==========================================================
 // GRUP RUTE UNTUK PRODI
 // ==========================================================
@@ -114,7 +107,6 @@ Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasi
     Route::get('/dashboard', MahasiswaDashboard::class)->name('dashboard');
 });
 
-
 // ==========================================================
 // RUTE BAWAAN LARAVEL (PROFIL, DLL)
 // ==========================================================
@@ -123,7 +115,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 
 // Route authentication dari Breeze (login, register, dll.)
 require __DIR__.'/auth.php';

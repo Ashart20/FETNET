@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Dashboard;
 
 use Livewire\Component;
@@ -10,4 +11,3 @@ class JadwalTerkini extends Component
         return view('livewire.dashboard.jadwal-terkini');
     }
 }
-

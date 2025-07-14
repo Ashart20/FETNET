@@ -13,7 +13,6 @@ return new class extends Migration
             $table->string('nama_ruangan');
             $table->string('kode_ruangan')->unique();
 
-
             $table->foreignId('building_id')->nullable()->constrained('buildings')->onDelete('set null');
 
             $table->string('lantai');

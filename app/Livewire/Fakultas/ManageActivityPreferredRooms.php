@@ -11,11 +11,14 @@ use Mary\Traits\Toast;
 
 class ManageActivityPreferredRooms extends Component
 {
-    use WithPagination, Toast;
+    use Toast, WithPagination;
 
     public bool $preferenceModal = false;
+
     public ?Activity $selectedActivity = null;
+
     public array $selectedRooms = [];
+
     public Collection $allRooms;
 
     public function mount(): void
@@ -35,7 +38,6 @@ class ManageActivityPreferredRooms extends Component
         ];
     }
 
-
     public function getStudentGroupNamesAttribute(Activity $activity): string
     {
         return $activity->studentGroups->pluck('nama_kelompok')->implode(', ');
@@ -52,7 +54,7 @@ class ManageActivityPreferredRooms extends Component
     public function savePreferences(): void
     {
         $this->validate([
-            'selectedRooms'   => 'array',
+            'selectedRooms' => 'array',
             'selectedRooms.*' => 'exists:master_ruangans,id',
         ]);
 
@@ -73,7 +75,7 @@ class ManageActivityPreferredRooms extends Component
     {
 
         $activities = Activity::with(['subject', 'prodi', 'studentGroups', 'preferredRooms']) //
-        ->latest()
+            ->latest()
             ->paginate(15);
 
         return view('livewire.fakultas.manage-activity-preferred-rooms', [

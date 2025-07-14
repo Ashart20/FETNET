@@ -4,12 +4,12 @@ namespace App\Imports;
 
 use App\Models\Teacher;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\SkipsOnError;
-use Maatwebsite\Excel\Concerns\SkipsErrors;
 
-class TeachersImport implements ToCollection, WithHeadingRow, SkipsOnError
+class TeachersImport implements SkipsOnError, ToCollection, WithHeadingRow
 {
     use SkipsErrors;
 
@@ -22,7 +22,6 @@ class TeachersImport implements ToCollection, WithHeadingRow, SkipsOnError
 
     public function collection(Collection $rows)
     {
-
 
         foreach ($rows as $row) {
 
@@ -37,13 +36,13 @@ class TeachersImport implements ToCollection, WithHeadingRow, SkipsOnError
                 ],
                 [
                     // Data yang akan diisi atau diperbarui
-                    'nama_dosen'     => $row['nama_dosen'],
-                    'title_depan'    => $row['title_depan'] ?? null,
+                    'nama_dosen' => $row['nama_dosen'],
+                    'title_depan' => $row['title_depan'] ?? null,
                     'title_belakang' => $row['title_belakang'] ?? null,
-                    'kode_univ'      => $row['kode_univ'] ?? null,
-                    'employee_id'    => $row['employee_id'] ?? null,
-                    'email'          => $row['email'] ?? null,
-                    'nomor_hp'       => $row['nomor_hp'] ?? null,
+                    'kode_univ' => $row['kode_univ'] ?? null,
+                    'employee_id' => $row['employee_id'] ?? null,
+                    'email' => $row['email'] ?? null,
+                    'nomor_hp' => $row['nomor_hp'] ?? null,
                 ]
             );
 

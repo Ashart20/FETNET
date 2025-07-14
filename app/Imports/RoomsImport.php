@@ -5,9 +5,9 @@ namespace App\Imports;
 use App\Models\Building;
 use App\Models\MasterRuangan;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Facades\Validator;
 
 class RoomsImport implements ToCollection, WithHeadingRow
 {
@@ -45,11 +45,11 @@ class RoomsImport implements ToCollection, WithHeadingRow
                 [
                     // Data untuk diupdate atau dibuat
                     'nama_ruangan' => $row['nama_ruangan'],
-                    'building_id'  => $building->id, // Gunakan ID dari gedung yang ditemukan/dibuat
-                    'lantai'       => $row['lantai'],
-                    'kapasitas'    => $row['kapasitas'],
-                    'tipe'         => $row['tipe'],
-                    'user_id'      => auth()->id(), // Hubungkan dengan user fakultas yang mengimpor
+                    'building_id' => $building->id, // Gunakan ID dari gedung yang ditemukan/dibuat
+                    'lantai' => $row['lantai'],
+                    'kapasitas' => $row['kapasitas'],
+                    'tipe' => $row['tipe'],
+                    'user_id' => auth()->id(), // Hubungkan dengan user fakultas yang mengimpor
                 ]
             );
         }

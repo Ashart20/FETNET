@@ -2,11 +2,11 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
+use App\Models\Room;
 use App\Models\Schedule; // Import model Schedule
-use App\Models\User;     // Import model User (asumsi Anda memiliki model User)
-use App\Models\Room;     // Import model Room
-use App\Models\TimeSlot;  // Import model TimeSlot
+use App\Models\TimeSlot;     // Import model User (asumsi Anda memiliki model User)
+use App\Models\User;     // Import model Room
+use Livewire\Component;  // Import model TimeSlot
 
 class Dashboard extends Component
 {
@@ -31,7 +31,6 @@ class Dashboard extends Component
         $uniqueTeachers = Schedule::distinct()->count('teacher');
         $uniqueRooms = Schedule::distinct()->count('room_id'); // atau Room::count(); jika semua room sudah diinsert
         $uniqueClasses = Schedule::distinct()->count('kelas');
-
 
         return view('livewire.dashboard', [
             'totalSchedules' => $totalSchedules,

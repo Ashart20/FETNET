@@ -25,14 +25,14 @@ class ViewSimulations extends Component
 
         $this->simulations = []; // Kosongkan array untuk memastikan data baru yang dimuat
         $user = Auth::user();
-        if (!$user->cluster_id) {
+        if (! $user->cluster_id) {
             return;
         }
 
         $clusterCode = $user->cluster->code;
         $directory = storage_path("app/public/simulations/{$clusterCode}/timetables");
 
-        if (!File::isDirectory($directory)) {
+        if (! File::isDirectory($directory)) {
             return;
         }
 
@@ -54,14 +54,13 @@ class ViewSimulations extends Component
             $correctFileName = basename($foundFiles[0]);
             $this->simulations[] = [
                 'folder' => $folderName,
-                'name' => "Simulasi " . str_replace(['simulasi_', '_'], ' ', $folderName),
+                'name' => 'Simulasi '.str_replace(['simulasi_', '_'], ' ', $folderName),
                 // Gunakan variabel $correctFileName yang sudah ditemukan
                 'url' => route('cluster.simulations.show', ['simulation_folder' => $folderName, 'file_name' => $correctFileName]),
-                'created_at' => date('d M Y, H:i:s', File::lastModified($folderPath))
+                'created_at' => date('d M Y, H:i:s', File::lastModified($folderPath)),
             ];
         }
     }
-
 
     /**
      * PERBAIKAN 2: Method baru untuk dipanggil oleh tombol refresh.
@@ -75,14 +74,16 @@ class ViewSimulations extends Component
     public function applySimulation(string $simulationFolder)
     {
         $user = Auth::user();
-        if (!$user->cluster_id) {
+        if (! $user->cluster_id) {
             $this->toast(type: 'error', title: 'Aksi Gagal!', description: 'Anda tidak terhubung ke cluster manapun.');
+
             return;
         }
 
         ApplyClusterScheduleJob::dispatch($user->cluster_id, $simulationFolder);
         $this->toast(type: 'info', title: 'Proses Penerapan Dimulai', description: 'Jadwal resmi untuk cluster Anda sedang diperbarui di latar belakang.');
     }
+
     public function deleteSimulation(string $simulationFolder)
     {
         // 1. Dapatkan user dan cluster code
@@ -103,6 +104,7 @@ class ViewSimulations extends Component
         // 4. Muat ulang daftar simulasi untuk memperbarui tampilan
         $this->loadSimulations();
     }
+
     public function deleteAllSimulations()
     {
         // 1. Dapatkan user dan cluster code
@@ -124,6 +126,7 @@ class ViewSimulations extends Component
         $this->toast(type: 'success', title: 'Semua Simulasi Dihapus!', description: 'Seluruh riwayat simulasi telah berhasil dihapus.');
         $this->loadSimulations();
     }
+
     public function render()
     {
         return view('livewire.cluster.view-simulations')->layout('layouts.app');

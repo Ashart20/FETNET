@@ -14,11 +14,15 @@ class ManageStudentGroups extends Component
     public $groups;
 
     public ?int $studentGroupId = null;
+
     public ?int $parentId = null;
 
     public string $nama_kelompok = '';
+
     public string $kode_kelompok = '';
+
     public ?int $jumlah_mahasiswa = null;
+
     public string $angkatan = '';
 
     public bool $studentGroupModal = false;
@@ -33,16 +37,16 @@ class ManageStudentGroups extends Component
                     ->where('parent_id', $this->parentId)
                     ->ignore($this->studentGroupId),
             ],
-            'kode_kelompok'    => 'nullable|string|max:15',
+            'kode_kelompok' => 'nullable|string|max:15',
             'jumlah_mahasiswa' => 'nullable|integer|min:0',
-            'angkatan'         => 'required|string|max:255',
+            'angkatan' => 'required|string|max:255',
         ];
     }
 
     protected $messages = [
         'nama_kelompok.required' => 'Nama kelompok/tingkat wajib diisi.',
-        'nama_kelompok.unique'   => 'Nama ini sudah digunakan pada level yang sama.',
-        'angkatan.required'      => 'Angkatan wajib diisi.',
+        'nama_kelompok.unique' => 'Nama ini sudah digunakan pada level yang sama.',
+        'angkatan.required' => 'Angkatan wajib diisi.',
     ];
 
     public function mount()

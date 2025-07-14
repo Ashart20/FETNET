@@ -15,9 +15,9 @@ class Dashboard extends Component
     public function stats()
     {
         return [
-            'totalProdi'     => Prodi::count(),
+            'totalProdi' => Prodi::count(),
             'totalUserProdi' => User::role('prodi')->count(),
-            'totalRuangan'   => MasterRuangan::count(),
+            'totalRuangan' => MasterRuangan::count(),
         ];
     }
 

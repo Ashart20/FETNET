@@ -15,14 +15,18 @@ class ManageRoomConstraints extends Component
     use Toast;
 
     public Collection $rooms;
+
     public Collection $days;
+
     public Collection $timeSlots;
 
     public ?int $selectedRoomId = null;
+
     public array $constraints = [];
 
     // Properti untuk menyorot
     public ?int $highlightedDayId = null;
+
     public ?int $highlightedTimeSlotId = null;
 
     public function mount()
@@ -44,7 +48,7 @@ class ManageRoomConstraints extends Component
         if ($this->selectedRoomId) {
             $this->constraints = RoomTimeConstraint::where('master_ruangan_id', $this->selectedRoomId)
                 ->get()
-                ->keyBy(fn($constraint) => $constraint->day_id . '-' . $constraint->time_slot_id)
+                ->keyBy(fn ($constraint) => $constraint->day_id.'-'.$constraint->time_slot_id)
                 ->all();
         } else {
             $this->constraints = [];
@@ -53,15 +57,16 @@ class ManageRoomConstraints extends Component
 
     public function toggleConstraint($dayId, $timeSlotId)
     {
-        if (!$this->selectedRoomId) {
+        if (! $this->selectedRoomId) {
             $this->error('Silakan pilih ruangan terlebih dahulu.');
+
             return;
         }
 
-        $key = $dayId . '-' . $timeSlotId;
+        $key = $dayId.'-'.$timeSlotId;
 
         if (isset($this->constraints[$key])) {
-            if($constraint = RoomTimeConstraint::find($this->constraints[$key]['id'])) {
+            if ($constraint = RoomTimeConstraint::find($this->constraints[$key]['id'])) {
                 $constraint->delete();
                 $this->success('Batasan waktu berhasil dihapus.');
             }
@@ -92,8 +97,10 @@ class ManageRoomConstraints extends Component
 
     public function setHighlightedDayUnavailable(): void
     {
-        if (!$this->selectedRoomId || !$this->highlightedDayId) return;
-        foreach($this->timeSlots as $slot) {
+        if (! $this->selectedRoomId || ! $this->highlightedDayId) {
+            return;
+        }
+        foreach ($this->timeSlots as $slot) {
             RoomTimeConstraint::updateOrCreate(
                 ['master_ruangan_id' => $this->selectedRoomId, 'day_id' => $this->highlightedDayId, 'time_slot_id' => $slot->id]
             );
@@ -103,7 +110,9 @@ class ManageRoomConstraints extends Component
 
     public function setHighlightedDayAvailable(): void
     {
-        if (!$this->selectedRoomId || !$this->highlightedDayId) return;
+        if (! $this->selectedRoomId || ! $this->highlightedDayId) {
+            return;
+        }
         RoomTimeConstraint::where('master_ruangan_id', $this->selectedRoomId)
             ->where('day_id', $this->highlightedDayId)
             ->delete();
@@ -112,8 +121,10 @@ class ManageRoomConstraints extends Component
 
     public function setHighlightedTimeSlotUnavailable(): void
     {
-        if (!$this->selectedRoomId || !$this->highlightedTimeSlotId) return;
-        foreach($this->days as $day) {
+        if (! $this->selectedRoomId || ! $this->highlightedTimeSlotId) {
+            return;
+        }
+        foreach ($this->days as $day) {
             RoomTimeConstraint::updateOrCreate(
                 ['master_ruangan_id' => $this->selectedRoomId, 'day_id' => $day->id, 'time_slot_id' => $this->highlightedTimeSlotId]
             );
@@ -123,7 +134,9 @@ class ManageRoomConstraints extends Component
 
     public function setHighlightedTimeSlotAvailable(): void
     {
-        if (!$this->selectedRoomId || !$this->highlightedTimeSlotId) return;
+        if (! $this->selectedRoomId || ! $this->highlightedTimeSlotId) {
+            return;
+        }
         RoomTimeConstraint::where('master_ruangan_id', $this->selectedRoomId)
             ->where('time_slot_id', $this->highlightedTimeSlotId)
             ->delete();

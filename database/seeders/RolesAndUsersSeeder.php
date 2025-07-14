@@ -2,12 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use App\Models\User; // Pastikan untuk import User
-use App\Models\Prodi;
-use App\Models\Cluster;
-use Illuminate\Support\Facades\Hash; // Import Hash untuk password
+use Illuminate\Support\Facades\Hash; // Pastikan untuk import User
+use Spatie\Permission\Models\Role; // Import Hash untuk password
 
 class RolesAndUsersSeeder extends Seeder
 {
@@ -37,5 +35,4 @@ class RolesAndUsersSeeder extends Seeder
         $fakultasUser->assignRole('fakultas');
 
     }
-
 }

@@ -18,13 +18,16 @@ class ManageStudentGroupConstraints extends Component
     public array $studentGroupsForDropdown = [];
 
     public Collection $days;
+
     public Collection $timeSlots;
 
     public ?int $selectedStudentGroupId = null;
+
     public array $constraints = [];
 
     // Properti untuk menyorot
     public ?int $highlightedDayId = null;
+
     public ?int $highlightedTimeSlotId = null;
 
     public function mount(): void
@@ -38,7 +41,6 @@ class ManageStudentGroupConstraints extends Component
                 ->with('childrenRecursive')
                 ->orderBy('nama_kelompok')
                 ->get();
-
 
             $this->studentGroupsForDropdown = $this->flattenGroups($topLevelGroups);
         }
@@ -54,12 +56,13 @@ class ManageStudentGroupConstraints extends Component
         foreach ($groups as $group) {
             $result[] = [
                 'id' => $group->id,
-                'name' => str_repeat('---', $level) . ' ' . $group->nama_kelompok
+                'name' => str_repeat('---', $level).' '.$group->nama_kelompok,
             ];
             if ($group->childrenRecursive->isNotEmpty()) {
                 $result = array_merge($result, $this->flattenGroups($group->childrenRecursive, $level + 1));
             }
         }
+
         return $result;
     }
 
@@ -74,7 +77,7 @@ class ManageStudentGroupConstraints extends Component
         if ($this->selectedStudentGroupId) {
             $this->constraints = StudentGroupTimeConstraint::where('student_group_id', $this->selectedStudentGroupId)
                 ->get()
-                ->keyBy(fn($constraint) => $constraint->day_id . '-' . $constraint->time_slot_id)
+                ->keyBy(fn ($constraint) => $constraint->day_id.'-'.$constraint->time_slot_id)
                 ->all();
         } else {
             $this->constraints = [];
@@ -83,11 +86,12 @@ class ManageStudentGroupConstraints extends Component
 
     public function toggleConstraint($dayId, $timeSlotId): void
     {
-        if (!$this->selectedStudentGroupId) {
+        if (! $this->selectedStudentGroupId) {
             $this->error('Silakan pilih kelompok mahasiswa terlebih dahulu.');
+
             return;
         }
-        $key = $dayId . '-' . $timeSlotId;
+        $key = $dayId.'-'.$timeSlotId;
         if (isset($this->constraints[$key])) {
             StudentGroupTimeConstraint::destroy($this->constraints[$key]['id']);
             $this->success('Batasan waktu berhasil dihapus.');
@@ -117,8 +121,10 @@ class ManageStudentGroupConstraints extends Component
 
     public function setHighlightedDayUnavailable(): void
     {
-        if (!$this->selectedStudentGroupId || !$this->highlightedDayId) return;
-        foreach($this->timeSlots as $slot) {
+        if (! $this->selectedStudentGroupId || ! $this->highlightedDayId) {
+            return;
+        }
+        foreach ($this->timeSlots as $slot) {
             StudentGroupTimeConstraint::updateOrCreate(
                 ['student_group_id' => $this->selectedStudentGroupId, 'day_id' => $this->highlightedDayId, 'time_slot_id' => $slot->id]
             );
@@ -128,7 +134,9 @@ class ManageStudentGroupConstraints extends Component
 
     public function setHighlightedDayAvailable(): void
     {
-        if (!$this->selectedStudentGroupId || !$this->highlightedDayId) return;
+        if (! $this->selectedStudentGroupId || ! $this->highlightedDayId) {
+            return;
+        }
         StudentGroupTimeConstraint::where('student_group_id', $this->selectedStudentGroupId)
             ->where('day_id', $this->highlightedDayId)
             ->delete();
@@ -137,8 +145,10 @@ class ManageStudentGroupConstraints extends Component
 
     public function setHighlightedTimeSlotUnavailable(): void
     {
-        if (!$this->selectedStudentGroupId || !$this->highlightedTimeSlotId) return;
-        foreach($this->days as $day) {
+        if (! $this->selectedStudentGroupId || ! $this->highlightedTimeSlotId) {
+            return;
+        }
+        foreach ($this->days as $day) {
             StudentGroupTimeConstraint::updateOrCreate(
                 ['student_group_id' => $this->selectedStudentGroupId, 'day_id' => $day->id, 'time_slot_id' => $this->highlightedTimeSlotId]
             );
@@ -148,7 +158,9 @@ class ManageStudentGroupConstraints extends Component
 
     public function setHighlightedTimeSlotAvailable(): void
     {
-        if (!$this->selectedStudentGroupId || !$this->highlightedTimeSlotId) return;
+        if (! $this->selectedStudentGroupId || ! $this->highlightedTimeSlotId) {
+            return;
+        }
         StudentGroupTimeConstraint::where('student_group_id', $this->selectedStudentGroupId)
             ->where('time_slot_id', $this->highlightedTimeSlotId)
             ->delete();

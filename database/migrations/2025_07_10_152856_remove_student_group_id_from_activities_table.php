@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -37,7 +36,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('activities', function (Blueprint $table) {
-            if (!Schema::hasColumn('activities', 'student_group_id')) {
+            if (! Schema::hasColumn('activities', 'student_group_id')) {
                 $table->foreignId('student_group_id')->nullable()->constrained('student_groups')->onDelete('cascade');
             }
         });

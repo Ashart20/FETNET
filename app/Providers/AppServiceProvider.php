@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
+use App\Livewire\Dashboard;
+use App\Livewire\Header;
+use App\Livewire\QuickActions;
+use App\Livewire\ScheduleTable;
+use App\Livewire\Sidebar;
+use App\Livewire\StatsCards;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use App\Livewire\Sidebar;
-use App\Livewire\Header;
-use App\Livewire\StatsCards;
-use App\Livewire\ScheduleTable;
-use App\Livewire\QuickActions;
-use App\Livewire\Dashboard;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(FetWatchService::class, function () {
-            return new FetWatchService();
+            return new FetWatchService;
         });
         //
     }

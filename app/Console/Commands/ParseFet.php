@@ -12,11 +12,11 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use SimpleXMLElement;
 
 class ParseFet extends Command
 {
     protected $signature = 'fet:parse {file} {--no-cleanup : Jangan hapus data jadwal lama sebelum parsing}';
+
     protected $description = 'Parse a FET result file and import the generated timetable based on constraint lists';
 
     public function handle(): void
@@ -24,9 +24,10 @@ class ParseFet extends Command
         $filePath = $this->argument('file');
         Log::info("ParseFet: Memulai proses parse untuk file hasil: {$filePath}");
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             Log::error("ParseFet: File tidak ditemukan di path: {$filePath}");
-            $this->error("File tidak ditemukan.");
+            $this->error('File tidak ditemukan.');
+
             return;
         }
 
@@ -34,40 +35,39 @@ class ParseFet extends Command
             $xml = simplexml_load_file($filePath);
             if ($xml === false) {
                 Log::error("ParseFet: Gagal membaca atau mem-parsing file XML: {$filePath}.");
-                $this->error("Gagal membaca file XML. Pastikan formatnya benar.");
+                $this->error('Gagal membaca file XML. Pastikan formatnya benar.');
+
                 return;
             }
 
             DB::transaction(function () use ($xml) {
 
-                if (!$this->option('no-cleanup')) {
+                if (! $this->option('no-cleanup')) {
                     $this->cleanupOldSchedule();
                 }
                 $daysMap = Day::all()->keyBy('name');
-                $timeSlotsMap = TimeSlot::all()->keyBy(fn($slot) => date('H:i', strtotime($slot->start_time)));
+                $timeSlotsMap = TimeSlot::all()->keyBy(fn ($slot) => date('H:i', strtotime($slot->start_time)));
                 $roomsMap = MasterRuangan::all()->keyBy('nama_ruangan');
                 // PERUBAHAN UTAMA: Mengubah 'studentGroup' menjadi 'studentGroups'
                 $activitiesMap = Activity::with('teachers', 'subject', 'studentGroups')->get()->keyBy('id'); // Perubahan
 
-
                 $timePlacements = $this->buildTimePlacements($xml);
                 $roomPlacements = $this->buildRoomPlacements($xml);
 
-                $this->info(count($timePlacements) . ' penempatan jadwal ditemukan. Memulai proses impor...');
+                $this->info(count($timePlacements).' penempatan jadwal ditemukan. Memulai proses impor...');
 
                 $importedCount = 0;
                 $skippedCount = 0;
 
-
                 foreach ($xml->Activities_List->Activity ?? [] as $activityXml) {
-                    $activityId = (int)$activityXml->Id;
+                    $activityId = (int) $activityXml->Id;
 
                     // Cari penempatan untuk aktivitas ini di peta yang sudah dibuat
                     $timeData = $timePlacements[$activityId] ?? null;
                     $roomName = $roomPlacements[$activityId] ?? null;
 
                     // Jika aktivitas ini tidak memiliki penempatan waktu, lewati
-                    if (!$timeData) {
+                    if (! $timeData) {
                         continue;
                     }
 
@@ -77,9 +77,10 @@ class ParseFet extends Command
                     $timeSlot = $timeSlotsMap->get($timeData['hour']);
 
                     // Jika ruangan tidak ditemukan atau tidak ada, bisa lewati atau pakai default
-                    if (!$roomName || !$roomsMap->has($roomName)) {
+                    if (! $roomName || ! $roomsMap->has($roomName)) {
                         Log::warning("ParseFet: Ruangan '{$roomName}' untuk Activity ID {$activityId} tidak ditemukan. Jadwal dilewati.");
                         $skippedCount++;
+
                         continue;
                     }
                     $room = $roomsMap->get($roomName);
@@ -87,12 +88,11 @@ class ParseFet extends Command
                     // Validasi akhir sebelum menyimpan
                     if ($activity && $day && $timeSlot && $room) {
                         $schedule = Schedule::create([
-                            'activity_id'      => $activity->id,
-                            'room_id'          => $room->id,
-                            'time_slot_id'     => $timeSlot->id,
-                            'day_id'           => $day->id,
+                            'activity_id' => $activity->id,
+                            'room_id' => $room->id,
+                            'time_slot_id' => $timeSlot->id,
+                            'day_id' => $day->id,
                         ]);
-
 
                         if ($schedule && $activity->teachers->isNotEmpty()) {
                             $schedule->teachers()->sync($activity->teachers->pluck('id'));
@@ -100,7 +100,7 @@ class ParseFet extends Command
                         $importedCount++;
                     } else {
                         Log::warning("ParseFet: Melewatkan jadwal untuk Activity ID {$activityId} karena data tidak lengkap.", [
-                            'activity_found' => !!$activity, 'day_found' => !!$day, 'timeslot_found' => !!$timeSlot, 'room_found' => !!$room
+                            'activity_found' => (bool) $activity, 'day_found' => (bool) $day, 'timeslot_found' => (bool) $timeSlot, 'room_found' => (bool) $room,
                         ]);
                         $skippedCount++;
                     }
@@ -112,11 +112,11 @@ class ParseFet extends Command
                 }
             });
 
-            event(new ScheduleDataUpdatedEvent());
+            event(new ScheduleDataUpdatedEvent);
 
         } catch (Exception $e) {
-            $this->error('Terjadi kesalahan saat parsing: ' . $e->getMessage());
-            Log::error("ParseFet Error: " . $e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
+            $this->error('Terjadi kesalahan saat parsing: '.$e->getMessage());
+            Log::error('ParseFet Error: '.$e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
         }
     }
 
@@ -134,9 +134,10 @@ class ParseFet extends Command
     private function buildTimePlacements(\SimpleXMLElement $xml): array
     {
         $placements = [];
-        foreach($xml->Time_Constraints_List->ConstraintActivityPreferredStartingTime ?? [] as $c) {
-            $placements[(int)$c->Activity_Id] = ['day' => (string)$c->Day, 'hour' => (string)$c->Hour];
+        foreach ($xml->Time_Constraints_List->ConstraintActivityPreferredStartingTime ?? [] as $c) {
+            $placements[(int) $c->Activity_Id] = ['day' => (string) $c->Day, 'hour' => (string) $c->Hour];
         }
+
         return $placements;
     }
 
@@ -146,9 +147,10 @@ class ParseFet extends Command
     private function buildRoomPlacements(\SimpleXMLElement $xml): array
     {
         $placements = [];
-        foreach($xml->Space_Constraints_List->ConstraintActivityPreferredRoom ?? [] as $c) {
-            $placements[(int)$c->Activity_Id] = (string)$c->Room;
+        foreach ($xml->Space_Constraints_List->ConstraintActivityPreferredRoom ?? [] as $c) {
+            $placements[(int) $c->Activity_Id] = (string) $c->Room;
         }
+
         return $placements;
     }
 }

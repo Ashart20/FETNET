@@ -9,34 +9,43 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Mary\Traits\Toast;
-use Illuminate\View\View;
 
 class ManageProdi extends Component
 {
-    use WithPagination, Toast;
+    use Toast, WithPagination;
 
     // Properti untuk Prodi
     public ?int $prodiId = null;
+
     public string $nama_prodi = '';
+
     public string $kode = '';
+
     public $cluster_id = '';
+
     public ?string $abbreviation = '';
 
     // Properti untuk User Prodi
     public ?int $userId = null;
+
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
 
     // Properti untuk data & state
     public Collection $clusters;
+
     public bool $prodiModal = false;
 
     // Properti untuk form tambah cluster
     public string $newClusterName = '';
+
     public string $newClusterCode = '';
 
     public function mount(): void
@@ -63,7 +72,7 @@ class ManageProdi extends Component
     public function render(): View
     {
         return view('livewire.fakultas.manage-prodi', [
-            'prodis' => Prodi::with('cluster', 'users')->latest()->paginate(10)
+            'prodis' => Prodi::with('cluster', 'users')->latest()->paginate(10),
         ])->layout('layouts.app');
     }
 
@@ -96,18 +105,18 @@ class ManageProdi extends Component
     {
         $validatedData = $this->validate([
             'nama_prodi' => ['required', 'string', 'min:3'],
-            'kode'       => ['required', 'string', 'max:10', Rule::unique('prodis')->ignore($this->prodiId)],
+            'kode' => ['required', 'string', 'max:10', Rule::unique('prodis')->ignore($this->prodiId)],
             'cluster_id' => ['nullable', 'exists:clusters,id'],
             'abbreviation' => 'nullable|string|max:50',
-            'name'       => ['required', 'string'],
-            'email'      => ['required', 'email', Rule::unique('users')->ignore($this->userId)],
-            'password'   => [$this->prodiId ? 'nullable' : 'required', 'min:8'],
+            'name' => ['required', 'string'],
+            'email' => ['required', 'email', Rule::unique('users')->ignore($this->userId)],
+            'password' => [$this->prodiId ? 'nullable' : 'required', 'min:8'],
         ]);
 
         DB::transaction(function () use ($validatedData) {
             $prodiData = [
                 'nama_prodi' => $validatedData['nama_prodi'],
-                'kode'       => $validatedData['kode'],
+                'kode' => $validatedData['kode'],
                 'abbreviation' => $validatedData['abbreviation'],
                 'cluster_id' => $validatedData['cluster_id'] ?: null,
             ];
@@ -118,12 +127,12 @@ class ManageProdi extends Component
                 'email' => $validatedData['email'],
                 'prodi_id' => $prodi->id,
             ];
-            if (!empty($validatedData['password'])) {
+            if (! empty($validatedData['password'])) {
                 $userData['password'] = Hash::make($validatedData['password']);
             }
             $user = User::updateOrCreate(['id' => $this->userId], $userData);
 
-            if (!$this->prodiId) {
+            if (! $this->prodiId) {
                 $user->assignRole('prodi');
             }
         });

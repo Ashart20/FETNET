@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Prodi;
 
 use App\Http\Controllers\Controller;
@@ -11,7 +12,7 @@ class JadwalGenerationController extends Controller
     {
         $prodi = auth()->user()->prodi;
 
-        if (!$prodi) {
+        if (! $prodi) {
             return back()->with('error', 'User Anda tidak terhubung dengan Program Studi manapun.');
         }
 

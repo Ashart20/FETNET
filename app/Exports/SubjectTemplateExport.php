@@ -15,18 +15,12 @@ class SubjectTemplateExport implements FromCollection, WithHeadings
         $this->data = $data;
     }
 
-    /**
-     * @return Collection
-     */
     public function collection(): Collection
     {
 
         return new Collection($this->data);
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
 

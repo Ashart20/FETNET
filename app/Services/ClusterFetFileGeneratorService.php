@@ -8,7 +8,6 @@ use App\Models\Building;
 use App\Models\Cluster;
 use App\Models\Day;
 use App\Models\MasterRuangan;
-use App\Models\Prodi;
 use App\Models\RoomTimeConstraint;
 use App\Models\StudentGroup;
 use App\Models\StudentGroupTimeConstraint;
@@ -31,12 +30,12 @@ class ClusterFetFileGeneratorService
         Log::info("Memulai pengambilan data untuk simulasi Cluster: {$cluster->name}.");
 
         $data = $this->fetchDataForCluster($cluster);
-        Log::info("Pengambilan data selesai. Ditemukan " . $data['activities']->count() . " aktivitas untuk cluster ini.");
+        Log::info('Pengambilan data selesai. Ditemukan '.$data['activities']->count().' aktivitas untuk cluster ini.');
 
         $xml = new SimpleXMLElement('<fet version="7.2.5"></fet>');
         $xml->addChild('Mode', 'Official');
         $xml->addChild('Institution_Name', "Simulasi Jadwal Cluster - {$cluster->name}");
-        $xml->addChild('Comments', 'Dibuat secara otomatis oleh sistem pada ' . now());
+        $xml->addChild('Comments', 'Dibuat secara otomatis oleh sistem pada '.now());
 
         $this->addDeclarations($xml, $data);
         $this->addConstraints($xml, $data);
@@ -53,7 +52,7 @@ class ClusterFetFileGeneratorService
             return array_fill_keys(['teachers', 'subjects', 'activities', 'rooms', 'buildings', 'days', 'timeSlots', 'teacherConstraints', 'roomConstraints', 'studentGroupConstraints', 'activityTags', 'studentGroups'], collect());
         }
 
-        $teacherIds = Teacher::whereHas('prodis', fn($q) => $q->whereIn('prodis.id', $prodiIds))->pluck('id');
+        $teacherIds = Teacher::whereHas('prodis', fn ($q) => $q->whereIn('prodis.id', $prodiIds))->pluck('id');
         $studentGroupIds = StudentGroup::whereIn('prodi_id', $prodiIds)->pluck('id');
 
         return [
@@ -95,12 +94,12 @@ class ClusterFetFileGeneratorService
 
     private function getUniqueStudentGroupName(StudentGroup $group): string
     {
-        return optional($group->prodi)->kode . '-' . $group->nama_kelompok;
+        return optional($group->prodi)->kode.'-'.$group->nama_kelompok;
     }
 
     private function getUniqueSubjectName(Subject $subject): string
     {
-        return optional($subject->prodi)->kode . '-' . $subject->nama_matkul;
+        return optional($subject->prodi)->kode.'-'.$subject->nama_matkul;
     }
 
     private function addDaysList(SimpleXMLElement $xml, Collection $days): void
@@ -181,11 +180,11 @@ class ClusterFetFileGeneratorService
     {
         $activitiesList = $xml->addChild('Activities_List');
         foreach ($activities as $activity) {
-            if ($activity->teachers->isEmpty() || !$activity->subject || $activity->studentGroups->isEmpty()) {
+            if ($activity->teachers->isEmpty() || ! $activity->subject || $activity->studentGroups->isEmpty()) {
                 continue;
             }
             $activityNode = $activitiesList->addChild('Activity');
-            foreach($activity->teachers as $teacher) {
+            foreach ($activity->teachers as $teacher) {
                 $activityNode->addChild('Teacher', htmlspecialchars($teacher->kode_dosen));
             }
             $activityNode->addChild('Subject', htmlspecialchars($this->getUniqueSubjectName($activity->subject)));
@@ -245,7 +244,9 @@ class ClusterFetFileGeneratorService
 
         foreach ($constraintsByTeacher as $teacherId => $items) {
             $first = $items->first();
-            if (!$first || !$first->teacher) continue;
+            if (! $first || ! $first->teacher) {
+                continue;
+            }
 
             $cNode = $timeList->addChild('ConstraintTeacherNotAvailableTimes');
             $cNode->addChild('Weight_Percentage', self::DEFAULT_WEIGHT);
@@ -268,7 +269,9 @@ class ClusterFetFileGeneratorService
 
         foreach ($constraintsByGroup as $groupId => $items) {
             $first = $items->first();
-            if (!$first || !$first->studentGroup || !$first->studentGroup->prodi) continue;
+            if (! $first || ! $first->studentGroup || ! $first->studentGroup->prodi) {
+                continue;
+            }
 
             $cNode = $timeList->addChild('ConstraintStudentsSetNotAvailableTimes');
             $cNode->addChild('Weight_Percentage', self::DEFAULT_WEIGHT);
@@ -284,12 +287,13 @@ class ClusterFetFileGeneratorService
         }
     }
 
-
     private function addRoomNotAvailableTimes(SimpleXMLElement $spaceList, Collection $constraints): void
     {
         foreach ($constraints->groupBy('master_ruangan_id') as $items) {
             $first = $items->first();
-            if (!$first || !$first->masterRuangan) continue;
+            if (! $first || ! $first->masterRuangan) {
+                continue;
+            }
             $cNode = $spaceList->addChild('ConstraintRoomNotAvailableTimes');
             $cNode->addChild('Room', htmlspecialchars($first->masterRuangan->nama_ruangan));
             foreach ($items as $item) {
@@ -317,7 +321,9 @@ class ClusterFetFileGeneratorService
                     $preferredRooms = $theoryRooms;
                 }
             }
-            if ($preferredRooms->isEmpty()) continue;
+            if ($preferredRooms->isEmpty()) {
+                continue;
+            }
 
             $cNode = $spaceList->addChild('ConstraintActivityPreferredRooms');
             $cNode->addChild('Weight_Percentage', '95');
@@ -334,16 +340,17 @@ class ClusterFetFileGeneratorService
     private function saveXmlToFile(SimpleXMLElement $xml, Cluster $cluster): string
     {
         $dirPath = storage_path('app/fet-files');
-        if (!file_exists($dirPath)) {
+        if (! file_exists($dirPath)) {
             mkdir($dirPath, 0775, true);
         }
-        $fileName = "simulasi_{$cluster->code}_" . time() . ".fet";
-        $filePath = $dirPath . '/' . $fileName;
+        $fileName = "simulasi_{$cluster->code}_".time().'.fet';
+        $filePath = $dirPath.'/'.$fileName;
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
         $dom->save($filePath);
+
         return $filePath;
     }
 }

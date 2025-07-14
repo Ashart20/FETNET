@@ -3,10 +3,10 @@
 namespace App\Livewire\Prodi;
 
 use App\Models\Day;
+use App\Models\Prodi;
 use App\Models\Teacher;
 use App\Models\TeacherTimeConstraint;
 use App\Models\TimeSlot;
-use App\Models\Prodi;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -17,23 +17,28 @@ class ManageTeacherConstraints extends Component
     use Toast;
 
     public Collection $teachers;
+
     public Collection $days;
+
     public Collection $timeSlots;
 
     public ?int $selectedTeacherId = null;
+
     public array $constraints = [];
 
     public ?int $highlightedDayId = null;
+
     public ?int $highlightedTimeSlotId = null;
 
     public function mount(): void
     {
         $prodi = auth()->user()->prodi;
 
-        if (!$prodi) {
+        if (! $prodi) {
             $this->teachers = collect();
             $this->days = Day::orderBy('id')->get();
             $this->timeSlots = TimeSlot::orderBy('start_time')->get();
+
             return;
         }
 
@@ -66,7 +71,7 @@ class ManageTeacherConstraints extends Component
         if ($this->selectedTeacherId) {
             $this->constraints = TeacherTimeConstraint::where('teacher_id', $this->selectedTeacherId)
                 ->get()
-                ->keyBy(fn($constraint) => $constraint->day_id . '-' . $constraint->time_slot_id)
+                ->keyBy(fn ($constraint) => $constraint->day_id.'-'.$constraint->time_slot_id)
                 ->all();
         } else {
             $this->constraints = [];
@@ -75,12 +80,13 @@ class ManageTeacherConstraints extends Component
 
     public function toggleConstraint($dayId, $timeSlotId): void
     {
-        if (!$this->selectedTeacherId) {
+        if (! $this->selectedTeacherId) {
             $this->error('Silakan pilih dosen terlebih dahulu.');
+
             return;
         }
 
-        $key = $dayId . '-' . $timeSlotId;
+        $key = $dayId.'-'.$timeSlotId;
 
         if (isset($this->constraints[$key])) {
             TeacherTimeConstraint::destroy($this->constraints[$key]['id']);
@@ -115,9 +121,11 @@ class ManageTeacherConstraints extends Component
      */
     public function setHighlightedDayUnavailable(): void
     {
-        if (!$this->selectedTeacherId || !$this->highlightedDayId) return;
+        if (! $this->selectedTeacherId || ! $this->highlightedDayId) {
+            return;
+        }
 
-        foreach($this->timeSlots as $slot) {
+        foreach ($this->timeSlots as $slot) {
             TeacherTimeConstraint::updateOrCreate(
                 ['teacher_id' => $this->selectedTeacherId, 'day_id' => $this->highlightedDayId, 'time_slot_id' => $slot->id],
                 []
@@ -131,7 +139,9 @@ class ManageTeacherConstraints extends Component
      */
     public function setHighlightedDayAvailable(): void
     {
-        if (!$this->selectedTeacherId || !$this->highlightedDayId) return;
+        if (! $this->selectedTeacherId || ! $this->highlightedDayId) {
+            return;
+        }
 
         TeacherTimeConstraint::where('teacher_id', $this->selectedTeacherId)
             ->where('day_id', $this->highlightedDayId)
@@ -145,9 +155,11 @@ class ManageTeacherConstraints extends Component
      */
     public function setHighlightedTimeSlotUnavailable(): void
     {
-        if (!$this->selectedTeacherId || !$this->highlightedTimeSlotId) return;
+        if (! $this->selectedTeacherId || ! $this->highlightedTimeSlotId) {
+            return;
+        }
 
-        foreach($this->days as $day) {
+        foreach ($this->days as $day) {
             TeacherTimeConstraint::updateOrCreate(
                 ['teacher_id' => $this->selectedTeacherId, 'day_id' => $day->id, 'time_slot_id' => $this->highlightedTimeSlotId],
                 []
@@ -161,7 +173,9 @@ class ManageTeacherConstraints extends Component
      */
     public function setHighlightedTimeSlotAvailable(): void
     {
-        if (!$this->selectedTeacherId || !$this->highlightedTimeSlotId) return;
+        if (! $this->selectedTeacherId || ! $this->highlightedTimeSlotId) {
+            return;
+        }
 
         TeacherTimeConstraint::where('teacher_id', $this->selectedTeacherId)
             ->where('time_slot_id', $this->highlightedTimeSlotId)

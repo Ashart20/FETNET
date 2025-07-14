@@ -2,31 +2,35 @@
 
 namespace App\Livewire\Prodi;
 
+use App\Exports\SubjectTemplateExport;
+use App\Imports\SubjectsImport;
 use App\Models\Subject;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
-use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\SubjectsImport;
-use App\Exports\SubjectTemplateExport;
 use Maatwebsite\Excel\Validators\ValidationException;
-use Maatwebsite\Excel\Excel as ExcelType;
-use Illuminate\Support\Facades\Storage;
 use Mary\Traits\Toast;
-
 
 class ManageSubjects extends Component
 {
-    use WithPagination,  WithFileUploads, Toast;
+    use Toast,  WithFileUploads, WithPagination;
 
     // Properti untuk form modal
     public ?int $subjectId = null;
+
     public string $nama_matkul = '';
+
     public string $kode_matkul = '';
+
     public ?int $sks = null;
+
     public ?int $semester = null;
+
     public $file;
+
     public bool $subjectModal = false;
 
     /**
@@ -52,12 +56,12 @@ class ManageSubjects extends Component
      */
     protected $messages = [
         'kode_matkul.required' => 'Kode mata kuliah wajib diisi.',
-        'kode_matkul.unique'   => 'Kode mata kuliah ini sudah ada di prodi Anda.',
+        'kode_matkul.unique' => 'Kode mata kuliah ini sudah ada di prodi Anda.',
         'nama_matkul.required' => 'Kode mata kuliah wajib diisi.',
-        'sks.required'         => 'Jumlah SKS wajib diisi.',
-        'sks.integer'          => 'SKS harus berupa angka.',
-        'semester.required'          => 'Semester wajib diisi.',
-        'semester.integer'          => 'Semester harus berupa angka.',
+        'sks.required' => 'Jumlah SKS wajib diisi.',
+        'sks.integer' => 'SKS harus berupa angka.',
+        'semester.required' => 'Semester wajib diisi.',
+        'semester.integer' => 'Semester harus berupa angka.',
     ];
 
     /**
@@ -83,7 +87,7 @@ class ManageSubjects extends Component
             ->paginate(100);
 
         return view('livewire.prodi.manage-subjects', [
-            'subjects' => $subjects
+            'subjects' => $subjects,
         ])->layout('layouts.app');
     }
 
@@ -100,11 +104,11 @@ class ManageSubjects extends Component
             $failures = $e->failures();
             $errorMessages = [];
             foreach ($failures as $failure) {
-                $errorMessages[] = "Baris ke-{$failure->row()}: " . implode(', ', $failure->errors());
+                $errorMessages[] = "Baris ke-{$failure->row()}: ".implode(', ', $failure->errors());
             }
-            $this->error('Impor Gagal. Ditemukan kesalahan:', implode("<br>", $errorMessages), timeout: 10000); // Gunakan Toast
+            $this->error('Impor Gagal. Ditemukan kesalahan:', implode('<br>', $errorMessages), timeout: 10000); // Gunakan Toast
         } catch (\Exception $e) {
-            $this->error('Impor Gagal.', 'Pastikan format dan header file Excel Anda sudah benar. Error: ' . $e->getMessage(), timeout: 10000); // Gunakan Toast
+            $this->error('Impor Gagal.', 'Pastikan format dan header file Excel Anda sudah benar. Error: '.$e->getMessage(), timeout: 10000); // Gunakan Toast
         }
     }
 
@@ -178,9 +182,13 @@ class ManageSubjects extends Component
         }
     }
 
-    public function openModal() { $this->subjectModal = true; }
+    public function openModal()
+    {
+        $this->subjectModal = true;
+    }
 
-    public function closeModal() {
+    public function closeModal()
+    {
         $this->subjectModal = false;
         $this->resetInputFields();
     }

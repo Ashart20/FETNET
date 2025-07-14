@@ -4,7 +4,6 @@ namespace App\Livewire\Fakultas;
 
 use App\Models\Prodi;
 use App\Models\Schedule;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -13,6 +12,7 @@ class ViewSchedules extends Component
     use WithPagination; // Aktifkan trait pagination
 
     public $prodis;
+
     public $selectedProdiId;
 
     public function mount()

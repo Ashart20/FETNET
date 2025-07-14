@@ -9,7 +9,6 @@ use App\Models\Schedule;
 use App\Models\StudentGroup;
 use App\Models\Subject;
 use App\Models\Teacher;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
@@ -22,16 +21,24 @@ class FetScheduleViewer extends Component
 
     // Properti untuk filter
     public string $filterHari = '';
+
     public string $filterKelas = '';
+
     public string $filterMatkul = '';
+
     public string $filterRuangan = '';
+
     public string $filterDosen = '';
 
     // Properti untuk opsi dropdown
     public array $daftarHari = [];
+
     public array $daftarKelas = [];
+
     public array $daftarMatkul = [];
+
     public array $daftarRuangan = [];
+
     public array $daftarDosen = [];
 
     /**
@@ -56,11 +63,11 @@ class FetScheduleViewer extends Component
         $this->daftarHari = Day::orderBy('id')->pluck('name')->toArray();
         $this->daftarRuangan = MasterRuangan::orderBy('nama_ruangan')->pluck('nama_ruangan')->toArray();
 
-        $this->daftarKelas = StudentGroup::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))
+        $this->daftarKelas = StudentGroup::when($prodiId, fn ($q) => $q->where('prodi_id', $prodiId))
             ->orderBy('nama_kelompok')
             ->pluck('nama_kelompok')
             ->toArray(); //
-        $this->daftarMatkul = Subject::when($prodiId, fn($q) => $q->where('prodi_id', $prodiId))->orderBy('nama_matkul')->pluck('nama_matkul')->toArray();
+        $this->daftarMatkul = Subject::when($prodiId, fn ($q) => $q->where('prodi_id', $prodiId))->orderBy('nama_matkul')->pluck('nama_matkul')->toArray();
         $this->daftarDosen = Teacher::when($prodiId, function ($query) use ($prodiId) {
             $query->whereHas('prodis', function ($subQuery) use ($prodiId) {
                 $subQuery->where('prodis.id', $prodiId);
@@ -90,22 +97,22 @@ class FetScheduleViewer extends Component
         $prodiId = $user?->prodi_id;
         $studentGroupId = $user?->student_group_id;
         $query = Schedule::query()->with([
-            'day', 'timeSlot', 'room', 'activity.subject', 'activity.studentGroups', 'activity.teachers' //
+            'day', 'timeSlot', 'room', 'activity.subject', 'activity.studentGroups', 'activity.teachers', //
         ]);
 
         // Terapkan filter berdasarkan peran pengguna
         if ($user->hasRole('prodi') && $prodiId) {
-            $query->whereHas('activity.subject', fn($q) => $q->where('prodi_id', $prodiId));
+            $query->whereHas('activity.subject', fn ($q) => $q->where('prodi_id', $prodiId));
         } elseif ($user->hasRole('mahasiswa') && $studentGroupId) {
-            $query->whereHas('activity.studentGroups', fn($q) => $q->where('id', $studentGroupId)); // Perubahan
+            $query->whereHas('activity.studentGroups', fn ($q) => $q->where('id', $studentGroupId)); // Perubahan
         }
 
         // Terapkan filter dari dropdown
-        $query->when($this->filterHari, fn($q, $val) => $q->whereHas('day', fn($sub) => $sub->where('name', $val)));
-        $query->when($this->filterRuangan, fn($q, $val) => $q->whereHas('room', fn($sub) => $sub->where('nama_ruangan', $val)));
-        $query->when($this->filterDosen, fn($q, $val) => $q->whereHas('activity.teachers', fn($sub) => $sub->where('nama_dosen', $val)));
-        $query->when($this->filterKelas, fn($q, $val) => $q->whereHas('activity.studentGroups', fn($sub) => $sub->where('nama_kelompok', $val))); // Perubahan
-        $query->when($this->filterMatkul, fn($q, $val) => $q->whereHas('activity.subject', fn($sub) => $sub->where('nama_matkul', $val)));
+        $query->when($this->filterHari, fn ($q, $val) => $q->whereHas('day', fn ($sub) => $sub->where('name', $val)));
+        $query->when($this->filterRuangan, fn ($q, $val) => $q->whereHas('room', fn ($sub) => $sub->where('nama_ruangan', $val)));
+        $query->when($this->filterDosen, fn ($q, $val) => $q->whereHas('activity.teachers', fn ($sub) => $sub->where('nama_dosen', $val)));
+        $query->when($this->filterKelas, fn ($q, $val) => $q->whereHas('activity.studentGroups', fn ($sub) => $sub->where('nama_kelompok', $val))); // Perubahan
+        $query->when($this->filterMatkul, fn ($q, $val) => $q->whereHas('activity.subject', fn ($sub) => $sub->where('nama_matkul', $val)));
 
         $jadwal = $query->join('days', 'schedules.day_id', '=', 'days.id')
             ->join('time_slots', 'schedules.time_slot_id', '=', 'time_slots.id')

@@ -27,19 +27,18 @@ class FetFileGeneratorService
     /**
      * Menghasilkan satu file .fet untuk SELURUH FAKULTAS.
      *
-     * @param string|null $customFilePath
      * @return string Path file .fet yang dihasilkan.
      */
     public function generateForFaculty(?string $customFilePath = null): string
     {
-        Log::info("Memulai pengambilan data untuk seluruh fakultas.");
+        Log::info('Memulai pengambilan data untuk seluruh fakultas.');
         $data = $this->fetchDataForFaculty();
-        Log::info("Pengambilan data selesai. Ditemukan " . $data['activities']->count() . " aktivitas.");
+        Log::info('Pengambilan data selesai. Ditemukan '.$data['activities']->count().' aktivitas.');
 
         $xml = new SimpleXMLElement('<fet version="7.2.5"></fet>');
         $xml->addChild('Mode', 'Official');
         $xml->addChild('Institution_Name', 'Fakultas Pendidikan Teknologi dan Kejuruan UPI'); // Nama institusi diubah menjadi level fakultas
-        $xml->addChild('Comments', 'Dibuat secara otomatis oleh sistem penjadwalan pada ' . now());
+        $xml->addChild('Comments', 'Dibuat secara otomatis oleh sistem penjadwalan pada '.now());
 
         $this->addDeclarations($xml, $data);
         $this->addConstraints($xml, $data);
@@ -102,8 +101,9 @@ class FetFileGeneratorService
     private function getUniqueStudentGroupName(StudentGroup $group): string
     {
         if ($group->prodi) {
-            return $group->prodi->kode . '-' . $group->nama_kelompok;
+            return $group->prodi->kode.'-'.$group->nama_kelompok;
         }
+
         // Fallback jika grup tidak punya prodi (seharusnya tidak terjadi)
         return $group->nama_kelompok;
     }
@@ -114,8 +114,9 @@ class FetFileGeneratorService
     private function getUniqueSubjectName(Subject $subject): string
     {
         if ($subject->prodi) {
-            return $subject->prodi->kode . '-' . $subject->nama_matkul;
+            return $subject->prodi->kode.'-'.$subject->nama_matkul;
         }
+
         return $subject->nama_matkul;
     }
 
@@ -227,14 +228,15 @@ class FetFileGeneratorService
     {
         $activitiesList = $xml->addChild('Activities_List');
         foreach ($activities as $activity) {
-            if ($activity->teachers->isEmpty() || !$activity->subject || $activity->studentGroups->isEmpty()) {
+            if ($activity->teachers->isEmpty() || ! $activity->subject || $activity->studentGroups->isEmpty()) {
                 Log::warning("Melewati Aktivitas ID: {$activity->id} karena data Dosen/Matkul/Kelompok tidak lengkap.");
+
                 continue;
             }
 
             $activityNode = $activitiesList->addChild('Activity');
 
-            foreach($activity->teachers as $teacher) {
+            foreach ($activity->teachers as $teacher) {
                 $activityNode->addChild('Teacher', htmlspecialchars($teacher->kode_dosen));
             }
 
@@ -309,7 +311,9 @@ class FetFileGeneratorService
     {
         foreach ($constraints->groupBy('teacher_id') as $items) {
             $first = $items->first();
-            if (!$first || !$first->teacher) continue;
+            if (! $first || ! $first->teacher) {
+                continue;
+            }
 
             $cNode = $timeList->addChild('ConstraintTeacherNotAvailableTimes');
             $cNode->addChild('Weight_Percentage', self::DEFAULT_WEIGHT);
@@ -327,7 +331,9 @@ class FetFileGeneratorService
     {
         foreach ($constraints->groupBy('student_group_id') as $items) {
             $first = $items->first();
-            if (!$first || !$first->studentGroup || !$first->studentGroup->prodi) continue;
+            if (! $first || ! $first->studentGroup || ! $first->studentGroup->prodi) {
+                continue;
+            }
 
             $cNode = $timeList->addChild('ConstraintStudentsSetNotAvailableTimes');
             $cNode->addChild('Weight_Percentage', self::DEFAULT_WEIGHT);
@@ -368,12 +374,13 @@ class FetFileGeneratorService
         }
     }
 
-
     private function addRoomNotAvailableTimes(SimpleXMLElement $spaceList, Collection $constraints): void
     {
         foreach ($constraints->groupBy('master_ruangan_id') as $items) {
             $first = $items->first();
-            if (!$first || !$first->masterRuangan) continue;
+            if (! $first || ! $first->masterRuangan) {
+                continue;
+            }
 
             $cNode = $spaceList->addChild('ConstraintRoomNotAvailableTimes');
             $cNode->addChild('Weight_Percentage', self::DEFAULT_WEIGHT);
@@ -422,12 +429,12 @@ class FetFileGeneratorService
     {
         if (is_null($customFilePath)) {
             $dirPath = storage_path('app/fet-generator/inputs');
-            if (!file_exists($dirPath)) {
+            if (! file_exists($dirPath)) {
                 mkdir($dirPath, 0775, true);
             }
             // Nama file digeneralisasi untuk fakultas
-            $fileName = 'input_fakultas_' . time() . '.fet';
-            $customFilePath = $dirPath . '/' . $fileName;
+            $fileName = 'input_fakultas_'.time().'.fet';
+            $customFilePath = $dirPath.'/'.$fileName;
         }
 
         $dom = new DOMDocument('1.0', 'UTF-8');

@@ -20,9 +20,11 @@ class GenerateClusterTimetable implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $timeout = 1800;
+
     public int $tries = 1;
 
     protected User $user;
+
     protected int $clusterId;
 
     public function __construct(User $user, int $clusterId)
@@ -39,7 +41,7 @@ class GenerateClusterTimetable implements ShouldQueue
             Log::info("File input simulasi .fet berhasil dibuat di: {$inputFilePath}");
             $this->runFetEngine($inputFilePath);
         } catch (\Exception $e) {
-            Log::error("GAGAL PADA PROSES SIMULASI CLUSTER: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('GAGAL PADA PROSES SIMULASI CLUSTER: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             throw $e;
         }
         Log::info("PROSES SIMULASI JADWAL UNTUK CLUSTER ID: {$this->clusterId} SELESAI.");
@@ -69,8 +71,8 @@ class GenerateClusterTimetable implements ShouldQueue
             ->env(['LD_LIBRARY_PATH' => $qtLibsPath])
             ->run([
                 $executablePath,
-                '--inputfile=' . $inputFileName,
-                '--outputdir=' . $outputDir,
+                '--inputfile='.$inputFileName,
+                '--outputdir='.$outputDir,
                 '--language=en',
                 // '--timelimit-s=' bisa ditambahkan kembali jika diperlukan
             ]);
@@ -78,14 +80,14 @@ class GenerateClusterTimetable implements ShouldQueue
         if ($process->successful()) {
             Log::info("Engine FET untuk simulasi cluster `{$clusterCode}` berhasil dijalankan.");
         } else {
-            Log::error("Proses engine FET untuk simulasi GAGAL.");
-            Log::error("FET STDOUT: " . $process->output());
-            Log::error("FET STDERR: " . $process->errorOutput());
+            Log::error('Proses engine FET untuk simulasi GAGAL.');
+            Log::error('FET STDOUT: '.$process->output());
+            Log::error('FET STDERR: '.$process->errorOutput());
         }
     }
 
     public function failed(Throwable $exception): void
     {
-        Log::critical("JOB SIMULASI CLUSTER GAGAL PERMANEN: " . $exception->getMessage());
+        Log::critical('JOB SIMULASI CLUSTER GAGAL PERMANEN: '.$exception->getMessage());
     }
 }

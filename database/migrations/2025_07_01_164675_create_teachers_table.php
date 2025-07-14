@@ -22,11 +22,12 @@ return new class extends Migration
             $table->string('employee_id')->nullable()->unique();
             $table->string('email')->nullable()->unique();
             $table->string('nomor_hp')->nullable();
-            //$table->foreignId('prodi_id')->constrained('prodis')->onDelete('cascade');
+            // $table->foreignId('prodi_id')->constrained('prodis')->onDelete('cascade');
             $table->timestamps();
         });
     }
-// ...
+
+    // ...
     /**
      * Reverse the migrations.
      */

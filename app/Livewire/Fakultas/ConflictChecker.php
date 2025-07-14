@@ -5,12 +5,12 @@ namespace App\Livewire\Fakultas;
 use App\Models\Schedule;
 use App\Models\Teacher;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class ConflictChecker extends Component
 {
     public EloquentCollection $teachers;
+
     public ?string $selectedTeacherId = null;
 
     public function mount(): void
@@ -37,14 +37,14 @@ class ConflictChecker extends Component
                 ->orderBy('time_slots.start_time')
                 ->select('schedules.*')
                 ->get();
-            
+
             if ($schedules) {
                 $hardConflicts = $schedules
                     ->groupBy(function ($schedule) {
                         // Kelompokkan berdasarkan kunci unik: ID Hari dan ID Slot Waktu
-                        return $schedule->day_id . '-' . $schedule->time_slot_id;
+                        return $schedule->day_id.'-'.$schedule->time_slot_id;
                     })
-                    ->filter(fn($group) => $group->count() > 1); // Hanya ambil grup yang isinya lebih dari 1
+                    ->filter(fn ($group) => $group->count() > 1); // Hanya ambil grup yang isinya lebih dari 1
             }
         }
 

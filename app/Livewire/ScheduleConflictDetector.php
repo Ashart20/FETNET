@@ -2,18 +2,16 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Log;
 // Pastikan model yang relevan diimpor
-use App\Models\Schedule;
-use App\Models\TimeSlot;
-use App\Models\Room;
-use Carbon\Carbon;
+use Livewire\Component;
 
 class ScheduleConflictDetector extends Component
 {
     // Properti untuk notifikasi umum
     public $showConflictNotification = false;
+
     public $showCleanNotification = false; // Ini untuk notifikasi "Tidak Ada Konflik!"
 
     // Properti untuk menyimpan detail konflik
@@ -50,6 +48,7 @@ class ScheduleConflictDetector extends Component
             Log::info('ScheduleConflictDetector: No schedules found to detect conflicts.');
             $this->showCleanNotification = true; // Tampilkan notifikasi bersih jika tidak ada jadwal
             $this->dispatch('showCleanNotification', 'Tidak ada jadwal yang terdeteksi.');
+
             return;
         }
 
@@ -65,12 +64,13 @@ class ScheduleConflictDetector extends Component
             $teacher = $schedule->teacher;
             $kelas = $schedule->kelas;
 
-            if (!$day || !$startTime || !$endTime) {
+            if (! $day || ! $startTime || ! $endTime) {
                 Log::warning("ScheduleConflictDetector: Skipping schedule due to missing time slot data: ID {$schedule->id}");
+
                 continue;
             }
 
-            $currentSlot = $day . '-' . $startTime . '-' . $endTime;
+            $currentSlot = $day.'-'.$startTime.'-'.$endTime;
 
             // Konflik Dosen
             if (isset($teacherOccupancy[$teacher][$currentSlot])) {
@@ -78,7 +78,9 @@ class ScheduleConflictDetector extends Component
                     'type' => 'Dosen Bentrok',
                     'resource' => $teacher,
                     'time' => "{$day}, {$startTime} - {$endTime}",
-                    'sessions' => array_merge([$schedule->subject . ' (' . $kelas . ')'], array_map(function($s) { return $s->subject . ' (' . $s->kelas . ')'; }, $teacherOccupancy[$teacher][$currentSlot])),
+                    'sessions' => array_merge([$schedule->subject.' ('.$kelas.')'], array_map(function ($s) {
+                        return $s->subject.' ('.$s->kelas.')';
+                    }, $teacherOccupancy[$teacher][$currentSlot])),
                 ];
             }
             $teacherOccupancy[$teacher][$currentSlot][] = $schedule;
@@ -89,7 +91,9 @@ class ScheduleConflictDetector extends Component
                     'type' => 'Ruangan Bentrok',
                     'resource' => $roomName,
                     'time' => "{$day}, {$startTime} - {$endTime}",
-                    'sessions' => array_merge([$schedule->subject . ' (' . $teacher . ')'], array_map(function($s) { return $s->subject . ' (' . $s->teacher . ')'; }, $roomOccupancy[$roomName][$currentSlot])),
+                    'sessions' => array_merge([$schedule->subject.' ('.$teacher.')'], array_map(function ($s) {
+                        return $s->subject.' ('.$s->teacher.')';
+                    }, $roomOccupancy[$roomName][$currentSlot])),
                 ];
             }
             if ($roomName) { // Hanya tambahkan jika roomName valid
@@ -102,15 +106,17 @@ class ScheduleConflictDetector extends Component
                     'type' => 'Kelas Bentrok',
                     'resource' => $kelas,
                     'time' => "{$day}, {$startTime} - {$endTime}",
-                    'sessions' => array_merge([$schedule->subject . ' (' . $teacher . ')'], array_map(function($s) { return $s->subject . ' (' . $s->teacher . ')'; }, $groupOccupancy[$kelas][$currentSlot])),
+                    'sessions' => array_merge([$schedule->subject.' ('.$teacher.')'], array_map(function ($s) {
+                        return $s->subject.' ('.$s->teacher.')';
+                    }, $groupOccupancy[$kelas][$currentSlot])),
                 ];
             }
             $groupOccupancy[$kelas][$currentSlot][] = $schedule;
         }
 
-        if (!empty($this->conflicts)) {
+        if (! empty($this->conflicts)) {
             $this->showConflictNotification = true;
-            Log::warning('ScheduleConflictDetector: Conflicts detected: ' . count($this->conflicts));
+            Log::warning('ScheduleConflictDetector: Conflicts detected: '.count($this->conflicts));
             // Mengirim event ke Alpine.js di frontend
             $this->dispatch('showConflictNotification', ['count' => count($this->conflicts)]);
         } else {

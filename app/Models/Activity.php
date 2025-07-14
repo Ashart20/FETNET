@@ -39,11 +39,13 @@ class Activity extends Model
     {
         return $this->belongsTo(Subject::class);
     }
+
     public function studentGroups(): BelongsToMany
     {
 
         return $this->belongsToMany(StudentGroup::class, 'activity_student_group');
     }
+
     public function activityTag(): BelongsTo
     {
         return $this->belongsTo(ActivityTag::class);
@@ -53,6 +55,7 @@ class Activity extends Model
     {
         return $this->belongsTo(Prodi::class);
     }
+
     public function getTeacherNamesAttribute(): string
     {
         return $this->teachers->pluck('nama_dosen')->implode(', ');

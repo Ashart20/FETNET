@@ -44,13 +44,14 @@ class StudentGroup extends Model
     {
         return $this->hasMany(StudentGroup::class, 'parent_id')->with('childrenRecursive');
     }
+
     public function students(): HasMany
     {
         return $this->hasMany(User::class);
     }
+
     public function prodi(): BelongsTo
     {
         return $this->belongsTo(Prodi::class);
     }
-
 }

@@ -2,23 +2,22 @@
 
 namespace App\Livewire\Prodi;
 
-use Livewire\Component;
-use App\Models\Teacher;
-use App\Models\Subject;
 use App\Models\Activity;
+use App\Models\Prodi;
+use App\Models\Subject;
+use App\Models\Teacher;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
-use App\Models\Prodi;
+use Livewire\Component;
 
 class Dashboard extends Component
 {
-
     #[Computed]
     public function stats(): array
     {
         $prodi = auth()->user()->prodi;
 
-        if (!$prodi) {
+        if (! $prodi) {
             return ['totalDosen' => 0, 'totalMatkul' => 0, 'totalAktivitas' => 0];
         }
 
@@ -43,6 +42,7 @@ class Dashboard extends Component
             'totalAktivitas' => Activity::where('prodi_id', $prodi->id)->count(),
         ];
     }
+
     public function render(): View
     {
         return view('livewire.prodi.dashboard')->layout('layouts.app');

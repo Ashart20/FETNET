@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Mahasiswa;
 
-use Livewire\Component;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class Dashboard extends Component
 {
