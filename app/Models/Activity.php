@@ -11,12 +11,7 @@ class Activity extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'subject_id',
-        'activity_tag_id',
-        'duration',
-        'prodi_id',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * Relasi many-to-many ke Teacher.

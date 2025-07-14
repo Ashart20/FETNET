@@ -75,6 +75,36 @@
 <?php $attributes = $attributes->except(\Mary\View\Components\Table::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_subject_display', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+            <div class="flex items-center gap-2">
+                
+                <span><?php echo e($activity->subject->nama_matkul); ?></span>
+
+                
+                <!--[if BLOCK]><![endif]--><?php if($activity->practicum_sks > 0): ?>
+                    <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => '+P'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'badge-info badge-xs','tooltip' => 'Dengan Praktikum']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $attributes = $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+            </div>
+            <?php }); ?>
             <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_student_group_names', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
             <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $activity->studentGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
@@ -100,14 +130,14 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
-<?php $component = Mary\View\Components\Badge::resolve(['value' => 'Tidak ada kelompok'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => '-'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-badge'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'badge-error']); ?>
+<?php $component->withAttributes(['class' => 'badge-ghost']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
@@ -120,9 +150,39 @@
 <?php endif; ?>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
             <?php }); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_activity_tag___name', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+            <!--[if BLOCK]><![endif]--><?php if($activity->activityTag): ?>
+                <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
+<?php $component = Mary\View\Components\Badge::resolve(['value' => $activity->activityTag->name] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'badge-primary']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $attributes = $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
+<?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
+<?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php endif; ?>
+            <?php else: ?>
+                -
+            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+            <?php }); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_teacher_names', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+            <?php echo e($activity->teachers->pluck('full_name')->implode(', ')); ?>
+
+            <?php }); ?>
 
             <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('actions', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
-            <div class="flex gap-2">
+            <div class="flex items-center space-x-2">
                 <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
 <?php $component = Mary\View\Components\Button::resolve(['icon' => 'o-pencil','spinner' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -132,7 +192,7 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['@click' => '$wire.edit('.e($activity->id).')','class' => 'btn-sm btn-warning']); ?>
+<?php $component->withAttributes(['wire:click' => 'edit('.e($activity->id).')','class' => 'btn-sm btn-warning']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
@@ -180,30 +240,26 @@
     
     <?php if (isset($component)) { $__componentOriginal89a573612f1f1cb2dd9fc072235d4356 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal89a573612f1f1cb2dd9fc072235d4356 = $attributes; } ?>
-<?php $component = Mary\View\Components\Modal::resolve(['title' => ''.e($activityId ? 'Edit' : 'Tambah').' Aktivitas','boxClass' => 'w-400','separator' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Modal::resolve(['title' => ''.e($activityId ? 'Edit' : 'Tambah').' Aktivitas','separator' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-modal'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Modal::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'modal-lg','wire:model' => 'activityModal']); ?>
-<<<<<<< Updated upstream
-            <div class="text-left">
-                <div class="flex flex-wrap -mx-3">
-                    <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
+<?php $component->withAttributes(['class' => 'backdrop-blur','wire:model' => 'activityModal']); ?>
+        <div class="space-y-5">
+            <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Mata Kuliah','options' => $subjects,'optionLabel' => 'nama_matkul','placeholder' => '-- Pilih --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Mata Kuliah','options' => $subjects,'optionValue' => 'id','optionLabel' => 'kode_name','placeholder' => '-- Pilih Mata Kuliah --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Select::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'subject_id']); ?>
-
-                         <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['wire:model' => 'subject_id','searchable' => true,'required' => true]); ?>
+<?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginald64144c2287634503c73cd4803d6e578)): ?>
 <?php $attributes = $__attributesOriginald64144c2287634503c73cd4803d6e578; ?>
@@ -213,12 +269,8 @@
 <?php $component = $__componentOriginald64144c2287634503c73cd4803d6e578; ?>
 <?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
 <?php endif; ?>
-                    </div>
-                </div>
-                <br/>
-                <div class="flex flex-wrap -mx-3">
-                    <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
+
+            <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
 <?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Kelompok Mahasiswa','options' => $allStudentGroups,'optionLabel' => 'nama_kelompok','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-choices'); ?>
@@ -227,7 +279,7 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'selectedStudentGroupIds','multiple' => true,'placeholder' => '-- Pilih Kelompok --']); ?>
+<?php $component->withAttributes(['wire:model' => 'selectedStudentGroupIds','multiple' => true,'placeholder' => '-- Pilih Kelompok --','required' => true]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
@@ -238,12 +290,8 @@
 <?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
 <?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
 <?php endif; ?>
-                    </div>
-                </div>
-                <br/>
-                <div class="flex flex-wrap -mx-3">
-                    <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
+
+            <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
 <?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Dosen','options' => $teachers,'optionLabel' => 'nama_dosen','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-choices'); ?>
@@ -252,7 +300,7 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'teacher_ids','placeholder' => '-- Pilih Dosen --']); ?>
+<?php $component->withAttributes(['wire:model' => 'teacher_ids','placeholder' => '-- Pilih Dosen --','multiple' => true,'required' => true]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
@@ -263,21 +311,17 @@
 <?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
 <?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
 <?php endif; ?>
-                    </div>
-                </div>
-                <br/>
-                <div class="flex flex-wrap -mx-3">
-                    <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
+
+            <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Tag Aktivitas (Wajib)','options' => $activityTags,'optionLabel' => 'name','placeholder' => '-- Pilih Tag --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Select::resolve(['label' => 'Tag Aktivitas (Opsional)','options' => $activityTags,'optionLabel' => 'name','placeholder' => '-- Pilih Tag --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Select::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'activity_tag_id']); ?>
+<?php $component->withAttributes(['wire:model' => 'activity_tag_id','allow-clear' => true]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginald64144c2287634503c73cd4803d6e578)): ?>
@@ -288,21 +332,17 @@
 <?php $component = $__componentOriginald64144c2287634503c73cd4803d6e578; ?>
 <?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
 <?php endif; ?>
-                    </div>
-                </div>
-                <br/>
-                <div class="flex flex-wrap -mx-3">
-                    <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <?php if (isset($component)) { $__componentOriginalf51438a7488970badd535e5f203e0c1b = $component; } ?>
+
+            <?php if (isset($component)) { $__componentOriginalf51438a7488970badd535e5f203e0c1b = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalf51438a7488970badd535e5f203e0c1b = $attributes; } ?>
-<?php $component = Mary\View\Components\Input::resolve(['label' => 'Nama Aktivitas (Opsional)'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Input::resolve(['label' => 'SKS Tambahan (Praktikum)'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-input'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Mary\View\Components\Input::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'name','placeholder' => ' Tentukan nama']); ?>
+<?php $component->withAttributes(['wire:model' => 'practicum_sks','type' => 'number']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalf51438a7488970badd535e5f203e0c1b)): ?>
@@ -313,226 +353,50 @@
 <?php $component = $__componentOriginalf51438a7488970badd535e5f203e0c1b; ?>
 <?php unset($__componentOriginalf51438a7488970badd535e5f203e0c1b); ?>
 <?php endif; ?>
-                    </div>
-                </div>
-                <br/>
-                <div class="flex flex-wrap -mx-3">
-                    <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:mb-0 xl:w-2/4">
-                        <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
-<?php $component = Mary\View\Components\Button::resolve(['label' => 'Batal'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['@click' => '$wire.closeModal()']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-                        <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
-<?php $component = Mary\View\Components\Button::resolve(['label' => ''.e($activityId ? 'Update' : 'Simpan').'','spinner' => 'store'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:click' => 'store','class' => 'btn-primary']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-                    </div>
-=======
-        <div class="text-left">
-            <div class="flex flex-wrap -mx-3">
-                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                    <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Mata Kuliah','options' => $subjects,'optionLabel' => 'nama_matkul','placeholder' => '-- Pilih --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-select'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Select::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'subject_id']); ?>
-
-                     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginald64144c2287634503c73cd4803d6e578)): ?>
-<?php $attributes = $__attributesOriginald64144c2287634503c73cd4803d6e578; ?>
-<?php unset($__attributesOriginald64144c2287634503c73cd4803d6e578); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginald64144c2287634503c73cd4803d6e578)): ?>
-<?php $component = $__componentOriginald64144c2287634503c73cd4803d6e578; ?>
-<?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
-<?php endif; ?>
->>>>>>> Stashed changes
-                </div>
-            </div>
-            <br/>
-            <div class="flex flex-wrap -mx-3">
-                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                    <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
-<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Kelompok Mahasiswa','options' => $allStudentGroups,'optionLabel' => 'nama_kelompok','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-choices'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'selectedStudentGroupIds','multiple' => true,'placeholder' => '-- Pilih Kelompok --']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
-<?php $attributes = $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
-<?php unset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
-<?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
-<?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
-<?php endif; ?>
-                </div>
-            </div>
-            <br/>
-            <div class="flex flex-wrap -mx-3">
-                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                    <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
-<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Dosen','options' => $teachers,'optionLabel' => 'nama_dosen','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-choices'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'teacher_ids','placeholder' => '-- Pilih Dosen --']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
-<?php $attributes = $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
-<?php unset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
-<?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
-<?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
-<?php endif; ?>
-                </div>
-            </div>
-            <br/>
-            <div class="flex flex-wrap -mx-3">
-                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                    <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
-<?php $component = Mary\View\Components\Select::resolve(['label' => 'Tag Aktivitas (Wajib)','options' => $activityTags,'optionLabel' => 'name','placeholder' => '-- Pilih Tag --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-select'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Select::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'activity_tag_id']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginald64144c2287634503c73cd4803d6e578)): ?>
-<?php $attributes = $__attributesOriginald64144c2287634503c73cd4803d6e578; ?>
-<?php unset($__attributesOriginald64144c2287634503c73cd4803d6e578); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginald64144c2287634503c73cd4803d6e578)): ?>
-<?php $component = $__componentOriginald64144c2287634503c73cd4803d6e578; ?>
-<?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
-<?php endif; ?>
-                </div>
-            </div>
-            <br/>
-            <div class="flex flex-wrap -mx-3">
-                <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                    <?php if (isset($component)) { $__componentOriginalf51438a7488970badd535e5f203e0c1b = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalf51438a7488970badd535e5f203e0c1b = $attributes; } ?>
-<?php $component = Mary\View\Components\Input::resolve(['label' => 'Nama Aktivitas (Opsional)'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-input'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Input::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'name','placeholder' => ' Tentukan nama']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalf51438a7488970badd535e5f203e0c1b)): ?>
-<?php $attributes = $__attributesOriginalf51438a7488970badd535e5f203e0c1b; ?>
-<?php unset($__attributesOriginalf51438a7488970badd535e5f203e0c1b); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalf51438a7488970badd535e5f203e0c1b)): ?>
-<?php $component = $__componentOriginalf51438a7488970badd535e5f203e0c1b; ?>
-<?php unset($__componentOriginalf51438a7488970badd535e5f203e0c1b); ?>
-<?php endif; ?>
-                </div>
-            </div>
-            <br/>
-            <div class="flex flex-wrap -mx-3">
-                <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:mb-0 xl:w-2/4">
-                    <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
-<?php $component = Mary\View\Components\Button::resolve(['label' => 'Batal'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['@click' => '$wire.closeModal()']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-                    <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
-<?php $component = Mary\View\Components\Button::resolve(['label' => ''.e($activityId ? 'Update' : 'Simpan').'','spinner' => 'store'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['wire:click' => 'store','class' => 'btn-primary']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
-<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
-<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
-<?php endif; ?>
-                </div>
-            </div>
         </div>
+
+         <?php $__env->slot('actions', null, []); ?> 
+            <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
+<?php $component = Mary\View\Components\Button::resolve(['label' => 'Batal'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['@click' => '$wire.closeModal()']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+            <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
+<?php $component = Mary\View\Components\Button::resolve(['label' => ''.e($activityId ? 'Update' : 'Simpan').'','spinner' => 'store'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:click' => 'store','class' => 'btn-primary']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+         <?php $__env->endSlot(); ?>
      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal89a573612f1f1cb2dd9fc072235d4356)): ?>

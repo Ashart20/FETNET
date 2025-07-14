@@ -29,4 +29,8 @@ class Subject extends Model
     {
         return $this->hasMany(Activity::class);
     }
+    public function getKodeNameAttribute(): string
+    {
+        return " {$this->nama_matkul} - {$this->kode_matkul} - {$this->semester}";
+    }
 }

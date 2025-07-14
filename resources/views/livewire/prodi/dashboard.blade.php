@@ -10,7 +10,7 @@
             title="Total Dosen"
             :value="$this->stats['totalDosen']"
             icon="o-academic-cap"
-            description="Dosen di prodi & cluster Anda"
+            description="Dosen yang terhubung dengan prodi Anda"
             class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300" />
         <x-mary-stat
             title="Total Mata Kuliah"

@@ -8,10 +8,11 @@ use App\Models\Prodi;
 use App\Models\StudentGroup;
 use App\Models\Subject;
 use App\Models\Teacher;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection; // Menggunakan alias
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Mary\Traits\Toast;
-use Illuminate\Database\Eloquent\Collection;
 
 
 class ManageActivities extends Component
@@ -19,7 +20,10 @@ class ManageActivities extends Component
     use WithPagination, Toast;
 
     // Koleksi data untuk pilihan di form
-    public Collection $teachers, $subjects, $allStudentGroups, $activityTags;
+    public EloquentCollection $teachers;
+    public EloquentCollection $subjects;
+    public EloquentCollection $allStudentGroups;
+    public EloquentCollection $activityTags;
 
     // Properti untuk form
     public ?int $activityId = null;
@@ -27,85 +31,80 @@ class ManageActivities extends Component
     public ?int $subject_id = null;
     public array $selectedStudentGroupIds = [];
     public ?int $activity_tag_id = null;
+    public ?int $practicum_sks = null;
+    public ?string $name = null;
 
     // Properti untuk kontrol modal
     public bool $activityModal = false;
-    public ?string $name = null;
+
     protected function rules(): array
     {
         return [
-            'teacher_ids'      => ['required', 'array', 'min:1'],
-            'teacher_ids.*'    => ['exists:teachers,id'],
-            'subject_id'       => ['required', 'exists:subjects,id'],
+            'teacher_ids'             => ['required', 'array', 'min:1'],
+            'teacher_ids.*'           => ['exists:teachers,id'],
+            'subject_id'              => ['required', 'exists:subjects,id'],
             'selectedStudentGroupIds' => ['required', 'array', 'min:1'],
             'selectedStudentGroupIds.*' => ['exists:student_groups,id'],
-            'activity_tag_id'  => ['nullable', 'exists:activity_tags,id'],
-            'name'                  => ['nullable', 'string', 'max:255'],
+            'activity_tag_id'         => ['nullable', 'exists:activity_tags,id'],
+            'practicum_sks'           => ['nullable', 'integer', 'min:1', 'max:10'],
+            'name'                    => ['nullable', 'string', 'max:255'],
         ];
     }
 
     protected function messages(): array
     {
         return [
-            'teacher_ids.required'      => 'Setidaknya pilih satu dosen.',
-            'subject_id.required'       => 'Mata kuliah wajib dipilih.',
-            'selectedStudentGroupIds.required' => 'Setidaknya pilih satu kelompok mahasiswa.', // Perubahan
-            'selectedStudentGroupIds.array'    => 'Pilihan kelompok mahasiswa harus berupa daftar.', // Perubahan
-            'selectedStudentGroupIds.min'      => 'Setidaknya pilih satu kelompok mahasiswa.', // Perubahan
-            'selectedStudentGroupIds.*.exists' => 'Kelompok mahasiswa yang dipilih tidak valid.', // Perubahan
+            'teacher_ids.required'             => 'Setidaknya pilih satu dosen.',
+            'subject_id.required'              => 'Mata kuliah wajib dipilih.',
+            'selectedStudentGroupIds.required' => 'Setidaknya pilih satu kelompok mahasiswa.',
         ];
     }
 
-    public function mount()
+    public function mount(): void
     {
         $prodi = auth()->user()->prodi;
 
         if (!$prodi) {
-            $this->teachers = $this->subjects = $this->studentGroups = $this->activityTags = collect();
+            $this->teachers = $this->subjects = $this->allStudentGroups = $this->activityTags = collect();
             return;
         }
 
-        // Ambil data dosen berdasarkan cluster
+        $clusterTeacherIds = collect();
         if ($prodi->cluster_id) {
-            $prodiIdsInCluster = Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
-            $this->teachers = Teacher::whereHas('prodis', fn($q) => $q->whereIn('prodis.id', $prodiIdsInCluster))
-                ->distinct()->orderBy('nama_dosen')->get();
-        } else {
-            $this->teachers = $prodi->teachers()->orderBy('nama_dosen')->get();
+            $prodiIdsInCluster = \App\Models\Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
+            $clusterTeacherIds = \Illuminate\Support\Facades\DB::table('prodi_teacher')
+                ->whereIn('prodi_id', $prodiIdsInCluster)
+                ->pluck('teacher_id');
         }
 
-        // Ambil data lain yang dibutuhkan
-        $this->subjects = Subject::where('prodi_id', $prodi->id)->orderBy('semester')->orderBy('kode_matkul')->get();
-        $this->allStudentGroups = StudentGroup::where('prodi_id', $prodi->id)
+        $linkedTeacherIds = $prodi->teachers()->pluck('teachers.id');
+        $allTeacherIds = $clusterTeacherIds->merge($linkedTeacherIds)->unique();
+        $this->teachers = \App\Models\Teacher::whereIn('id', $allTeacherIds)->orderBy('nama_dosen')->get();
+        $this->subjects = \App\Models\Subject::where('prodi_id', $prodi->id)->orderBy('semester')->orderBy('kode_matkul')->get();
+        $this->allStudentGroups = \App\Models\StudentGroup::where('prodi_id', $prodi->id)
             ->whereDoesntHave('children')
             ->orderBy('nama_kelompok')
             ->get();
-        $this->activityTags = ActivityTag::orderBy('name')->get();
+        $this->activityTags = \App\Models\ActivityTag::orderBy('name')->get();
     }
-
-    // Mendefinisikan header untuk tabel Mary UI
     public function headers(): array
     {
         return [
-            ['key' => 'subject.kode_matkul', 'label' => 'Kode','class' => 'w-2'],
-            ['key' => 'subject.nama_matkul', 'label' => 'Mata Kuliah'],
-            ['key' => 'subject.semester', 'label' => 'Semester', 'class' => 'w-2 text-center'],
-            ['key' => 'duration', 'label' => 'Durasi', 'class' => 'w-2 text-center'],
-            ['key' => 'student_group_names', 'label' => 'Kelompok','class' => 'w-10 text-left'],
-            ['key' => 'teacher_names', 'label' => 'Dosen'],
-
-
+            ['key' => 'subject.kode_matkul', 'label' => 'Kode', 'class' => 'w-16'],
+            ['key' => 'subject_display', 'label' => 'Mata Kuliah'],
+            ['key' => 'subject.semester', 'label' => 'SMT', 'class' => 'w-1 text-center'],
+            ['key' => 'duration', 'label' => 'SKS Total', 'class' => 'w-1 text-center'],
+            ['key' => 'activity_tag.name', 'label' => 'Tag', 'class' => 'w-1 text-center'],
+            ['key' => 'student_group_names', 'label' => 'Kelompok'],
+            ['key' => 'teacher_names', 'label' => 'Dosen Pengampu'],
         ];
-    }
-    public function getStudentGroupNamesAttribute(Activity $activity): string
-    {
-        return $activity->studentGroups->pluck('nama_kelompok')->implode(', ');
     }
 
     public function render()
     {
-        $activities = Activity::where('prodi_id', auth()->user()->prodi_id)
-            ->with(['teachers', 'subject', 'studentGroups'])
+        $activities = Activity::query()
+            ->where('prodi_id', auth()->user()->prodi_id)
+            ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
             ->orderBy('subject_id')
             ->paginate(10);
 
@@ -115,23 +114,29 @@ class ManageActivities extends Component
         ])->layout('layouts.app');
     }
 
-    public function create()
+    public function create(): void
     {
         $this->resetInputFields();
         $this->activityModal = true;
     }
 
-    public function store()
+    public function store(): void
     {
         $validatedData = $this->validate();
         $subject = Subject::find($validatedData['subject_id']);
+
+        $baseSks = $subject->sks;
+        $practicumSks = $this->practicum_sks ?? 0;
+        $finalDuration = $baseSks + $practicumSks;
+
         $activityData = [
-            'subject_id'       => $validatedData['subject_id'],
-            'activity_tag_id'  => $validatedData['activity_tag_id'] ?? null,
-            'prodi_id'         => auth()->user()->prodi_id,
-            'duration'         => $subject->sks,
-            'name'             => $validatedData['name'] ?? null,
-            'quantity'         => 1,
+            'subject_id'      => $validatedData['subject_id'],
+            'activity_tag_id' => $validatedData['activity_tag_id'],
+            'prodi_id'        => auth()->user()->prodi_id,
+            'duration'        => $finalDuration,
+            'practicum_sks'   => $this->practicum_sks,
+            'name'            => $validatedData['name'],
+            'quantity'        => 1,
         ];
 
         $activity = Activity::updateOrCreate(['id' => $this->activityId], $activityData);
@@ -141,36 +146,42 @@ class ManageActivities extends Component
         $this->closeModal();
     }
 
-    public function edit($id)
+    public function edit(Activity $activity): void
     {
-        $activity = Activity::with(['teachers', 'studentGroups'])->where('prodi_id', auth()->user()->prodi_id)->findOrFail($id);
-        $this->activityId = $id;
-        $this->activityId = $id;
+        if ($activity->prodi_id !== auth()->user()->prodi_id) {
+            $this->toast(type: 'error', title: 'Akses Ditolak!');
+            return;
+        }
+
+        $this->activityId = $activity->id;
         $this->teacher_ids = $activity->teachers->pluck('id')->map(fn($id) => (string) $id)->all();
         $this->subject_id = $activity->subject_id;
         $this->selectedStudentGroupIds = $activity->studentGroups->pluck('id')->map(fn($id) => (string) $id)->all();
         $this->activity_tag_id = $activity->activity_tag_id;
-        $this->activityModal = true;
+        $this->practicum_sks = $activity->practicum_sks;
         $this->name = $activity->name;
+        $this->activityModal = true;
     }
 
-    public function delete($id)
+    public function delete(Activity $activity): void
     {
-        Activity::where('prodi_id', auth()->user()->prodi_id)->findOrFail($id)->delete();
+        if ($activity->prodi_id !== auth()->user()->prodi_id) {
+            $this->toast(type: 'error', title: 'Akses Ditolak!');
+            return;
+        }
+        $activity->delete();
         $this->toast(type: 'warning', title: 'Aktivitas berhasil dihapus.');
     }
 
-    public function closeModal()
+    public function closeModal(): void
     {
         $this->activityModal = false;
         $this->resetInputFields();
     }
 
-    private function resetInputFields()
+    private function resetInputFields(): void
     {
-        $this->reset('activityId', 'teacher_ids', 'subject_id', 'selectedStudentGroupIds', 'activity_tag_id', 'name');
+        $this->reset('activityId', 'teacher_ids', 'subject_id', 'selectedStudentGroupIds', 'activity_tag_id', 'name', 'practicum_sks');
         $this->resetErrorBag();
     }
-
-
 }
