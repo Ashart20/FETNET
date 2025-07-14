@@ -35,7 +35,7 @@ class ManageSubjects extends Component
     public function rules()
     {
         return [
-            'nama_matkul' => 'required|string|max:15',
+            'nama_matkul' => 'required|string|max:100',
             'kode_matkul' => [
                 'required',
                 'string',

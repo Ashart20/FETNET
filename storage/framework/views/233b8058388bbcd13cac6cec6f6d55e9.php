@@ -179,12 +179,9 @@
             </label>
         </div>
 
+
         <div class="flex items-center justify-end mt-4">
-            <?php if(Route::has('password.request')): ?>
-                <a class="underline text-sm text-indigo-600 hover:text-indigo-800 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="<?php echo e(route('password.request')); ?>">
-                    <?php echo e(__('Lupa Password?')); ?> 
-                </a>
-            <?php endif; ?>
+            
 
             <?php if (isset($component)) { $__componentOriginald411d1792bd6cc877d687758b753742c = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald411d1792bd6cc877d687758b753742c = $attributes; } ?>
@@ -210,9 +207,6 @@
         </div>
 
         
-        <div class="mt-4 text-center">
-            <p class="text-sm text-gray-600">Belum punya akun? <a href="<?php echo e(route('register')); ?>" class="underline text-indigo-600 hover:text-indigo-800">Daftar Sekarang</a></p>
-        </div>
     </form>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

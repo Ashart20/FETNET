@@ -191,29 +191,26 @@
             <div class="text-left">
                 <div class="flex flex-wrap -mx-3">
                     <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
-<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Mata Kuliah','options' => $subjects,'optionLabel' => 'nama_matkul'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-choices'); ?>
+                        <?php if (isset($component)) { $__componentOriginald64144c2287634503c73cd4803d6e578 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginald64144c2287634503c73cd4803d6e578 = $attributes; } ?>
+<?php $component = Mary\View\Components\Select::resolve(['label' => 'Pilih Mata Kuliah','options' => $subjects,'optionLabel' => 'nama_matkul','placeholder' => '-- Pilih --'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Select::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['wire:model' => 'subject_id','placeholder' => '-- Pilih --']); ?>
-                            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('item', function($subject) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
-                            <?php echo e($subject->kode_matkul); ?>-<?php echo e($subject->semester); ?>-<?php echo e($subject->nama_matkul); ?>
+<?php $component->withAttributes(['wire:model' => 'subject_id']); ?>
 
-                            <?php }); ?>
                          <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
-<?php $attributes = $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
-<?php unset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
+<?php if (isset($__attributesOriginald64144c2287634503c73cd4803d6e578)): ?>
+<?php $attributes = $__attributesOriginald64144c2287634503c73cd4803d6e578; ?>
+<?php unset($__attributesOriginald64144c2287634503c73cd4803d6e578); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
-<?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
-<?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
+<?php if (isset($__componentOriginald64144c2287634503c73cd4803d6e578)): ?>
+<?php $component = $__componentOriginald64144c2287634503c73cd4803d6e578; ?>
+<?php unset($__componentOriginald64144c2287634503c73cd4803d6e578); ?>
 <?php endif; ?>
                     </div>
                 </div>

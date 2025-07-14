@@ -40,21 +40,25 @@
             </label>
         </div>
 
+
         <div class="flex items-center justify-end mt-4">
+            {{-- Teks B. Indo
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-indigo-600 hover:text-indigo-800 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Lupa Password?') }} {{-- Teks B. Indo --}}
+                    {{ __('Lupa Password?') }}
                 </a>
             @endif
+            --}}
 
             <x-primary-button class="ms-3 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out"> {{-- Sesuaikan warna tombol --}}
                 {{ __('Masuk') }} {{-- Teks B. Indo --}}
             </x-primary-button>
         </div>
 
-        {{-- Tambahkan link untuk register --}}
+        {{-- Tambahkan link untuk register
         <div class="mt-4 text-center">
             <p class="text-sm text-gray-600">Belum punya akun? <a href="{{ route('register') }}" class="underline text-indigo-600 hover:text-indigo-800">Daftar Sekarang</a></p>
         </div>
+        --}}
     </form>
 </x-guest-layout>

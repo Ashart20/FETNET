@@ -32,11 +32,9 @@
             <div class="text-left">
                 <div class="flex flex-wrap -mx-3">
                     <div class="w-full max-w-full px-3 mb-6 sm:w-4/4 sm:flex-none xl:mb-0 xl:w-4/4">
-                        <x-mary-choices label="Pilih Mata Kuliah" wire:model="subject_id" :options="$subjects" option-label="nama_matkul" placeholder="-- Pilih --">
-                            @scope('item', $subject)
-                            {{ $subject->kode_matkul }}-{{ $subject->semester }}-{{ $subject->nama_matkul }}
-                            @endscope
-                        </x-mary-choices>
+                        <x-mary-select label="Pilih Mata Kuliah" wire:model="subject_id" :options="$subjects" option-label="nama_matkul" placeholder="-- Pilih --">
+
+                        </x-mary-select>
                     </div>
                 </div>
                 <br/>
