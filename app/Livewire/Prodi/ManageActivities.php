@@ -171,4 +171,6 @@ class ManageActivities extends Component
         $this->reset('activityId', 'teacher_ids', 'subject_id', 'selectedStudentGroupIds', 'activity_tag_id', 'name');
         $this->resetErrorBag();
     }
+
+
 }
