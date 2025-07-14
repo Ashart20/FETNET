@@ -353,7 +353,7 @@ class FetFileGeneratorService
         foreach ($teachers as $teacher) {
             $cNode = $timeList->addChild('ConstraintTeacherMaxHoursDaily');
             $cNode->addChild('Weight_Percentage', self::DEFAULT_WEIGHT);
-            $cNode->addChild('Maximum_Hours_Daily', config('fet.max_hours_teacher', 8));
+            $cNode->addChild('Maximum_Hours_Daily', config('fet.max_hours_teacher', 12));
             $cNode->addChild('Teacher', htmlspecialchars($teacher->kode_dosen));
         }
     }
@@ -402,11 +402,24 @@ class FetFileGeneratorService
         foreach ($activities as $activity) {
             $preferredRooms = $activity->preferredRooms;
 
-            if ($preferredRooms->isEmpty() && isset($activity->activityTag)) {
-                $tagName = $activity->activityTag->name;
-                if ($tagName === 'PRAKTIKUM') {
-                    $preferredRooms = $labRooms;
-                } elseif ($tagName === 'GANJIL' || $tagName === 'GENAP') {
+            // Jika tidak ada preferensi ruangan yang diatur manual
+            if ($preferredRooms->isEmpty()) {
+                if ($activity->activityTag) {
+                    $tagName = $activity->activityTag->name;
+
+                    if ($tagName === 'PRAKTIKUM') {
+                        $preferredRooms = $labRooms;
+                    }
+                    // PERBAIKAN DI SINI: Gunakan 'KELAS TEORI' dengan spasi
+                    elseif ($tagName === 'KELAS TEORI') {
+                        $preferredRooms = $theoryRooms;
+                    }
+                    // Jika tag lain (misal: PILIHAN), gunakan ruang teori sebagai default
+                    else {
+                        $preferredRooms = $theoryRooms;
+                    }
+                } else {
+                    // JIKA TIDAK ADA TAG SAMA SEKALI, berikan semua ruang teori sebagai default
                     $preferredRooms = $theoryRooms;
                 }
             }
@@ -415,6 +428,7 @@ class FetFileGeneratorService
                 continue;
             }
 
+            // Tambahkan constraint ke file XML
             $cNode = $spaceList->addChild('ConstraintActivityPreferredRooms');
             $cNode->addChild('Weight_Percentage', '95');
             $cNode->addChild('Activity_Id', $activity->id);
