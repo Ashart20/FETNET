@@ -13,7 +13,7 @@ use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Mary\Traits\Toast;
-
+use Auth;
 class ManageProdi extends Component
 {
     use Toast, WithPagination;
@@ -178,5 +178,15 @@ class ManageProdi extends Component
         $this->reset();
         $this->loadClusters();
         $this->resetErrorBag();
+    }
+
+    public function loginAs($prodiId){
+        $user = User::where('prodi_id', $prodiId)->first();
+        Auth::login($user);
+        session()->regenerate();
+        if ($user->hasRole('prodi')) {
+            // Pastikan Anda sudah membuat rute bernama 'prodi.dashboard'
+            return redirect()->route('prodi.dashboard');
+        }
     }
 }

@@ -24,6 +24,7 @@
 
             @scope('actions', $prodi)
             <div class="flex space-x-2">
+                <x-mary-button icon="o-arrow-left-end-on-rectangle" @click="$wire.loginAs({{ $prodi->id }})" class="btn-sm btn-success" />
                 <x-mary-button icon="o-pencil" @click="$wire.edit({{ $prodi->id }})" class="btn-sm btn-warning" />
                 <x-mary-button icon="o-trash" wire:click="delete({{ $prodi->id }})" wire:confirm="PERHATIAN!|Anda yakin ingin menghapus prodi ini?|Aksi ini juga akan menghapus user yang terhubung." class="btn-sm btn-error" />
             </div>
