@@ -4,6 +4,37 @@
                    subtitle="Atur ruangan mana saja yang diutamakan untuk setiap mata kuliah." />
 
     {{-- Tabel Aktivitas --}}
+    <div class="flex flex-wrap -mx-3">
+        <div class="w-full max-w-full px-3 mb-6 sm:w-1/3 sm:flex-none xl:mb-0 xl:w-1/3">
+        <x-mary-choices
+            label="Select client level"
+            wire:model.live="prodi_searchable_id"
+            :options="$prodiSearchable"
+            search-function="search"
+            debounce="300ms" {{-- Default is `250ms`--}}
+            min-chars="2" {{-- Default is `0`--}}
+            placeholder="Select client level"
+            single
+            searchable>
+
+            @scope('item', $prodis)
+            <x-mary-list-item :item="$prodis">
+                <x-slot:avatar>
+                    <x-mary-icon name="o-user" class="bg-orange-100 p-2 w-8 h8 rounded-full"/>
+                </x-slot:avatar>
+                <x-slot:value>
+                    {{$prodis->kode}}-{{$prodis->abbreviation}} :: {{$prodis->nama_prodi}}
+                </x-slot:value>
+            </x-mary-list-item>
+            @endscope
+
+            @scope('selection', $prodi)
+            {{$prodi->kode}}-{{$prodi->abbreviation}} :: {{$prodi->nama_prodi}}
+            @endscope
+        </x-mary-choices>
+        </div>
+    </div>
+    <br/>
     <x-mary-table :headers="$this->headers()" :rows="$activities" with-pagination>
         {{-- Scope untuk menampilkan nama mata kuliah dan kodenya --}}
         @scope('cell_subject.nama_matkul', $activity)

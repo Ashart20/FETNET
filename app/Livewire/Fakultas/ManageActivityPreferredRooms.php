@@ -3,7 +3,9 @@
 namespace App\Livewire\Fakultas;
 
 use App\Models\Activity;
+use App\Models\FetNet\ClientLevel;
 use App\Models\MasterRuangan;
+use App\Models\Prodi;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -20,10 +22,12 @@ class ManageActivityPreferredRooms extends Component
     public array $selectedRooms = [];
 
     public Collection $allRooms;
-
+    public $prodi_searchable_id = null;
+    public $prodiSearchable;
     public function mount(): void
     {
         $this->allRooms = MasterRuangan::orderBy('nama_ruangan')->get();
+        $this->prodiSelect();
     }
 
     public function headers(): array
@@ -74,12 +78,30 @@ class ManageActivityPreferredRooms extends Component
     public function render()
     {
 
-        $activities = Activity::with(['subject', 'prodi', 'studentGroups', 'preferredRooms']) //
-            ->latest()
+        $activities = Activity:://
+            where('prodi_id', $this->prodi_searchable_id)
+            ->with(['subject', 'prodi', 'studentGroups', 'preferredRooms'])
+                ->orderBy('prodi_id')
+            ->orderBy('subject_id')
             ->paginate(15);
 
         return view('livewire.fakultas.manage-activity-preferred-rooms', [
             'activities' => $activities,
         ])->layout('layouts.app');
     }
+
+    public function prodiSelect(string $value = '')
+    {
+        // Besides the search results, you must include on demand selected option
+        $selectedOption = Prodi::where('id', $this->prodi_searchable_id)->get();
+        //$this->faculties = $selectedOption;
+        $this->prodiSearchable = Prodi::query()
+            ->where('kode', 'like', "%$value%")
+            ->orwhere('abbreviation', 'like', "%$value%")
+            ->take(5)
+            ->get()
+            ->merge($selectedOption);     // <-- Adds selected option
+    }
+
+
 }
