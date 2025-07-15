@@ -79,7 +79,7 @@ class GenerateFacultyTimetableJob implements ShouldQueue
                 '--inputfile='.$inputFilePath,
                 '--outputdir='.$outputDir,
                 '--language=en',
-                '--timelimit-s='.$timeout,
+                '--timelimitseconds='.$timeout,
             ]);
 
         if ($process->successful()) {
