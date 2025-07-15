@@ -105,9 +105,38 @@
 <?php endif; ?>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
             <?php }); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_activities', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+                <?php echo e($prodi->teachers->count()); ?>
 
+            <?php }); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_teachers', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+                <?php echo e($prodi->activities->count()); ?>
+
+            <?php }); ?>
             <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('actions', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
             <div class="flex space-x-2">
+                <!--[if BLOCK]><![endif]--><?php if(auth()->user()->hasRole('superadmin')): ?>
+                    <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
+<?php $component = Mary\View\Components\Button::resolve(['icon' => 'o-arrow-left-end-on-rectangle'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Button::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['@click' => '$wire.loginAs('.e($prodi->id).')','class' => 'btn-sm btn-success']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $attributes = $__attributesOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__attributesOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal602b228a887fab12f0012a3179e5b533)): ?>
+<?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
+<?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
+<?php endif; ?>
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
 <?php $component = Mary\View\Components\Button::resolve(['icon' => 'o-pencil'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>

@@ -1,3 +1,0 @@
-<svg class="inline w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-  <path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/>
-</svg><?php /**PATH /Volumes/EXCHANGE/WebDev/FetAS/storage/framework/views/56fc1bdc61d314b037c57d2b214ee78b.blade.php ENDPATH**/ ?>

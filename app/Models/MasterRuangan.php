@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\RoomTimeConstraint;
+
 
 class MasterRuangan extends Model
 {
@@ -41,8 +44,10 @@ class MasterRuangan extends Model
     {
         return $this->belongsTo(Building::class);
     }
-
-    /**
+    public function timeConstraints(): HasMany
+    {
+        return $this->hasMany(RoomTimeConstraint::class);
+    }    /**
      * Relasi ke model User (Penanggung Jawab).
      */
     public function user(): BelongsTo

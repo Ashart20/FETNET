@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\TeacherTimeConstraint;
 
 class Teacher extends Model
 {
@@ -27,7 +29,10 @@ class Teacher extends Model
     {
         return $this->belongsTo(Prodi::class);
     }
-
+    public function timeConstraints(): HasMany
+    {
+        return $this->hasMany(TeacherTimeConstraint::class);
+    }
     protected function fullname(): Attribute
     {
         return Attribute::make(

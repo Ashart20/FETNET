@@ -23,10 +23,9 @@ class GenerateController extends Controller
     public function generate(Request $request)
     {
         // Dapatkan pengguna yang sedang login untuk referensi/logging jika diperlukan.
-        $user = Auth::user();
 
         // Memanggil Job. Job ini sekarang akan menangani seluruh proses untuk fakultas.
-        GenerateFacultyTimetableJob::dispatch($user);
+        GenerateFacultyTimetableJob::dispatch(auth()->id());
 
         // Memberikan feedback ke pengguna.
         return redirect()->route('fakultas.generate.index')
