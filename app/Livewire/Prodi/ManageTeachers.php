@@ -163,7 +163,7 @@ class ManageTeachers extends Component
         if ($prodi->cluster_id) {
             $prodiIdsInCluster = \App\Models\Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
         }
-        
+
         try {
             $teacher = \App\Models\Teacher::whereHas('prodis', function ($query) use ($prodiIdsInCluster) {
                 $query->whereIn('prodis.id', $prodiIdsInCluster);

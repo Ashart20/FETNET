@@ -215,7 +215,7 @@ class FetFileGeneratorService
             foreach ($group->childrenRecursive as $subgroup) {
 
                 $subgroupNode = $groupNode->addChild('Subgroup');
-                $subgroupNode->addChild('Name', htmlspecialchars($subgroup->nama_kelompok));
+                $subgroupNode->addChild('Name', htmlspecialchars($this->getUniqueStudentGroupName($subgroup)));
                 $subgroupNode->addChild('Long_Name', '');
                 $subgroupNode->addChild('Code', '');
                 $subgroupNode->addChild('Number_of_Students', $subgroup->jumlah_mahasiswa ?? 0);

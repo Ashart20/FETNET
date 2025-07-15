@@ -82,7 +82,13 @@ class ManageActivities extends Component
         $this->teachers = \App\Models\Teacher::whereIn('id', $allTeacherIds)->orderBy('nama_dosen')->get();
         $this->subjects = \App\Models\Subject::where('prodi_id', $prodi->id)->orderBy('semester')->orderBy('kode_matkul')->get();
         $this->allStudentGroups = \App\Models\StudentGroup::where('prodi_id', $prodi->id)
-            ->whereDoesntHave('children')
+            ->where(function ($query) {
+                $query->whereDoesntHave('children')
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereHas('children')
+                            ->whereDoesntHave('children.children');
+                    });
+            })
             ->orderBy('nama_kelompok')
             ->get();
         $this->activityTags = \App\Models\ActivityTag::orderBy('name')->get();
