@@ -107,7 +107,7 @@ class ManageTeachers extends Component
             $teachersQuery->with(['activities.subject', 'activities.prodi']);
         }
 
-        $teachers = $teachersQuery->orderBy('nama_dosen')->paginate(10);
+        $teachers = $teachersQuery->orderBy('nama_dosen')->orderBy('prodi_id')->paginate(10);
 
         return view('livewire.prodi.manage-teachers', [
             'teachers' => $teachers,
