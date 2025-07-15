@@ -132,6 +132,48 @@
             </div>
         </div>
 
+        <div class="bg-white dark:bg-dark-secondary rounded-xl border border-gray-200 dark:border-dark-tertiary my-8">
+            <div class="flex flex-col md:flex-row justify-between md:items-center p-6 border-b border-gray-200 dark:border-dark-tertiary">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Validasi Integritas Data</h2>
+                    <p class="text-sm text-gray-500 mt-1">Periksa kelengkapan data sebelum generate jadwal untuk menghindari error.</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <x-mary-button label="Jalankan Validasi Sekarang" wire:click="runValidation" icon="o-sparkles" class="btn-primary" spinner />
+                </div>
+            </div>
+
+            <div class="p-6">
+                @if ($hasBeenValidated)
+                    @if (empty($validationIssues))
+                        <x-mary-alert title="Semua Data Valid!" description="Tidak ditemukan masalah berdasarkan aturan validasi saat ini." icon="o-check-circle" class="alert-success" />
+                    @else
+                        <div class="space-y-4">
+                            @foreach ($validationIssues as $issue)
+                                @php
+                                    $isError = $issue['type'] === 'Error';
+                                    $bgColor = $isError ? 'bg-red-900/50 border-red-700' : 'bg-yellow-900/50 border-yellow-700';
+                                    $icon = $isError ? 'o-x-circle' : 'o-exclamation-triangle';
+                                    $iconColor = $isError ? 'text-red-400' : 'text-yellow-400';
+                                @endphp
+                                <div class="p-4 border rounded-lg {{ $bgColor }}">
+                                    <div class="flex items-start space-x-3">
+                                        <x-mary-icon :name="$icon" class="w-6 h-6 flex-shrink-0 {{ $iconColor }}" />
+                                        <div>
+                                            <h3 class="font-bold">{{ $issue['message'] }}</h3>
+                                            <p class="text-sm text-gray-300">{{ $issue['suggestion'] }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                @else
+                    <x-mary-alert title="Validasi Belum Dijalankan" description="Tekan tombol 'Jalankan Validasi Sekarang' untuk memulai pengecekan data." icon="o-information-circle" />
+                @endif
+            </div>
+        </div>
+
         {{-- ======================================================= --}}
         {{-- BAGIAN AKSI CEPAT & PANDUAN (GAYA TERPADU) --}}
         {{-- ======================================================= --}}

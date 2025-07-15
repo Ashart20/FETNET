@@ -1,6 +1,6 @@
-    <?php if(strlen($label ?? '') > 0): ?>
+    <!--[if BLOCK]><![endif]--><?php if(strlen($label ?? '') > 0): ?>
         <div class="inline-flex items-center gap-1">
-    <?php endif; ?>
+    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         <?php if (isset($component)) { $__componentOriginal606b6d7eddc2e418f11096356be15e19 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal606b6d7eddc2e418f11096356be15e19 = $attributes; } ?>
 <?php $component = BladeUI\Icons\Components\Icon::resolve(['name' => $icon()] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -22,10 +22,10 @@
 <?php unset($__componentOriginal606b6d7eddc2e418f11096356be15e19); ?>
 <?php endif; ?>
 
-    <?php if(strlen($label ?? '') > 0): ?>
+    <!--[if BLOCK]><![endif]--><?php if(strlen($label ?? '') > 0): ?>
             <div class="<?php echo e($labelClasses()); ?>" <?php echo e($attributes->whereStartsWith('@')); ?>>
                 <?php echo e($label); ?>
 
             </div>
         </div>
-    <?php endif; ?><?php /**PATH /home/ashart20/FETNET/storage/framework/views/d04610aaf319a517f42880e9bb8c76bd.blade.php ENDPATH**/ ?>
+    <?php endif; ?><!--[if ENDBLOCK]><![endif]--><?php /**PATH /home/ashart20/FETNET/storage/framework/views/d04610aaf319a517f42880e9bb8c76bd.blade.php ENDPATH**/ ?>

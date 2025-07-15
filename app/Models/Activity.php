@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Activity extends Model
 {
@@ -54,5 +55,10 @@ class Activity extends Model
     public function getTeacherNamesAttribute(): string
     {
         return $this->teachers->pluck('nama_dosen')->implode(', ');
+    }
+
+    public function getNameOrSubjectAttribute(): string
+    {
+        return $this->name ?? $this->subject?->nama_matkul ?? 'Tanpa Nama';
     }
 }

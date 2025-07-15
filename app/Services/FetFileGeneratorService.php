@@ -30,7 +30,7 @@ class FetFileGeneratorService
      *
      * @return string Path file .fet yang dihasilkan.
      */
-    public function generateForFaculty(?string $customFilePath = null): string
+    public function generateForFaculty(?string $customFilePath = null, ?int $userId = null): string // <-- Terima $userId
     {
         Log::info('Memulai pengambilan data untuk seluruh fakultas.');
         $data = $this->fetchDataForFaculty();
@@ -46,7 +46,7 @@ class FetFileGeneratorService
 
         $xml->addChild('Timetable_Generation_Options_List');
 
-        return $this->saveXmlToFile($xml, null, $customFilePath); // null karena tidak lagi spesifik prodi
+        return $this->saveXmlToFile($xml, null, $customFilePath, $userId); // null karena tidak lagi spesifik prodi
     }
 
     /**
@@ -431,7 +431,7 @@ class FetFileGeneratorService
 
             // Tambahkan constraint ke file XML
             $cNode = $spaceList->addChild('ConstraintActivityPreferredRooms');
-            $cNode->addChild('Weight_Percentage', '95');
+            $cNode->addChild('Weight_Percentage', '100');
             $cNode->addChild('Activity_Id', $activity->id);
             $cNode->addChild('Number_of_Preferred_Rooms', $preferredRooms->count());
             foreach ($preferredRooms as $room) {
@@ -440,7 +440,7 @@ class FetFileGeneratorService
         }
     }
 
-    private function saveXmlToFile(SimpleXMLElement $xml, ?Prodi $prodi, ?string $customFilePath): string
+    private function saveXmlToFile(SimpleXMLElement $xml, ?Prodi $prodi, ?string $customFilePath, ?int $userId): string // <-- Terima $userId
     {
         if (is_null($customFilePath)) {
             $dirPath = storage_path('app/fet-generator/inputs');
@@ -460,7 +460,7 @@ class FetFileGeneratorService
         FetFile::create([
             'link' => $customFilePath,
             'tipe' => 'fakultas',
-            'tipe_id' => auth()->user()->id,
+            'tipe_id' => $userId,
         ]);
         return $customFilePath;
     }

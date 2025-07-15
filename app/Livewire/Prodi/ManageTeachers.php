@@ -30,9 +30,9 @@ class ManageTeachers extends Component
     public ?string $title_depan = '';
     public ?string $title_belakang = '';
     public string $kode_univ = '';
-    public string $employee_id = '';
+    public ?string $employee_id = null;
     public string $email = '';
-    public string $nomor_hp = '';
+    public ?string $nomor_hp = null;
 
     // Properti untuk kontrol UI
     public bool $teacherModal = false;

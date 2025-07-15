@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class StudentGroup extends Model
 {
     use HasFactory;
@@ -53,5 +54,9 @@ class StudentGroup extends Model
     public function prodi(): BelongsTo
     {
         return $this->belongsTo(Prodi::class);
+    }
+    public function timeConstraints(): HasMany
+    {
+        return $this->hasMany(StudentGroupTimeConstraint::class);
     }
 }

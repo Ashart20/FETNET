@@ -13,7 +13,14 @@ class Schedule extends Model
     use HasFactory;
 
     protected $guarded = [];
-
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
     /**
      * Relasi ke Prodi melalui model Activity.
      */

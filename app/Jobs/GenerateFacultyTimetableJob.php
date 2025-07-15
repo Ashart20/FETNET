@@ -20,41 +20,63 @@ use Throwable;
 class GenerateFacultyTimetableJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    /**
+     * Menyimpan ID user yang memulai proses ini.
+     * @var int
+     */
+    public int $userId;
 
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(int $userId)
+    {
+        $this->userId = $userId;
+    }
+
+    /**
+     * Execute the job.
+     */
     public int $timeout = 1800;
 
     public int $tries = 1;
 
     protected $user;
 
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
 
     public function handle(FetFileGeneratorService $fetFileGenerator): void
     {
         Log::info('MEMULAI PROSES GENERATE JADWAL FAKULTAS (GABUNGAN)');
-        Log::info('Menghapus semua data jadwal lama...');
-        DB::table('schedule_teacher')->delete();
-        Schedule::query()->delete();
-        Log::info('Data jadwal lama berhasil dihapus.');
 
         try {
-            // PANGGILAN TUNGGAL: Panggil service untuk membuat satu file .fet untuk seluruh fakultas
-            $inputFilePath = $fetFileGenerator->generateForFaculty();
+            // <-- `try` dimulai dari sini, membungkus semua proses
+
+            // Langkah 1: Hapus jadwal lama
+            Log::info('Menghapus semua data jadwal lama...');
+            DB::table('schedule_teacher')->delete();
+            Schedule::query()->delete();
+            Log::info('Data jadwal lama berhasil dihapus.');
+
+            // Langkah 2: Buat file input .fet
+            $inputFilePath = $fetFileGenerator->generateForFaculty(null, $this->userId);
             Log::info("File input .fet gabungan berhasil dibuat di: {$inputFilePath}");
 
-            // Jalankan FET Engine sekali untuk file gabungan
+            // Langkah 3: Jalankan FET Engine dan proses hasilnya
+            // (Asumsi method ini juga bisa melempar Exception jika gagal)
             $this->runFetEngine($inputFilePath);
 
+            Log::info('--- PROSES GENERATE JADWAL FAKULTAS SELESAI DENGAN SUKSES ---');
+
         } catch (\Exception $e) {
-            Log::error('GAGAL TOTAL DI TENGAH PROSES GENERATE FAKULTAS: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            // Jika gagal, job akan berhenti dan ditandai sebagai failed().
+            // Jika ada error di langkah mana pun, akan ditangkap di sini
+            Log::error('!!! PROSES GENERATE JADWAL GAGAL !!!');
+            Log::error('Pesan Error: ' . $e->getMessage());
+            Log::error('Lokasi File: ' . $e->getFile() . ' pada baris ' . $e->getLine());
+            Log::error('Stack Trace: ' . substr($e->getTraceAsString(), 0, 2000)); // Dibatasi agar log tidak terlalu panjang
+
+            // Melempar kembali exception agar job ditandai sebagai 'failed' oleh Laravel
             throw $e;
         }
-
-        Log::info('PROSES GENERATE JADWAL FAKULTAS (GABUNGAN) SELESAI.');
     }
 
     private function runFetEngine(string $inputFilePath): void
