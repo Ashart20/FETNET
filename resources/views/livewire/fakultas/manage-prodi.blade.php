@@ -29,7 +29,7 @@
             @endscope
             @scope('actions', $prodi)
             <div class="flex space-x-2">
-                @if(aut()->user()->hasRole('superadmin'))
+                @if(auth()->user()->hasRole('superadmin'))
                     <x-mary-button icon="o-arrow-left-end-on-rectangle" @click="$wire.loginAs({{ $prodi->id }})" class="btn-sm btn-success" />
                 @endif
                 <x-mary-button icon="o-pencil" @click="$wire.edit({{ $prodi->id }})" class="btn-sm btn-warning" />
