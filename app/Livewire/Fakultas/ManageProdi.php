@@ -66,6 +66,8 @@ class ManageProdi extends Component
             ['key' => 'kode', 'label' => 'Kode'],
             ['key' => 'cluster.name', 'label' => 'Cluster'],
             ['key' => 'users', 'label' => 'User Terdaftar', 'sortable' => false],
+            ['key' => 'activities', 'label' => 'Jumlah activitas', 'class' => 'text-center'],
+            ['key' => 'teachers', 'label' => 'Jumlah dosen', 'class' => 'text-center'],
         ];
     }
 

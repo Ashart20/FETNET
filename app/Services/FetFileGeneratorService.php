@@ -6,6 +6,7 @@ use App\Models\Activity;
 use App\Models\ActivityTag;
 use App\Models\Building;
 use App\Models\Day;
+use App\Models\FetFile;
 use App\Models\MasterRuangan;
 use App\Models\Prodi;
 use App\Models\RoomTimeConstraint;
@@ -456,7 +457,11 @@ class FetFileGeneratorService
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
         $dom->save($customFilePath);
-
+        FetFile::create([
+            'link' => $customFilePath,
+            'tipe' => 'fakultas',
+            'tipe_id' => auth()->user()->id,
+        ]);
         return $customFilePath;
     }
 }

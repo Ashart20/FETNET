@@ -7,6 +7,7 @@ use App\Models\ActivityTag;
 use App\Models\Building;
 use App\Models\Cluster;
 use App\Models\Day;
+use App\Models\FetFile;
 use App\Models\MasterRuangan;
 use App\Models\RoomTimeConstraint;
 use App\Models\StudentGroup;
@@ -350,7 +351,11 @@ class ClusterFetFileGeneratorService
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML());
         $dom->save($filePath);
-
+        FetFile::create([
+            'link' => $filePath,
+            'tipe' => 'cluster',
+            'tipe_id' => $cluster->id,
+        ]);
         return $filePath;
     }
 }

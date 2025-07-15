@@ -21,10 +21,17 @@
                 <x-mary-badge value="Belum ada user" class="badge-error" />
             @endforelse
             @endscope
-
+            @scope('cell_activities', $prodi)
+                {{$prodi->teachers->count()}}
+            @endscope
+            @scope('cell_teachers', $prodi)
+                {{$prodi->activities->count()}}
+            @endscope
             @scope('actions', $prodi)
             <div class="flex space-x-2">
-                <x-mary-button icon="o-arrow-left-end-on-rectangle" @click="$wire.loginAs({{ $prodi->id }})" class="btn-sm btn-success" />
+                @if(aut()->user()->hasRole('superadmin'))
+                    <x-mary-button icon="o-arrow-left-end-on-rectangle" @click="$wire.loginAs({{ $prodi->id }})" class="btn-sm btn-success" />
+                @endif
                 <x-mary-button icon="o-pencil" @click="$wire.edit({{ $prodi->id }})" class="btn-sm btn-warning" />
                 <x-mary-button icon="o-trash" wire:click="delete({{ $prodi->id }})" wire:confirm="PERHATIAN!|Anda yakin ingin menghapus prodi ini?|Aksi ini juga akan menghapus user yang terhubung." class="btn-sm btn-error" />
             </div>

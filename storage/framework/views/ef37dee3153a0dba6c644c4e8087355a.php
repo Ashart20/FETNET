@@ -105,7 +105,14 @@
 <?php endif; ?>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
             <?php }); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_activities', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+                <?php echo e($prodi->teachers->count()); ?>
 
+            <?php }); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_teachers', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+                <?php echo e($prodi->activities->count()); ?>
+
+            <?php }); ?>
             <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('actions', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
             <div class="flex space-x-2">
                 <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
