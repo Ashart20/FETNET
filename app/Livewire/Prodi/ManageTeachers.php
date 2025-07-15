@@ -27,8 +27,8 @@ class ManageTeachers extends Component
     public ?int $teacherId = null;
     public string $nama_dosen = '';
     public string $kode_dosen = '';
-    public string $title_depan = '';
-    public string $title_belakang = '';
+    public ?string $title_depan = '';
+    public ?string $title_belakang = '';
     public string $kode_univ = '';
     public string $employee_id = '';
     public string $email = '';
