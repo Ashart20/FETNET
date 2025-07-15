@@ -151,11 +151,36 @@ class ManageTeachers extends Component
 
     public function edit($id)
     {
-        $teacher = Teacher::whereHas('prodis', fn ($q) => $q->where('prodis.id', auth()->user()->prodi_id))->findOrFail($id);
+        $prodi = auth()->user()->prodi;
+
+
+        if (!$prodi) {
+            $this->toast(type: 'error', title: 'Akses Ditolak!');
+            return;
+        }
+
+        $prodiIdsInCluster = collect([$prodi->id]);
+        if ($prodi->cluster_id) {
+            $prodiIdsInCluster = \App\Models\Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
+        }
+        
+        try {
+            $teacher = \App\Models\Teacher::whereHas('prodis', function ($query) use ($prodiIdsInCluster) {
+                $query->whereIn('prodis.id', $prodiIdsInCluster);
+            })
+                ->findOrFail($id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $this->toast(type: 'error', title: 'Data Dosen Tidak Ditemukan!', description: 'Dosen ini mungkin tidak lagi berada di dalam cluster Anda.');
+            return;
+        }
+
+        // Isi properti form
         $this->teacherId = $id;
         $this->fill($teacher->toArray());
         $this->teacherModal = true;
     }
+
+
 
     public function unlinkTeacher($id)
     {
