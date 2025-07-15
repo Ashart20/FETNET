@@ -21,10 +21,13 @@
                 <x-mary-badge value="Belum ada user" class="badge-error" />
             @endforelse
             @endscope
-            @scope('cell_activities', $prodi)
+            @scope('cell_teachers', $prodi)
                 {{$prodi->teachers->count()}}
             @endscope
-            @scope('cell_teachers', $prodi)
+            @scope('cell_subjects', $prodi)
+            {{$prodi->subjects->count()}}
+            @endscope
+            @scope('cell_activities', $prodi)
                 {{$prodi->activities->count()}}
             @endscope
             @scope('actions', $prodi)
