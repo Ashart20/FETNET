@@ -193,8 +193,8 @@ class FetFileGeneratorService
             $yearNode->addChild('Number_of_Students', $year->jumlah_mahasiswa ?? 0);
             $yearNode->addChild('Comments', '');
 
-            if ($year->childrenRecursive->isNotEmpty()) {
-                foreach ($year->childrenRecursive as $group) {
+            if ($year->children->isNotEmpty()) {
+                foreach ($year->children as $group) {
                     $this->addStudentGroupRecursive($yearNode, $group);
                 }
             }
@@ -211,8 +211,8 @@ class FetFileGeneratorService
         $groupNode->addChild('Number_of_Students', $group->jumlah_mahasiswa ?? 0);
         $groupNode->addChild('Comments', '');
 
-        if ($group->childrenRecursive->isNotEmpty()) {
-            foreach ($group->childrenRecursive as $subgroup) {
+        if ($group->children->isNotEmpty()) {
+            foreach ($group->children as $subgroup) {
 
                 $subgroupNode = $groupNode->addChild('Subgroup');
                 $subgroupNode->addChild('Name', htmlspecialchars($this->getUniqueStudentGroupName($subgroup)));
