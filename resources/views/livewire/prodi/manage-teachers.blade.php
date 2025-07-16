@@ -143,7 +143,7 @@
                     <x-mary-input label="Kode Dosen (Prodi)" wire:model="kode_dosen" placeholder="Contoh: BDO, RMD" required />
                 </div>
                 <div class="space-y-4">
-                    <x-mary-input label="Kode UPI" wire:model="kode_univ" placeholder="Masukkan kode UPI />
+                    <x-mary-input label="Kode UPI" wire:model="kode_univ" placeholder="Masukkan kode UPI" />
                     <x-mary-input label="Employee ID / NIP" wire:model="employee_id" placeholder="Masukkan NIP" />
                     <x-mary-input label="Email" wire:model="email" type="email" placeholder="dosen@email.com" />
                     <x-mary-input label="Nomor HP" wire:model="nomor_hp" placeholder="08123456789" />
