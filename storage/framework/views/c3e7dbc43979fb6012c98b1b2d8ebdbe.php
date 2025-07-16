@@ -22,6 +22,85 @@
 <?php endif; ?>
 
     
+    <div class="flex flex-wrap -mx-3">
+        <div class="w-full max-w-full px-3 mb-6 sm:w-1/3 sm:flex-none xl:mb-0 xl:w-1/3">
+        <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
+<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Select prodi','options' => $prodiSearchable,'searchFunction' => 'search','debounce' => '300ms','minChars' => '2','single' => true,'searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-choices'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Choices::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model.live' => 'prodi_searchable_id','placeholder' => 'Select prodi']); ?>
+
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('item', function($prodis) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+            <?php if (isset($component)) { $__componentOriginal8653fe0e2b5ee7b7ab3811c66ab90418 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8653fe0e2b5ee7b7ab3811c66ab90418 = $attributes; } ?>
+<?php $component = Mary\View\Components\ListItem::resolve(['item' => $prodis] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-list-item'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\ListItem::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                 <?php $__env->slot('avatar', null, []); ?> 
+                    <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-user'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-icon'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'bg-orange-100 p-2 w-8 h8 rounded-full']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
+<?php endif; ?>
+                 <?php $__env->endSlot(); ?>
+                 <?php $__env->slot('value', null, []); ?> 
+                    <?php echo e($prodis->kode); ?>-<?php echo e($prodis->abbreviation); ?> :: <?php echo e($prodis->nama_prodi); ?>
+
+                 <?php $__env->endSlot(); ?>
+             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8653fe0e2b5ee7b7ab3811c66ab90418)): ?>
+<?php $attributes = $__attributesOriginal8653fe0e2b5ee7b7ab3811c66ab90418; ?>
+<?php unset($__attributesOriginal8653fe0e2b5ee7b7ab3811c66ab90418); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8653fe0e2b5ee7b7ab3811c66ab90418)): ?>
+<?php $component = $__componentOriginal8653fe0e2b5ee7b7ab3811c66ab90418; ?>
+<?php unset($__componentOriginal8653fe0e2b5ee7b7ab3811c66ab90418); ?>
+<?php endif; ?>
+            <?php }); ?>
+
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('selection', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+            <?php echo e($prodi->kode); ?>-<?php echo e($prodi->abbreviation); ?> :: <?php echo e($prodi->nama_prodi); ?>
+
+            <?php }); ?>
+         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
+<?php $attributes = $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
+<?php unset($__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207)): ?>
+<?php $component = $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207; ?>
+<?php unset($__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207); ?>
+<?php endif; ?>
+        </div>
+    </div>
+    <br/>
     <?php if (isset($component)) { $__componentOriginal8fbd727209323874b055feef49197909 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal8fbd727209323874b055feef49197909 = $attributes; } ?>
 <?php $component = Mary\View\Components\Table::resolve(['headers' => $this->headers(),'rows' => $activities,'withPagination' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
