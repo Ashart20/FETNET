@@ -90,7 +90,7 @@
                     label="Pilih Ruangan"
                     wire:model="selectedRooms"
                     :options="$allRooms"
-                    option-label="nama_ruangan"
+                    option-label="name_with_capacity"
                     searchable
                     multiple />
 

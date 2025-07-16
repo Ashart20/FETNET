@@ -286,7 +286,7 @@
 <?php $component->withAttributes(['wire:submit' => 'savePreferences']); ?>
                 <?php if (isset($component)) { $__componentOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalb2c45e9907fdbe9ac5d66b9b5be51207 = $attributes; } ?>
-<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Ruangan','options' => $allRooms,'optionLabel' => 'nama_ruangan','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Mary\View\Components\Choices::resolve(['label' => 'Pilih Ruangan','options' => $allRooms,'optionLabel' => 'name_with_capacity','searchable' => true] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-choices'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>

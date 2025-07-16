@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\RoomTimeConstraint;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 
 class MasterRuangan extends Model
@@ -61,5 +62,11 @@ class MasterRuangan extends Model
     public function preferredForActivities(): BelongsToMany
     {
         return $this->belongsToMany(Activity::class, 'activity_preferred_room');
+    }
+    protected function nameWithCapacity(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => "{$this->nama_ruangan} (Kapasitas: {$this->kapasitas})",
+        );
     }
 }

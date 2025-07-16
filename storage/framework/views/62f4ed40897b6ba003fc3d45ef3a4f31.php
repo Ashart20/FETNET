@@ -105,11 +105,15 @@
 <?php endif; ?>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
             <?php }); ?>
-            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_activities', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_teachers', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
                 <?php echo e($prodi->teachers->count()); ?>
 
             <?php }); ?>
-            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_teachers', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_subjects', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
+            <?php echo e($prodi->subjects->count()); ?>
+
+            <?php }); ?>
+            <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_activities', function($prodi) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
                 <?php echo e($prodi->activities->count()); ?>
 
             <?php }); ?>

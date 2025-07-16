@@ -29,14 +29,30 @@ class ManageActivityPreferredRooms extends Component
         $this->allRooms = MasterRuangan::orderBy('nama_ruangan')->get();
         $this->prodiSelect();
     }
+    public function search(string $value = ''): void
+    {
+        // Ambil opsi yang sedang terpilih agar tidak hilang dari daftar saat mencari
+        $selectedOption = Prodi::where('id', $this->prodi_searchable_id)->get();
 
+        // Cari prodi berdasarkan nama, kode, atau singkatan
+        $this->prodiSearchable = Prodi::query()
+            ->where(function($q) use ($value) {
+                $q->where('nama_prodi', 'like', "%$value%")
+                    ->orWhere('kode', 'like', "%$value%")
+                    ->orWhere('abbreviation', 'like', "%$value%");
+            })
+            ->take(5) // Batasi 5 hasil untuk performa
+            ->get()
+            ->merge($selectedOption);
+    }
     public function headers(): array
     {
         return [
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'subject.nama_matkul', 'label' => 'Mata Kuliah'],
             ['key' => 'prodi.nama_prodi', 'label' => 'Prodi'],
-            ['key' => 'student_group_names', 'label' => 'Kelompok Mahasiswa'], // PERUBAHAN: Gunakan key baru
+            ['key' => 'student_group_names', 'label' => 'Kelompok Mahasiswa'],
+            ['key' => 'student_groups_sum_jumlah_mahasiswa', 'label' => 'Jml. Mhs', 'class' => 'text-center'],// PERUBAHAN: Gunakan key baru
             ['key' => 'preferred_rooms', 'label' => 'Preferensi Ruangan', 'sortable' => false],
             ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
         ];
@@ -82,6 +98,10 @@ class ManageActivityPreferredRooms extends Component
             where('prodi_id', $this->prodi_searchable_id)
             ->with(['subject', 'prodi', 'studentGroups', 'preferredRooms'])
                 ->orderBy('prodi_id')
+            ->when($this->prodi_searchable_id, function ($query) {
+                $query->where('prodi_id', $this->prodi_searchable_id);
+            })
+            ->withSum('studentGroups', 'jumlah_mahasiswa')
             ->orderBy('subject_id')
             ->paginate(15);
 
@@ -92,16 +112,14 @@ class ManageActivityPreferredRooms extends Component
 
     public function prodiSelect(string $value = '')
     {
-        // Besides the search results, you must include on demand selected option
+        // Ambil opsi yang sedang terpilih agar tidak hilang dari daftar
         $selectedOption = Prodi::where('id', $this->prodi_searchable_id)->get();
-        //$this->faculties = $selectedOption;
+
         $this->prodiSearchable = Prodi::query()
             ->where('kode', 'like', "%$value%")
+            ->orwhere('nama_prodi', 'like', "%$value%")
             ->orwhere('abbreviation', 'like', "%$value%")
-            ->take(5)
             ->get()
-            ->merge($selectedOption);     // <-- Adds selected option
+            ->merge($selectedOption);
     }
-
-
-}
+    }
