@@ -282,29 +282,39 @@
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
             <?php }); ?>
             <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('cell_preferred_rooms', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
-            <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $activity->preferredRooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
-<?php $component = Mary\View\Components\Badge::resolve(['value' => $room->nama_ruangan.', kap: '.$room->kapasitas] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('mary-badge'); ?>
+            <div class="flex flex-wrap gap-1">
+                <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $activity->preferredRooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <div class="badge badge-primary badge-outline flex items-center p-0">
+                        <span class="pl-3 pr-2 py-1"><?php echo e($room->nama_ruangan.', kap: '.$room->kapasitas); ?></span>
+
+                        <button
+                            wire:click="removePreferredRoom(<?php echo e($activity->id); ?>, <?php echo e($room->id); ?>)"
+                            wire:confirm="Anda yakin ingin menghapus preferensi ruangan '<?php echo e($room->nama_ruangan); ?>' dari aktivitas ini?"
+                            class="btn btn-ghost btn-xs btn-circle mr-1">
+                            <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
+<?php $component = Mary\View\Components\Icon::resolve(['name' => 'o-x-mark'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-icon'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Mary\View\Components\Badge::ignoredParameterNames()); ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Icon::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'badge-primary badge-outline']); ?>
+<?php $component->withAttributes(['class' => 'h-4 w-4']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
-<?php $attributes = $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
-<?php unset($__attributesOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php if (isset($__attributesOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $attributes = $__attributesOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__attributesOriginalce0070e6ae017cca68172d0230e44821); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed)): ?>
-<?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
-<?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
+<?php if (isset($__componentOriginalce0070e6ae017cca68172d0230e44821)): ?>
+<?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
+<?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
 <?php endif; ?>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
+                        </button>
+                    </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <?php if (isset($component)) { $__componentOriginal4f015fb6508e425790bdb8f79792e6ed = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal4f015fb6508e425790bdb8f79792e6ed = $attributes; } ?>
 <?php $component = Mary\View\Components\Badge::resolve(['value' => 'Belum diatur'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('mary-badge'); ?>
@@ -324,7 +334,8 @@
 <?php $component = $__componentOriginal4f015fb6508e425790bdb8f79792e6ed; ?>
 <?php unset($__componentOriginal4f015fb6508e425790bdb8f79792e6ed); ?>
 <?php endif; ?>
-            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+            </div>
             <?php }); ?>
             <?php $__bladeCompiler = $__bladeCompiler ?? null; $loop = null; $__env->slot('actions', function($activity) use ($__env,$__bladeCompiler) { $loop = (object) $__env->getLoopStack()[0] ?>
             <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>

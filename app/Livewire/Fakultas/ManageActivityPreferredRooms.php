@@ -35,7 +35,20 @@ class ManageActivityPreferredRooms extends Component
                 $q->where('nama_prodi', 'like', "%$value%")->orWhere('kode', 'like', "%$value%")->orWhere('abbreviation', 'like', "%$value%");
             })->take(50)->get()->merge($selectedOption);
     }
+    public function removePreferredRoom(int $activityId, int $roomId): void
+    {
+        // Cari aktivitas yang sesuai
+        $activity = Activity::find($activityId);
 
+        if ($activity) {
+            // `detach` digunakan untuk menghapus relasi many-to-many
+            $activity->preferredRooms()->detach($roomId);
+            $this->success('Preferensi ruangan berhasil dihapus.');
+        } else {
+            $this->error('Gagal menghapus, aktivitas tidak ditemukan.');
+        }
+
+    }
     public function headers(): array
     {
         return [['key' => 'id', 'label' => 'ID', 'class' => 'hidden'], ['key' => 'subject.nama_matkul', 'label' => 'Mata Kuliah'], ['key' => 'prodi.nama_prodi', 'label' => 'Prodi'], ['key' => 'student_group_names', 'label' => 'Kelompok Mahasiswa'], ['key' => 'tipe_kelas', 'label' => 'Tipe Kelas', 'class' => 'text-center'], ['key' => 'preferred_rooms', 'label' => 'Preferensi Ruangan', 'sortable' => false], ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],];

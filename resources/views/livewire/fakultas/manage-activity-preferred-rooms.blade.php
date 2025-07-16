@@ -46,11 +46,22 @@
             @endif
             @endscope
             @scope('cell_preferred_rooms', $activity)
-            @forelse($activity->preferredRooms as $room)
-                <x-mary-badge :value="$room->nama_ruangan.', kap: '.$room->kapasitas" class="badge-primary badge-outline" />
-            @empty
-                <x-mary-badge value="Belum diatur" class="badge-ghost" />
-            @endforelse
+            <div class="flex flex-wrap gap-1">
+                @forelse($activity->preferredRooms as $room)
+                    <div class="badge badge-primary badge-outline flex items-center p-0">
+                        <span class="pl-3 pr-2 py-1">{{ $room->nama_ruangan.', kap: '.$room->kapasitas }}</span>
+
+                        <button
+                            wire:click="removePreferredRoom({{ $activity->id }}, {{ $room->id }})"
+                            wire:confirm="Anda yakin ingin menghapus preferensi ruangan '{{ $room->nama_ruangan }}' dari aktivitas ini?"
+                            class="btn btn-ghost btn-xs btn-circle mr-1">
+                            <x-mary-icon name="o-x-mark" class="h-4 w-4" />
+                        </button>
+                    </div>
+                @empty
+                    <x-mary-badge value="Belum diatur" class="badge-ghost" />
+                @endforelse
+            </div>
             @endscope
             @scope('actions', $activity)
             <x-mary-button icon="o-home-modern" wire:click="editPreferences({{ $activity->id }})" label="Atur" class="btn-primary btn-sm" />
