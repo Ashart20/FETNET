@@ -492,30 +492,31 @@ class TimetableValidationService
     }
     private function validateStudentWorkload(): void
     {
-        // Hitung total slot waktu yang mungkin dalam seminggu
+        // Ini adalah "(13 jam) X (5 hari)" Anda
         $totalPossibleSlots = \App\Models\Day::count() * \App\Models\TimeSlot::count();
         if ($totalPossibleSlots === 0) {
             return;
         }
 
-        // Ambil data kelompok, hanya dengan SKS total dan batasan waktu miliknya sendiri
         $studentGroups = \App\Models\StudentGroup::withSum('activities', 'duration')
             ->withCount('timeConstraints')
             ->with('prodi')
             ->get();
 
         foreach ($studentGroups as $group) {
-            // Demand: Total SKS kelompok ini
+            // Ini adalah "beban sks kelompok mahasiswa tersebut"
             $totalLoad = $group->activities_sum_duration ?? 0;
             if ($totalLoad === 0) {
                 continue;
             }
 
-            // Supply: Total slot dikurangi batasan milik kelompok ini saja
+            // Ini adalah "jumlah ketidaksediaan mahasiswa"
             $totalUnavailable = $group->time_constraints_count;
+
+            // Ini adalah "ketersediaan mahasiswa" (hasil pengurangan)
             $totalAvailable = $totalPossibleSlots - $totalUnavailable;
 
-            // Bandingkan
+            // "kemudian bandingkan"
             if ($totalLoad > $totalAvailable) {
                 $this->addIssue(
                     'Error',
