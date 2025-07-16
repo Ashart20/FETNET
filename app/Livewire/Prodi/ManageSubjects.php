@@ -46,8 +46,8 @@ class ManageSubjects extends Component
                 'min:3',
                 Rule::unique('subjects')->where('prodi_id', auth()->user()->prodi_id)->ignore($this->subjectId),
             ],
-            'sks' => 'required|integer|min:1|max:6',
-            'semester' => 'required|integer|min:1|max:6',
+            'sks' => 'required|integer|min:1|max:10',
+            'semester' => 'required|integer|min:1|max:10',
         ];
     }
 
