@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 
 class StudentGroup extends Model
@@ -28,7 +29,10 @@ class StudentGroup extends Model
     {
         return $this->belongsTo(StudentGroup::class, 'parent_id');
     }
-
+    public function activities(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Activity::class, 'activity_student_group');
+    }
     /**
      * Mendefinisikan relasi ke children group (satu level).
      */

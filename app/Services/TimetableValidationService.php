@@ -35,6 +35,10 @@ class TimetableValidationService
         $this->validateLockedResources();
         $this->validateRoomSupplyVsDemand();
         $this->validateConstraintIntersection();
+        $this->validateActivityDurationVsTeacherDailyLimit();
+        $this->validateActivityDurationVsStudentDailyLimit();
+        $this->validateSingleRoomWorkload();
+        $this->validateOrphanRecords();
         // Anda bisa menambahkan method validasi lain di sini
 
         return $this->issues;
@@ -68,37 +72,29 @@ class TimetableValidationService
      */
     private function validateRoomCapacity(): void
     {
-        $allRooms = \App\Models\MasterRuangan::all();
-        // Tambahkan 'prodi' ke dalam with() untuk eager loading
-        $activities = \App\Models\Activity::with('studentGroups', 'activityTag', 'prodi')->get();
-
-        $theoryRoomsMaxCapacity = $allRooms->where('tipe', 'KELAS_TEORI')->max('kapasitas') ?? 0;
-        $labRoomsMaxCapacity = $allRooms->where('tipe', 'LABORATORIUM')->max('kapasitas') ?? 0;
-
+        $activities = \App\Models\Activity::with('studentGroups', 'activityTag', 'preferredRooms', 'prodi')->get();
         foreach ($activities as $activity) {
             $studentCount = $activity->studentGroups->sum('jumlah_mahasiswa');
             if ($studentCount == 0) continue;
 
-            // Siapkan informasi tambahan untuk pesan error
-            $prodiName = $activity->prodi?->nama_prodi ?? 'N/A';
-            $groupNames = $activity->studentGroups->pluck('nama_kelompok')->implode(', ');
+            // Tentukan kandidat ruangan: preferensi dulu, baru tipe umum
+            $candidateRooms = $activity->preferredRooms;
+            if ($candidateRooms->isEmpty()) {
+                $tag = $activity->activityTag->name ?? 'KELAS TEORI';
+                $roomType = ($tag === 'PRAKTIKUM') ? 'LABORATORIUM' : 'KELAS_TEORI';
+                $candidateRooms = \App\Models\MasterRuangan::where('tipe', $roomType)->get();
+            }
 
-            $tag = $activity->activityTag->name ?? 'KELAS TEORI';
+            $maxCapacityInSelection = $candidateRooms->max('kapasitas') ?? 0;
 
-            if ($tag === 'PRAKTIKUM') {
-                if ($studentCount > $labRoomsMaxCapacity) {
-                    // Pesan error baru yang lebih deskriptif
-                    $message = "Aktivitas Praktikum '{$activity->nameOrSubject}' (Prodi: {$prodiName}, Kelompok: {$groupNames}) butuh kapasitas {$studentCount}.";
-                    $suggestion = "Kapasitas lab terbesar hanya {$labRoomsMaxCapacity}. Tidak bisa dijadwalkan.";
-                    $this->addIssue('Error', $message, $suggestion);
-                }
-            } else { // Untuk KELAS TEORI, PILIHAN, dll.
-                if ($studentCount > $theoryRoomsMaxCapacity) {
-                    // Pesan error baru yang lebih deskriptif
-                    $message = "Aktivitas Teori '{$activity->nameOrSubject}' (Prodi: {$prodiName}, Kelompok: {$groupNames}) butuh kapasitas {$studentCount}.";
-                    $suggestion = "Kapasitas ruang teori terbesar hanya {$theoryRoomsMaxCapacity}. Tidak bisa dijadwalkan.";
-                    $this->addIssue('Error', $message, $suggestion);
-                }
+            if ($studentCount > $maxCapacityInSelection) {
+                $prodiName = $activity->prodi?->nama_prodi ?? 'N/A';
+                $groupNames = $activity->studentGroups->pluck('nama_kelompok')->implode(', ');
+
+                $message = "Kapasitas ruangan tidak cukup untuk '{$activity->nameOrSubject}' (Prodi: {$prodiName}).";
+                $suggestion = "Aktivitas ini (Kelompok: {$groupNames}) butuh kapasitas {$studentCount}, tetapi pilihan ruangan terbesar hanya {$maxCapacityInSelection}.";
+
+                $this->addIssue('Error', $message, $suggestion);
             }
         }
     }
@@ -220,12 +216,13 @@ class TimetableValidationService
 
     private function validateConstraintIntersection(): void
     {
-        // Muat semua relasi yang dibutuhkan sekaligus
+        // 1. Muat semua relasi yang dibutuhkan sekaligus untuk performa
         $activities = \App\Models\Activity::with([
             'teachers.timeConstraints',
             'studentGroups.timeConstraints',
             'preferredRooms.timeConstraints',
             'prodi',
+            'activityTag'
         ])->get();
 
         $totalPossibleSlots = \App\Models\Day::count() * \App\Models\TimeSlot::count();
@@ -233,7 +230,15 @@ class TimetableValidationService
             return;
         }
 
+        // Ambil semua tipe ruangan sekali saja untuk efisiensi
+        $allRooms = \App\Models\MasterRuangan::with('timeConstraints')->get();
+        $labRooms = $allRooms->where('tipe', 'LABORATORIUM');
+        $theoryRooms = $allRooms->where('tipe', 'KELAS_TEORI');
+
+        // 2. Loop melalui setiap aktivitas untuk divalidasi
         foreach ($activities as $activity) {
+            // --- Tahap 1: Cek Titik Temu Dosen & Mahasiswa ---
+
             // Kumpulkan slot tidak tersedia dari Dosen
             $teacherUnavailableSlots = $activity->teachers->flatMap(fn ($t) => $t->timeConstraints->map(fn ($c) => $c->day_id . '-' . $c->time_slot_id));
 
@@ -243,10 +248,8 @@ class TimetableValidationService
             // Gabungkan semua slot tidak tersedia dari Dosen dan Mahasiswa
             $peopleUnavailableSlots = $teacherUnavailableSlots->merge($studentUnavailableSlots)->unique();
 
-            // Jika Dosen & Mahasiswa saja sudah tidak punya waktu bersama, langsung laporkan
+            // Jika Dosen & Mahasiswa saja sudah tidak punya waktu bersama, langsung laporkan dan hentikan pengecekan untuk aktivitas ini
             if ($peopleUnavailableSlots->count() >= $totalPossibleSlots) {
-
-                // --- INI BAGIAN LENGKAPNYA ---
                 $teacherNames = $activity->teachers->pluck('nama_dosen')->implode(', ');
                 $groupNames = $activity->studentGroups->pluck('nama_kelompok')->implode(', ');
 
@@ -255,41 +258,54 @@ class TimetableValidationService
                     "Aktivitas '{$activity->nameOrSubject}' (Prodi: {$activity->prodi?->nama_prodi}) tidak dapat dijadwalkan.",
                     "Tidak ada titik temu waktu luang antara Dosen ({$teacherNames}) dan Mahasiswa ({$groupNames})."
                 );
-                // --- AKHIR BAGIAN LENGKAP ---
-
-                continue; // Lanjut ke aktivitas berikutnya, tidak perlu cek ruangan lagi
+                continue; // Lanjut ke aktivitas berikutnya
             }
 
-            // --- LOGIKA CEK TITIK TEMU DENGAN RUANGAN ---
-            if ($activity->preferredRooms->isNotEmpty()) {
-                $allPossibleSlotsMap = [];
-                $days = \App\Models\Day::all();
-                $timeSlots = \App\Models\TimeSlot::all();
-                foreach ($days as $day) {
-                    foreach ($timeSlots as $timeSlot) {
-                        $allPossibleSlotsMap[$day->id . '-' . $timeSlot->id] = true;
+            // --- Tahap 2: Cek Titik Temu dengan Ruangan ---
+
+            // Tentukan kandidat ruangan untuk aktivitas ini
+            $candidateRooms = $activity->preferredRooms;
+            if ($candidateRooms->isEmpty()) {
+                $tag = $activity->activityTag->name ?? 'KELAS TEORI';
+                $candidateRooms = ($tag === 'PRAKTIKUM') ? $labRooms : $theoryRooms;
+            }
+
+            if ($candidateRooms->isEmpty()) continue;
+
+            // Dapatkan semua slot waktu di mana dosen & mahasiswa BISA bertemu
+            $allSlotsMap = [];
+            $days = \App\Models\Day::all();
+            $timeSlots = \App\Models\TimeSlot::all();
+            foreach ($days as $day) {
+                foreach ($timeSlots as $timeSlot) {
+                    $allSlotsMap[$day->id . '-' . $timeSlot->id] = true;
+                }
+            }
+            $possibleTimeKeys = collect(array_keys($allSlotsMap))->diff($peopleUnavailableSlots);
+
+            // Untuk setiap waktu luang tersebut, cek apakah ada minimal 1 ruangan yang juga luang
+            $isPlaceable = false;
+            foreach ($possibleTimeKeys as $timeKey) {
+                foreach ($candidateRooms as $room) {
+                    $isRoomUnavailable = $room->timeConstraints->contains(fn ($c) => ($c->day_id . '-' . $c->time_slot_id) === $timeKey);
+                    if (!$isRoomUnavailable) {
+                        $isPlaceable = true; // Ditemukan kombinasi waktu & ruangan yang pas!
+                        break;
                     }
                 }
-                $possibleSlotsForPeople = collect(array_keys($allPossibleSlotsMap))->diff($peopleUnavailableSlots);
+                if ($isPlaceable) break;
+            }
 
-                $canBePlaced = false;
-                foreach ($possibleSlotsForPeople as $slotKey) {
-                    foreach ($activity->preferredRooms as $room) {
-                        if (!$room->timeConstraints->contains(fn($c) => ($c->day_id . '-' . $c->time_slot_id) === $slotKey)) {
-                            $canBePlaced = true;
-                            break;
-                        }
-                    }
-                    if ($canBePlaced) break;
-                }
+            // Jika setelah semua pengecekan tidak ditemukan kombinasi yang pas
+            if (!$isPlaceable) {
+                $teacherNames = $activity->teachers->pluck('nama_dosen')->implode(', ');
+                $groupNames = $activity->studentGroups->pluck('nama_kelompok')->implode(', ');
 
-                if (!$canBePlaced) {
-                    $this->addIssue(
-                        'Error',
-                        "Aktivitas '{$activity->nameOrSubject}' (Prodi: {$activity->prodi?->nama_prodi}) tidak dapat dijadwalkan.",
-                        "Tidak ada titik temu waktu luang antara Dosen/Mahasiswa dengan Ruangan yang tersedia."
-                    );
-                }
+                $this->addIssue(
+                    'Error',
+                    "Aktivitas '{$activity->nameOrSubject}' (Prodi: {$activity->prodi?->nama_prodi}) tidak dapat dijadwalkan.",
+                    "Tidak ada ruangan yang tersedia pada waktu luang bersama antara Dosen ({$teacherNames}) dan Mahasiswa ({$groupNames})."
+                );
             }
         }
     }
@@ -304,4 +320,174 @@ class TimetableValidationService
             'suggestion' => $suggestion,
         ];
     }
+    private function validateActivityDurationVsTeacherDailyLimit(): void
+    {
+        // Ambil data yang dibutuhkan sekali saja untuk performa
+        $teachers = \App\Models\Teacher::with(['activities', 'timeConstraints', 'prodis'])->get();
+        $slotsInADay = \App\Models\TimeSlot::count();
+        $days = \App\Models\Day::all();
+
+        if ($slotsInADay === 0) return;
+
+        // Loop melalui setiap dosen
+        foreach ($teachers as $teacher) {
+            // 1. Cari durasi (SKS) terbesar dari semua aktivitas yang diajar dosen ini
+            $maxActivityDuration = $teacher->activities->max('duration');
+
+            // Jika dosen tidak punya aktivitas, lewati
+            if (!$maxActivityDuration) {
+                continue;
+            }
+
+            // 2. Hitung slot tidak tersedia per hari untuk dosen ini
+            $unavailableSlotsByDay = $teacher->timeConstraints->groupBy('day_id')->map->count();
+
+            // 3. Cari hari dengan waktu luang terbanyak
+            $maxAvailableSlotsOnAnyDay = 0;
+            foreach ($days as $day) {
+                $unavailableCount = $unavailableSlotsByDay->get($day->id, 0);
+                $availableSlots = $slotsInADay - $unavailableCount;
+                if ($availableSlots > $maxAvailableSlotsOnAnyDay) {
+                    $maxAvailableSlotsOnAnyDay = $availableSlots;
+                }
+            }
+
+            // 4. Bandingkan SKS terbesar dengan waktu luang terpanjang
+            if ($maxActivityDuration > $maxAvailableSlotsOnAnyDay) {
+                $prodiNames = $teacher->prodis->pluck('nama_prodi')->implode(', ');
+
+                $this->addIssue(
+                    'Error',
+                    "Dosen '{$teacher->nama_dosen}' (Prodi: {$prodiNames}) memiliki aktivitas yang tidak bisa dijadwalkan.",
+                    "Aktivitas terbesar butuh {$maxActivityDuration} jam, tetapi waktu luang terpanjang dalam sehari hanya {$maxAvailableSlotsOnAnyDay} jam."
+                );
+            }
+        }
+    }
+    private function validateActivityDurationVsStudentDailyLimit(): void
+    {
+        // Ambil data yang dibutuhkan
+        $studentGroups = \App\Models\StudentGroup::with(['activities', 'timeConstraints', 'prodi'])->get();
+        $slotsInADay = \App\Models\TimeSlot::count();
+        $days = \App\Models\Day::all();
+
+        if ($slotsInADay === 0) return;
+
+        // Loop melalui setiap kelompok mahasiswa
+        foreach ($studentGroups as $group) {
+            // 1. Cari durasi (SKS) terbesar dari semua aktivitas yang diikuti kelompok ini
+            $maxActivityDuration = $group->activities->max('duration');
+
+            if (!$maxActivityDuration) {
+                continue;
+            }
+
+            // 2. Hitung slot tidak tersedia per hari untuk kelompok ini
+            $unavailableSlotsByDay = $group->timeConstraints->groupBy('day_id')->map->count();
+
+            // 3. Cari hari dengan waktu luang terbanyak
+            $maxAvailableSlotsOnAnyDay = 0;
+            foreach ($days as $day) {
+                $unavailableCount = $unavailableSlotsByDay->get($day->id, 0);
+                $availableSlots = $slotsInADay - $unavailableCount;
+                if ($availableSlots > $maxAvailableSlotsOnAnyDay) {
+                    $maxAvailableSlotsOnAnyDay = $availableSlots;
+                }
+            }
+
+            // 4. Bandingkan SKS terbesar dengan waktu luang terpanjang
+            if ($maxActivityDuration > $maxAvailableSlotsOnAnyDay) {
+                $this->addIssue(
+                    'Error',
+                    "Kelompok '{$group->nama_kelompok}' (Prodi: {$group->prodi?->nama_prodi}) memiliki aktivitas yang tidak bisa dijadwalkan.",
+                    "Aktivitas terbesar butuh {$maxActivityDuration} jam, tetapi waktu luang terpanjang dalam sehari hanya {$maxAvailableSlotsOnAnyDay} jam."
+                );
+            }
+        }
+    }
+    private function validateSingleRoomWorkload(): void
+    {
+        $totalPossibleSlots = \App\Models\Day::count() * \App\Models\TimeSlot::count();
+        if ($totalPossibleSlots === 0) return;
+
+        // 1. Ambil semua aktivitas yang memiliki preferensi ruangan
+        $activitiesWithPrefs = \App\Models\Activity::has('preferredRooms')->with('preferredRooms')->get();
+
+        // 2. Filter hanya aktivitas yang punya SATU preferensi ruangan, lalu kelompokkan berdasarkan ID ruangan tersebut
+        $activitiesBySingleRoom = $activitiesWithPrefs
+            ->filter(fn ($activity) => $activity->preferredRooms->count() === 1)
+            ->groupBy(fn ($activity) => $activity->preferredRooms->first()->id);
+
+        // 3. Loop melalui setiap ruangan yang diperebutkan
+        foreach ($activitiesBySingleRoom as $roomId => $activities) {
+            // Hitung KEBUTUHAN (Demand): total SKS dari semua aktivitas yang memperebutkan ruangan ini
+            $demand = $activities->sum('duration');
+
+            // Hitung KETERSEDIAAN (Supply): total jam kosong untuk ruangan ini
+            $room = \App\Models\MasterRuangan::withCount('timeConstraints')->find($roomId);
+            if (!$room) continue;
+
+            $supply = $totalPossibleSlots - $room->time_constraints_count;
+
+            // 4. Bandingkan
+            if ($demand > $supply) {
+                $activityNames = $activities->pluck('nameOrSubject')->implode(', ');
+                $this->addIssue(
+                    'Error',
+                    "Ruangan '{$room->nama_ruangan}' kelebihan beban.",
+                    "Dibutuhkan total {$demand} jam oleh aktivitas ({$activityNames}), tetapi ruangan ini hanya tersedia {$supply} jam."
+                );
+            }
+        }
+    }
+    private function validateOrphanRecords(): void
+    {
+        // Cek batasan waktu dosen yang tidak memiliki relasi dosen yang valid
+        $orphanTeacherConstraints = \App\Models\TeacherTimeConstraint::whereDoesntHave('teacher')->get();
+        foreach ($orphanTeacherConstraints as $constraint) {
+            $this->addIssue(
+                'Error',
+                "Data Batasan Waktu Dosen (ID: {$constraint->id}) merujuk pada dosen yang sudah dihapus.",
+                "Hapus data batasan ini melalui halaman Batasan Waktu Dosen atau langsung dari database."
+            );
+        }
+
+        // Cek batasan waktu mahasiswa yang tidak memiliki relasi kelompok yang valid
+        $orphanStudentConstraints = \App\Models\StudentGroupTimeConstraint::whereDoesntHave('studentGroup')->get();
+        foreach ($orphanStudentConstraints as $constraint) {
+            $this->addIssue(
+                'Error',
+                "Data Batasan Waktu Mahasiswa (ID: {$constraint->id}) merujuk pada kelompok yang sudah dihapus.",
+                "Hapus data batasan ini melalui halaman Batasan Waktu Mahasiswa atau langsung dari database."
+            );
+        }
+
+        // Cek batasan waktu ruangan yang tidak memiliki relasi ruangan yang valid
+        $orphanRoomConstraints = \App\Models\RoomTimeConstraint::whereDoesntHave('masterRuangan')->get();
+        foreach ($orphanRoomConstraints as $constraint) {
+            $this->addIssue(
+                'Error',
+                "Data Batasan Waktu Ruangan (ID: {$constraint->id}) merujuk pada ruangan yang sudah dihapus.",
+                "Hapus data batasan ini melalui halaman Batasan Waktu Ruangan atau langsung dari database."
+            );
+        }
+        // Cek aktivitas yang tidak punya mata kuliah
+        $orphanActivitiesBySubject = \App\Models\Activity::whereDoesntHave('subject')->get();
+        foreach ($orphanActivitiesBySubject as $activity) {
+            $this->addIssue('Error', "Aktivitas (ID: {$activity->id}) merujuk pada mata kuliah yang sudah dihapus.", "Perbaiki atau hapus aktivitas ini di halaman 'Manajemen Aktivitas'.");
+        }
+
+        // Cek aktivitas yang tidak punya prodi
+        $orphanActivitiesByProdi = \App\Models\Activity::whereDoesntHave('prodi')->get();
+        foreach ($orphanActivitiesByProdi as $activity) {
+            $this->addIssue('Error', "Aktivitas (ID: {$activity->id}) merujuk pada prodi yang sudah dihapus.", "Perbaiki atau hapus aktivitas ini.");
+        }
+
+        // Cek mata kuliah yang tidak punya prodi
+        $orphanSubjects = \App\Models\Subject::whereDoesntHave('prodi')->get();
+        foreach ($orphanSubjects as $subject) {
+            $this->addIssue('Error', "Mata Kuliah '{$subject->nama_matkul}' merujuk pada prodi yang sudah dihapus.", "Perbaiki atau hapus mata kuliah ini di halaman 'Manajemen Matkul'.");
+        }
+    }
+    
 }
