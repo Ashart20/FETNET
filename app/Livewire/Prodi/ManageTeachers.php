@@ -29,7 +29,7 @@ class ManageTeachers extends Component
     public string $kode_dosen = '';
     public ?string $title_depan = '';
     public ?string $title_belakang = '';
-    public string $kode_univ = '';
+    public ?string $kode_univ = '';
     public ?string $employee_id = null;
     public string $email = '';
     public ?string $nomor_hp = null;
