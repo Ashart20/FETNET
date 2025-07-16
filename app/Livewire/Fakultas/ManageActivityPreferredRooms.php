@@ -22,12 +22,13 @@ class ManageActivityPreferredRooms extends Component
     public array $selectedRooms = [];
 
     public Collection $allRooms;
+    public $search;
     public $prodi_searchable_id = null;
-    public $prodiSearchable;
+    public $prodisSearchable;
     public function mount(): void
     {
         $this->allRooms = MasterRuangan::orderBy('nama_ruangan')->get();
-        $this->prodiSelect();
+        $this->clientLevelsSelect();
     }
     public function search(string $value = ''): void
     {
@@ -48,7 +49,7 @@ class ManageActivityPreferredRooms extends Component
     public function headers(): array
     {
         return [
-            ['key' => 'id', 'label' => 'ID'],
+            ['key' => 'id', 'label' => 'ID', 'class' => 'hidden'],
             ['key' => 'subject.nama_matkul', 'label' => 'Mata Kuliah'],
             ['key' => 'prodi.nama_prodi', 'label' => 'Prodi'],
             ['key' => 'student_group_names', 'label' => 'Kelompok Mahasiswa'],
@@ -97,28 +98,40 @@ class ManageActivityPreferredRooms extends Component
         $activities = Activity:://
             where('prodi_id', $this->prodi_searchable_id)
             ->with(['subject', 'prodi', 'studentGroups', 'preferredRooms'])
+<<<<<<< HEAD
                 ->orderBy('prodi_id')
             ->when($this->prodi_searchable_id, function ($query) {
                 $query->where('prodi_id', $this->prodi_searchable_id);
             })
             ->withSum('studentGroups', 'jumlah_mahasiswa')
+=======
+            ->orderBy('prodi_id')
+>>>>>>> ca5c10843270e4241b487cb0fd067f8774aebaa4
             ->orderBy('subject_id')
-            ->paginate(15);
+            ->paginate(9);
 
         return view('livewire.fakultas.manage-activity-preferred-rooms', [
             'activities' => $activities,
         ])->layout('layouts.app');
     }
 
-    public function prodiSelect(string $value = '')
+    public function clientLevelsSelect(string $value = '')
     {
         // Ambil opsi yang sedang terpilih agar tidak hilang dari daftar
         $selectedOption = Prodi::where('id', $this->prodi_searchable_id)->get();
+<<<<<<< HEAD
 
         $this->prodiSearchable = Prodi::query()
             ->where('kode', 'like', "%$value%")
             ->orwhere('nama_prodi', 'like', "%$value%")
             ->orwhere('abbreviation', 'like', "%$value%")
+=======
+        //$this->faculties = $selectedOption;
+        $this->prodisSearchable = Prodi::query()
+            ->where('kode', 'like', "%$value%")
+            ->orwhere('nama_prodi', 'like', "%$value%")
+            ->take(20)
+>>>>>>> ca5c10843270e4241b487cb0fd067f8774aebaa4
             ->get()
             ->merge($selectedOption);
     }

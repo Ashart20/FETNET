@@ -9,6 +9,12 @@
             <x-mary-button label="Tambah Prodi & User" @click="$wire.create()" class="btn-primary" icon="o-plus" />
         </div>
 
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:mb-0 xl:w-2/4">
+                <x-mary-input wire:model.live="searchProdi" label="Search prodi"/>
+            </div>
+        </div>
+        <hr/>
         {{-- Tabel Merry UI --}}
         <x-mary-table :headers="$this->headers()" :rows="$prodis" with-pagination>
             @scope('cell_users', $prodi)
