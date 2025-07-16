@@ -38,7 +38,7 @@
                                         <x-mary-badge value="N/A (Kelompok tidak ditemukan)" class="badge-error" />
                                     @endforelse
                                 </td>
-                                <td>{{ $schedule->room->nama_ruangan ?? '-' }}</td>
+                                <td>{{ $schedule->room->kode_ruangan ?? '-' }}</td>
                             </tr>
                         @endforeach
                         </tbody>

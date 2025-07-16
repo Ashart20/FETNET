@@ -124,7 +124,7 @@
 <?php endif; ?>
                                     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                 </td>
-                                <td><?php echo e($schedule->room->nama_ruangan ?? '-'); ?></td>
+                                <td><?php echo e($schedule->room->kode_ruangan ?? '-'); ?></td>
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                         </tbody>

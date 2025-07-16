@@ -37,7 +37,7 @@ class MasterRuangan extends Model
         'user_id',
         'tipe',
     ];
-
+    protected $appends = ['name_with_capacity'];
     /**
      * Relasi ke model Building.
      */
