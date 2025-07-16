@@ -20,8 +20,11 @@ class Activity extends Model
      */
     public function teachers(): BelongsToMany
     {
-        return $this->belongsToMany(Teacher::class, 'activity_teacher');
+        return $this->belongsToMany(Teacher::class, 'activity_teacher')
+            ->withTimestamps() // Penting untuk memberitahu Eloquent agar mengelola timestamps
+            ->orderBy('activity_teacher.created_at', 'asc'); // Mengurutkan berdasarkan waktu pembuatan
     }
+
 
     /**
      * Relasi many-to-many ke MasterRuangan (untuk preferensi ruangan).

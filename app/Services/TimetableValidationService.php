@@ -39,6 +39,7 @@ class TimetableValidationService
         $this->validateActivityDurationVsStudentDailyLimit();
         $this->validateSingleRoomWorkload();
         $this->validateOrphanRecords();
+        $this->validateStudentWorkload();
         // Anda bisa menambahkan method validasi lain di sini
 
         return $this->issues;
@@ -489,5 +490,39 @@ class TimetableValidationService
             $this->addIssue('Error', "Mata Kuliah '{$subject->nama_matkul}' merujuk pada prodi yang sudah dihapus.", "Perbaiki atau hapus mata kuliah ini di halaman 'Manajemen Matkul'.");
         }
     }
-    
+    private function validateStudentWorkload(): void
+    {
+        // Hitung total slot waktu yang mungkin dalam seminggu
+        $totalPossibleSlots = \App\Models\Day::count() * \App\Models\TimeSlot::count();
+        if ($totalPossibleSlots === 0) {
+            return;
+        }
+
+        // Ambil data kelompok, hanya dengan SKS total dan batasan waktu miliknya sendiri
+        $studentGroups = \App\Models\StudentGroup::withSum('activities', 'duration')
+            ->withCount('timeConstraints')
+            ->with('prodi')
+            ->get();
+
+        foreach ($studentGroups as $group) {
+            // Demand: Total SKS kelompok ini
+            $totalLoad = $group->activities_sum_duration ?? 0;
+            if ($totalLoad === 0) {
+                continue;
+            }
+
+            // Supply: Total slot dikurangi batasan milik kelompok ini saja
+            $totalUnavailable = $group->time_constraints_count;
+            $totalAvailable = $totalPossibleSlots - $totalUnavailable;
+
+            // Bandingkan
+            if ($totalLoad > $totalAvailable) {
+                $this->addIssue(
+                    'Error',
+                    "Beban SKS Kelompok '{$group->nama_kelompok}' (Prodi: {$group->prodi?->nama_prodi}) tidak dapat dipenuhi.",
+                    "Total beban {$totalLoad} SKS, tetapi kelompok ini hanya memiliki {$totalAvailable} slot waktu luang."
+                );
+            }
+        }
+    }
 }

@@ -31,7 +31,7 @@ class ManageRoomConstraints extends Component
 
     public function mount()
     {
-        $this->rooms = MasterRuangan::orderBy('kode_ruangan')->get();
+        $this->rooms = MasterRuangan::orderBy('nama_ruangan')->get();
         $this->days = Day::orderBy('id')->get();
         $this->timeSlots = TimeSlot::orderBy('start_time')->get();
         $this->loadConstraints();

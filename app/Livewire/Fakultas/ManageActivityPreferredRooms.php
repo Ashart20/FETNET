@@ -33,7 +33,9 @@ class ManageActivityPreferredRooms extends Component
         $this->prodisSearchable = Prodi::query()
             ->where(function($q) use ($value) {
                 $q->where('nama_prodi', 'like', "%$value%")->orWhere('kode', 'like', "%$value%")->orWhere('abbreviation', 'like', "%$value%");
-            })->take(50)->get()->merge($selectedOption);
+            })
+            ->orderBy('nama_prodi', 'asc')
+            ->take(50)->get()->merge($selectedOption);
     }
     public function removePreferredRoom(int $activityId, int $roomId): void
     {
