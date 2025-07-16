@@ -33,7 +33,7 @@ class ManageActivityPreferredRooms extends Component
         $this->prodisSearchable = Prodi::query()
             ->where(function($q) use ($value) {
                 $q->where('nama_prodi', 'like', "%$value%")->orWhere('kode', 'like', "%$value%")->orWhere('abbreviation', 'like', "%$value%");
-            })->take(5)->get()->merge($selectedOption);
+            })->take(50)->get()->merge($selectedOption);
     }
 
     public function headers(): array
