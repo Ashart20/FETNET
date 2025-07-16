@@ -40,6 +40,7 @@ class ManageProdi extends Component
 
     // Properti untuk data & state
     public Collection $clusters;
+    public $searchProdi = null;
 
     public bool $prodiModal = false;
 
@@ -74,8 +75,17 @@ class ManageProdi extends Component
 
     public function render(): View
     {
+        $prodi = Prodi::with('cluster', 'users')->latest()->paginate(8);
+        if(!is_null($this->searchProdi)){
+            $prodi = Prodi::
+                with('cluster', 'users')
+                ->where('kode', 'like', "%$this->searchProdi%")
+                ->orwhere('abbreviation', 'like', "%$this->searchProdi%")
+                ->orwhere('nama_prodi', 'like', "%$this->searchProdi%")
+                ->paginate(8);
+        }
         return view('livewire.fakultas.manage-prodi', [
-            'prodis' => Prodi::with('cluster', 'users')->latest()->paginate(10),
+            'prodis' => $prodi,
         ])->layout('layouts.app');
     }
 

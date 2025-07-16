@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Prodi extends Model
 {
     use HasFactory;
-
+    protected $table = 'prodis';
     protected $fillable = ['nama_prodi', 'kode', 'cluster_id', 'abbreviation'];
 
     public function cluster(): BelongsTo

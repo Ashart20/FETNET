@@ -25,9 +25,15 @@ class Teacher extends Model
         'nomor_hp',
     ];
 
-    public function prodi(): BelongsTo
+    /*public function prodi(): BelongsTo
     {
         return $this->belongsTo(Prodi::class);
+    }
+    */
+
+
+    public function prodi(){
+        return $this->hasOne(ProdiTeacher::class, 'teacher_id','id' );
     }
     public function timeConstraints(): HasMany
     {

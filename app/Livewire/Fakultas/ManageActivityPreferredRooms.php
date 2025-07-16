@@ -22,18 +22,19 @@ class ManageActivityPreferredRooms extends Component
     public array $selectedRooms = [];
 
     public Collection $allRooms;
+    public $search;
     public $prodi_searchable_id = null;
-    public $prodiSearchable;
+    public $prodisSearchable;
     public function mount(): void
     {
         $this->allRooms = MasterRuangan::orderBy('nama_ruangan')->get();
-        $this->prodiSelect();
+        $this->clientLevelsSelect();
     }
 
     public function headers(): array
     {
         return [
-            ['key' => 'id', 'label' => 'ID'],
+            ['key' => 'id', 'label' => 'ID', 'class' => 'hidden'],
             ['key' => 'subject.nama_matkul', 'label' => 'Mata Kuliah'],
             ['key' => 'prodi.nama_prodi', 'label' => 'Prodi'],
             ['key' => 'student_group_names', 'label' => 'Kelompok Mahasiswa'], // PERUBAHAN: Gunakan key baru
@@ -81,24 +82,24 @@ class ManageActivityPreferredRooms extends Component
         $activities = Activity:://
             where('prodi_id', $this->prodi_searchable_id)
             ->with(['subject', 'prodi', 'studentGroups', 'preferredRooms'])
-                ->orderBy('prodi_id')
+            ->orderBy('prodi_id')
             ->orderBy('subject_id')
-            ->paginate(15);
+            ->paginate(9);
 
         return view('livewire.fakultas.manage-activity-preferred-rooms', [
             'activities' => $activities,
         ])->layout('layouts.app');
     }
 
-    public function prodiSelect(string $value = '')
+    public function clientLevelsSelect(string $value = '')
     {
         // Besides the search results, you must include on demand selected option
         $selectedOption = Prodi::where('id', $this->prodi_searchable_id)->get();
         //$this->faculties = $selectedOption;
-        $this->prodiSearchable = Prodi::query()
+        $this->prodisSearchable = Prodi::query()
             ->where('kode', 'like', "%$value%")
-            ->orwhere('abbreviation', 'like', "%$value%")
-            ->take(5)
+            ->orwhere('nama_prodi', 'like', "%$value%")
+            ->take(20)
             ->get()
             ->merge($selectedOption);     // <-- Adds selected option
     }

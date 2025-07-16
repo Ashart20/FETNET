@@ -47,6 +47,7 @@
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
                             <li><a href="{{ route('fakultas.cluster-users') }}" @if(request()->routeIs('fakultas.cluster-users')) class="active" @endif>Manajemen User Cluster</a></li>
                             <li><a href="{{ route('fakultas.prodi') }}" @if(request()->routeIs('fakultas.prodi')) class="active" @endif>Manajemen Prodi</a></li>
+                            <li><a href="{{ route('fakultas.dosen') }}" @if(request()->routeIs('fakultas.dosen')) class="active" @endif>Manajemen Dosen</a></li>
                         </ul>
                     </details>
                 </li>

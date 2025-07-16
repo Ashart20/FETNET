@@ -14,6 +14,7 @@ use App\Livewire\Faculty\Dashboard;
 use App\Livewire\Fakultas\ManageActivityPreferredRooms;
 use App\Livewire\Fakultas\ManageClusterUsers;
 use App\Livewire\Fakultas\ManageProdi;
+use App\Livewire\Fakultas\ManageDosen;
 use App\Livewire\Fakultas\ManageRoomConstraints;
 use App\Livewire\Fakultas\ManageRooms;
 // Prodi Components
@@ -55,6 +56,7 @@ Route::middleware('auth')->get('/hasil-fet', FetScheduleViewer::class)->name('ha
 Route::middleware(['auth', 'role:fakultas'])->prefix('fakultas')->name('fakultas.')->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/prodi', ManageProdi::class)->name('prodi');
+    Route::get('/dosen', ManageDosen::class)->name('dosen');
     Route::get('/cluster-users', ManageClusterUsers::class)->name('cluster-users');
     Route::get('/ruangan', ManageRooms::class)->name('rooms');
     Route::get('/batasan-ruangan', ManageRoomConstraints::class)->name('room-constraints');

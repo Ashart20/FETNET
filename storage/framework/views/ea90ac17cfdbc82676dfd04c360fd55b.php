@@ -86,6 +86,7 @@
                         <ul class="p-2 bg-base-100 rounded-t-none z-20">
                             <li><a href="<?php echo e(route('fakultas.cluster-users')); ?>" <?php if(request()->routeIs('fakultas.cluster-users')): ?> class="active" <?php endif; ?>>Manajemen User Cluster</a></li>
                             <li><a href="<?php echo e(route('fakultas.prodi')); ?>" <?php if(request()->routeIs('fakultas.prodi')): ?> class="active" <?php endif; ?>>Manajemen Prodi</a></li>
+                            <li><a href="<?php echo e(route('fakultas.dosen')); ?>" <?php if(request()->routeIs('fakultas.dosen')): ?> class="active" <?php endif; ?>>Manajemen Dosen</a></li>
                         </ul>
                     </details>
                 </li>
