@@ -82,9 +82,6 @@
                             <th rowspan="2">Kode</th>
                             <th rowspan="2">Nama Dosen</th>
                             <th colspan="{{ auth()->user()->prodi->cluster->prodis->count() ?? 1 }}" class="text-center border-x dark:border-gray-700">Beban Mengajar (SKS)</th>
-                            <th>
-
-                            </th>
                             <th rowspan="2" class="text-center">Total</th>
                         </tr>
                         <tr>
