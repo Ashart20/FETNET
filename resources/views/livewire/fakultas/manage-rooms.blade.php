@@ -10,6 +10,12 @@
             <x-mary-button label="Unduh Template Excel" icon="o-document-arrow-down" class="btn-secondary" wire:click="downloadTemplate" spinner />
         </div>
 
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:mb-0 xl:w-2/4">
+                <x-mary-input wire:model.live="searchRoom" label="Search room"/>
+            </div>
+        </div>
+        <hr/>
         <x-mary-table :headers="$this->headers()" :rows="$rooms" with-pagination>
             {{-- Menggunakan relasi untuk menampilkan nama gedung --}}
             @scope('cell_building.name', $room)

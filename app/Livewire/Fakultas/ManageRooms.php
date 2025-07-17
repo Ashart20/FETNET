@@ -57,6 +57,8 @@ class ManageRooms extends Component
 
     public $file;
 
+    public $searchRoom = null;
+
     /**
      * Aturan validasi dinamis untuk kode ruangan.
      */
@@ -94,6 +96,11 @@ class ManageRooms extends Component
     public function render()
     {
         $rooms = MasterRuangan::with('building')->latest()->paginate(10);
+        if(!is_null($this->searchRoom)){
+            $rooms =MasterRuangan::
+                where('nama_ruangan', 'like', "%$this->searchRoom%")
+                ->paginate(10);
+        }
 
         return view('livewire.fakultas.manage-rooms', [
             'rooms' => $rooms,
