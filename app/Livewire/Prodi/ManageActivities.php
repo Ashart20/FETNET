@@ -142,6 +142,7 @@ class ManageActivities extends Component
                 ->groupBy('activities.id') // ganti distinct dengan groupBy kolom unik
                 ->orderBy('subjects.kode_matkul')
                 ->paginate(10);
+            $this->resetPage();
         }
 
 
