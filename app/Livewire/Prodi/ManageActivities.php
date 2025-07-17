@@ -8,12 +8,14 @@ use App\Models\Prodi;
 use App\Models\StudentGroup;
 use App\Models\Subject;
 use App\Models\Teacher;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection; // Menggunakan alias
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Mary\Traits\Toast;
-
 
 class ManageActivities extends Component
 {
@@ -36,7 +38,7 @@ class ManageActivities extends Component
 
     // Properti untuk kontrol modal
     public bool $activityModal = false;
-
+    
     protected function rules(): array
     {
         return [
@@ -46,7 +48,7 @@ class ManageActivities extends Component
             'selectedStudentGroupIds' => ['required', 'array', 'min:1'],
             'selectedStudentGroupIds.*' => ['exists:student_groups,id'],
             'activity_tag_id'         => ['nullable', 'exists:activity_tags,id'],
-            'practicum_sks'           => ['nullable', 'integer', 'min:1', 'max:10'],
+            'practicum_sks'           => ['nullable', 'integer', 'min:0', 'max:20'],
             'name'                    => ['nullable', 'string', 'max:255'],
         ];
     }
@@ -71,28 +73,30 @@ class ManageActivities extends Component
 
         $clusterTeacherIds = collect();
         if ($prodi->cluster_id) {
-            $prodiIdsInCluster = \App\Models\Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
-            $clusterTeacherIds = \Illuminate\Support\Facades\DB::table('prodi_teacher')
-                ->whereIn('prodi_id', $prodiIdsInCluster)
-                ->pluck('teacher_id');
+            $prodiIdsInCluster = Prodi::where('cluster_id', $prodi->cluster_id)->pluck('id');
+            $clusterTeacherIds = DB::table('prodi_teacher')->whereIn('prodi_id', $prodiIdsInCluster)->pluck('teacher_id');
         }
 
         $linkedTeacherIds = $prodi->teachers()->pluck('teachers.id');
         $allTeacherIds = $clusterTeacherIds->merge($linkedTeacherIds)->unique();
-        $this->teachers = \App\Models\Teacher::whereIn('id', $allTeacherIds)->orderBy('nama_dosen')->get();
-        $this->subjects = \App\Models\Subject::where('prodi_id', $prodi->id)->orderBy('semester')->orderBy('kode_matkul')->get();
-        $this->allStudentGroups = \App\Models\StudentGroup::where('prodi_id', $prodi->id)
-            ->where(function ($query) {
-                $query->whereDoesntHave('children')
-                    ->orWhere(function ($subQuery) {
-                        $subQuery->whereHas('children')
-                            ->whereDoesntHave('children.children');
-                    });
-            })
-            ->orderBy('nama_kelompok')
-            ->get();
-        $this->activityTags = \App\Models\ActivityTag::orderBy('name')->get();
+        $this->teachers = Teacher::whereIn('id', $allTeacherIds)->orderBy('nama_dosen')->get();
+        $this->subjects = Subject::where('prodi_id', $prodi->id)->orderBy('semester')->orderBy('kode_matkul')->get();
+        $this->allStudentGroups = StudentGroup::where('prodi_id', $prodi->id)
+            ->where(fn ($q) => $q->whereDoesntHave('children')->orWhere(fn ($sq) => $sq->whereHas('children')->whereDoesntHave('children.children')))
+            ->orderBy('nama_kelompok')->get();
+        $this->activityTags = ActivityTag::orderBy('name')->get();
     }
+
+    public function toggleTeacherSelection(int $teacherId): void
+    {
+        $key = array_search($teacherId, $this->teacher_ids);
+        if ($key !== false) {
+            array_splice($this->teacher_ids, $key, 1);
+        } else {
+            $this->teacher_ids[] = $teacherId;
+        }
+    }
+
     public function headers(): array
     {
         return [
@@ -103,21 +107,17 @@ class ManageActivities extends Component
             ['key' => 'activity_tag.name', 'label' => 'Tag', 'class' => 'w-1 text-center'],
             ['key' => 'student_group_names', 'label' => 'Kelompok'],
             ['key' => 'teacher_names', 'label' => 'Dosen Pengampu'],
+            ['key' => 'actions', 'label' => 'Aksi', 'class' => 'w-1'],
         ];
     }
 
-    public function render()
+    public function render(): View
     {
         $activities = Activity::query()
             ->where('prodi_id', auth()->user()->prodi_id)
             ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
-            ->orderBy('subject_id')
-            ->paginate(10);
-
-        return view('livewire.prodi.manage-activities', [
-            'activities' => $activities,
-            'headers' => $this->headers(),
-        ])->layout('layouts.app');
+            ->orderBy('subject_id')->paginate(10);
+        return view('livewire.prodi.manage-activities', ['activities' => $activities, 'headers' => $this->headers(),])->layout('layouts.app');
     }
 
     public function create(): void
@@ -130,11 +130,7 @@ class ManageActivities extends Component
     {
         $validatedData = $this->validate();
         $subject = Subject::find($validatedData['subject_id']);
-
-        $baseSks = $subject->sks;
-        $practicumSks = $this->practicum_sks ?? 0;
-        $finalDuration = $baseSks + $practicumSks;
-
+        $finalDuration = ($subject->sks ?? 0) + ($this->practicum_sks ?? 0);
         $activityData = [
             'subject_id'      => $validatedData['subject_id'],
             'activity_tag_id' => $validatedData['activity_tag_id'],
@@ -146,21 +142,28 @@ class ManageActivities extends Component
         ];
 
         $activity = Activity::updateOrCreate(['id' => $this->activityId], $activityData);
-        $activity->teachers()->sync($validatedData['teacher_ids']);
+        $activity->teachers()->detach();
+
+        // Attach kembali dengan menyertakan data untuk kolom 'order'
+        if (!empty($this->teacher_ids)) {
+            foreach ($this->teacher_ids as $index => $teacherId) {
+                // `$index` akan menjadi 0, 1, 2, dst. yang merepresentasikan urutan
+                $activity->teachers()->attach($teacherId, ['order' => $index]);
+            }
+        }
         $activity->studentGroups()->sync($validatedData['selectedStudentGroupIds']);
         $this->toast(type: 'success', title: $this->activityId ? 'Aktivitas berhasil diperbarui.' : 'Aktivitas berhasil ditambahkan.');
         $this->closeModal();
     }
-
     public function edit(Activity $activity): void
     {
         if ($activity->prodi_id !== auth()->user()->prodi_id) {
             $this->toast(type: 'error', title: 'Akses Ditolak!');
             return;
         }
-
+        $this->resetInputFields();
         $this->activityId = $activity->id;
-        $this->teacher_ids = $activity->teachers->pluck('id')->map(fn($id) => (string) $id)->all();
+        $this->teacher_ids = $activity->teachers->pluck('id')->all();
         $this->subject_id = $activity->subject_id;
         $this->selectedStudentGroupIds = $activity->studentGroups->pluck('id')->map(fn($id) => (string) $id)->all();
         $this->activity_tag_id = $activity->activity_tag_id;
@@ -187,7 +190,18 @@ class ManageActivities extends Component
 
     private function resetInputFields(): void
     {
-        $this->reset('activityId', 'teacher_ids', 'subject_id', 'selectedStudentGroupIds', 'activity_tag_id', 'name', 'practicum_sks');
+        $this->reset([
+            'activityId',
+            'teacher_ids',
+            'subject_id',
+            'selectedStudentGroupIds',
+            'activity_tag_id',
+            'name',
+            'practicum_sks'
+        ]);
+
+        $this->teacher_ids = [];
+        $this->selectedStudentGroupIds = [];
         $this->resetErrorBag();
     }
 }

@@ -27,7 +27,7 @@
             @endscope
             @scope('cell_student_group_names', $activity)
             @forelse($activity->studentGroups as $group)
-                <x-mary-badge :value="$group->nama_kelompok.', jumlah mahasiswa'" class="badge-primary badge-outline" />
+                <x-mary-badge :value="$group->nama_kelompok . ', ' . $group->jumlah_mahasiswa . ' mahasiswa'" class="badge-primary badge-outline" />
             @empty
                 <x-mary-badge value="N/A" class="badge-error" />
             @endforelse

@@ -1,3 +1,17 @@
+@php
+    /**
+     * @var \App\Models\Activity[]|\Illuminate\Contracts\Pagination\LengthAwarePaginator $activities
+     * @var \App\Models\Subject[]|\Illuminate\Database\Eloquent\Collection $subjects
+     * @var \App\Models\StudentGroup[]|\Illuminate\Database\Eloquent\Collection $allStudentGroups
+     * @var \App\Models\Teacher[]|\Illuminate\Database\Eloquent\Collection $teachers
+     * @var \App\Models\ActivityTag[]|\Illuminate\Database\Eloquent\Collection $activityTags
+     * @var array $headers
+     * @var bool $activityModal
+     * @var int|null $activityId
+     * @var array $teacher_ids
+     */
+@endphp
+
 <div>
     <x-mary-toast />
 
@@ -12,21 +26,20 @@
         <x-mary-table :headers="$headers" :rows="$activities" with-pagination>
             @scope('cell_subject_display', $activity)
             <div class="flex items-center gap-2">
-                {{-- Tampilkan nama mata kuliah --}}
-                <span>{{ $activity->subject->nama_matkul }}</span>
-
-                {{-- Jika ada SKS praktikum, tampilkan badge +P --}}
+                <span class="font-semibold">{{ $activity->subject->nama_matkul }}</span>
                 @if($activity->practicum_sks > 0)
                     <x-mary-badge value="+P" class="badge-info badge-xs" tooltip="Dengan Praktikum" />
                 @endif
             </div>
             @endscope
             @scope('cell_student_group_names', $activity)
-            @forelse($activity->studentGroups as $group)
-                <x-mary-badge :value="$group->nama_kelompok" class="badge-neutral mr-1 mb-1" />
-            @empty
-                <x-mary-badge value="-" class="badge-ghost" />
-            @endforelse
+            <div class="flex flex-wrap gap-1">
+                @forelse($activity->studentGroups as $group)
+                    <x-mary-badge :value="$group->nama_kelompok . ', ' " class="badge-neutral" />
+                @empty
+                    <x-mary-badge value="-" class="badge-ghost" />
+                @endforelse
+            </div>
             @endscope
             @scope('cell_activity_tag.name', $activity)
             @if($activity->activityTag)
@@ -36,9 +49,9 @@
             @endif
             @endscope
             @scope('cell_teacher_names', $activity)
-            {{ $activity->teachers->pluck('full_name')->implode(', ') }}
+            {{-- Menggunakan accessor `teacher_names` yang sudah diurutkan dari model --}}
+            {!! nl2br(e($activity->teacher_names)) !!}
             @endscope
-
             @scope('actions', $activity)
             <div class="flex items-center space-x-2">
                 <x-mary-button icon="o-pencil" wire:click="edit({{ $activity->id }})" class="btn-sm btn-warning" spinner />
@@ -56,7 +69,7 @@
                 wire:model="subject_id"
                 :options="$subjects"
                 option-value="id"
-                option-label="kode_name"  {{-- Cukup panggil accessor yang baru dibuat --}}
+                option-label="kode_name"
                 placeholder="-- Pilih Mata Kuliah --"
                 searchable
                 required
@@ -72,15 +85,43 @@
                 placeholder="-- Pilih Kelompok --"
                 required />
 
-            <x-mary-choices
-                label="Pilih Dosen"
-                wire:model="teacher_ids"
-                :options="$teachers"
-                option-label="nama_dosen"
-                placeholder="-- Pilih Dosen --"
-                searchable
-                multiple
-                required />
+            {{-- Input Dosen Manual --}}
+            <div>
+                <label class="label font-semibold" for="teachers-list">Pilih Dosen</label>
+                @php
+                    if ($activityId && !empty($teacher_ids)) {
+                        $orderedIds = $teacher_ids;
+                        [$selected, $unselected] = $teachers->partition(fn($teacher) => in_array($teacher->id, $orderedIds));
+                        $sortedSelected = $selected->sortBy(fn($teacher) => array_search($teacher->id, $orderedIds));
+                        $displayTeachers = $sortedSelected->merge($unselected);
+                    } else {
+                        $displayTeachers = $teachers;
+                    }
+                @endphp
+                <div id="teachers-list" class="p-4 border rounded-lg max-h-60 overflow-y-auto space-y-2">
+                    @forelse($displayTeachers as $teacher)
+                        <x-mary-checkbox
+                            :label="$teacher->nama_dosen"
+                            :value="$teacher->id"
+                            wire:click="toggleTeacherSelection({{ $teacher->id }})"
+                            :checked="in_array($teacher->id, $teacher_ids)"
+                        />
+                    @empty
+                        <p class="text-gray-500">Tidak ada dosen ditemukan.</p>
+                    @endforelse
+                </div>
+                @if(!empty($teacher_ids))
+                    <div class="mt-3 text-xs">
+                        <span class="font-bold">Urutan Terpilih:</span>
+                        <div class="flex flex-wrap gap-1 mt-1">
+                            @foreach($teacher_ids as $id)
+                                <x-mary-badge :value="$teachers->find($id)?->nama_dosen ?? '...'" class="badge-ghost" />
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+                @error('teacher_ids') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
 
             <x-mary-select
                 label="Tag Aktivitas (Opsional)"
@@ -94,7 +135,6 @@
                 label="SKS Tambahan (Praktikum)"
                 wire:model="practicum_sks"
                 type="number"
-
             />
         </div>
 

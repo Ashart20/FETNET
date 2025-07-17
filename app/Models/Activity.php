@@ -20,9 +20,10 @@ class Activity extends Model
      */
     public function teachers(): BelongsToMany
     {
+        // Mengganti orderBy `created_at` menjadi `order`
         return $this->belongsToMany(Teacher::class, 'activity_teacher')
-            ->withTimestamps() // Penting untuk memberitahu Eloquent agar mengelola timestamps
-            ->orderBy('activity_teacher.created_at', 'asc'); // Mengurutkan berdasarkan waktu pembuatan
+            ->withPivot('order') // Beritahu Eloquent untuk juga mengambil data 'order'
+            ->orderBy('activity_teacher.order', 'asc');
     }
 
 
