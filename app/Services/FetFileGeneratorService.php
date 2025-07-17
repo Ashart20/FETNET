@@ -354,7 +354,7 @@ class FetFileGeneratorService
         foreach ($teachers as $teacher) {
             $cNode = $timeList->addChild('ConstraintTeacherMaxHoursDaily');
             $cNode->addChild('Weight_Percentage', self::DEFAULT_WEIGHT);
-            $cNode->addChild('Maximum_Hours_Daily', config('fet.max_hours_teacher', 12));
+            $cNode->addChild('Maximum_Hours_Daily', config('fet.max_hours_teacher', 13));
             $cNode->addChild('Teacher', htmlspecialchars($teacher->kode_dosen));
         }
     }
@@ -369,7 +369,7 @@ class FetFileGeneratorService
 
             $cNode = $timeList->addChild('ConstraintStudentsSetMaxHoursDaily');
             $cNode->addChild('Weight_Percentage', self::DEFAULT_WEIGHT);
-            $cNode->addChild('Maximum_Hours_Daily', config('fet.max_hours_student', 10));
+            $cNode->addChild('Maximum_Hours_Daily', config('fet.max_hours_student', 13));
             // PENTING: Gunakan nama unik untuk referensi constraint
             $cNode->addChild('Students', htmlspecialchars($this->getUniqueStudentGroupName($group)));
         }
