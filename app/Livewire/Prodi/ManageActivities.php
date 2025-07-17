@@ -127,14 +127,25 @@ class ManageActivities extends Component
             ->paginate(10);
 
         if (!is_null($this->searchActivities)) {
+            $search = $this->searchActivities;
+
             $activities = Activity::join('subjects', 'subjects.id', '=', 'activities.subject_id')
+                ->join('activity_teacher', 'activity_teacher.activity_id', '=', 'activities.id')
+                ->join('teachers', 'teachers.id', '=', 'activity_teacher.teacher_id')
                 ->where('activities.prodi_id', auth()->user()->prodi_id)
-                ->where('subjects.nama_matkul', 'like', "%{$this->searchActivities}%")
+                ->where(function ($query) use ($search) {
+                    $query->where('subjects.nama_matkul', 'like', "%{$search}%")
+                        ->orWhere('teachers.nama_dosen', 'like', "%{$search}%");
+                })
                 ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
+                ->select('activities.*') // tetap pilih kolom activities saja
+                ->groupBy('activities.id') // ganti distinct dengan groupBy kolom unik
                 ->orderBy('subjects.kode_matkul')
-                ->select('activities.*') // hanya kolom dari activities agar tidak duplikasi
                 ->paginate(10);
         }
+
+
+
         return view('livewire.prodi.manage-activities', ['activities' => $activities, 'headers' => $this->headers(),])->layout('layouts.app');
     }
 
