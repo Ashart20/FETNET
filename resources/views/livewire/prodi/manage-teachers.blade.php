@@ -120,21 +120,7 @@
                                         @php($totalSKS += $sksPerProdi)
                                     </td>
                                 @endif
-                                @if(auth()->user()->prodi?->cluster)
-                                    @foreach(auth()->user()->prodi->cluster->prodis as $prodi)
-                                        <td class="text-center border-x dark:border-gray-700">
-                                            @php($sksPerProdi = $teacher->activities->where('prodi_id', $prodi->id)->sum('subject.sks'))
-                                            {{ $sksPerProdi > 0 ? $sksPerProdi : '-' }}
-                                            @php($totalSKS += $sksPerProdi)
-                                        </td>
-                                    @endforeach
-                                @else
-                                    <td class="text-center border-x dark:border-gray-700">
-                                        @php($sksPerProdi = $teacher->activities->where('prodi_id', auth()->user()->prodi_id)->sum('subject.sks'))
-                                        {{ $sksPerProdi > 0 ? $sksPerProdi : '-' }}
-                                        @php($totalSKS += $sksPerProdi)
-                                    </td>
-                                @endif
+
                                 <td class="text-center font-bold">{{ $totalSKS > 0 ? $totalSKS : '-' }}</td>
                             </tr>
                         @endforeach
