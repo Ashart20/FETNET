@@ -39,6 +39,8 @@ class ManageActivities extends Component
     // Properti untuk kontrol modal
     public bool $activityModal = false;
 
+    public $searchActivities = null;
+
     // DITAMBAHKAN KEMBALI: Aturan validasi
     protected function rules(): array
     {
@@ -115,10 +117,22 @@ class ManageActivities extends Component
 
     public function render(): View
     {
-        $activities = Activity::query()
-            ->where('prodi_id', auth()->user()->prodi_id)
+        $activities = Activity::join('subjects', 'subjects.id', '=', 'activities.subject_id')
+            ->where('activities.prodi_id', auth()->user()->prodi_id)
             ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
-            ->orderBy('subject_id')->paginate(10);
+            ->orderBy('subjects.kode_matkul')
+            ->select('activities.*') // penting agar hanya data activities yang diambil
+            ->paginate(10);
+
+        if (!is_null($this->searchActivities)) {
+            $activities = Activity::join('subjects', 'subjects.id', '=', 'activities.subject_id')
+                ->where('activities.prodi_id', auth()->user()->prodi_id)
+                ->where('subjects.nama_matkul', 'like', "%{$this->searchActivities}%")
+                ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
+                ->orderBy('subjects.kode_matkul')
+                ->select('activities.*') // hanya kolom dari activities agar tidak duplikasi
+                ->paginate(10);
+        }
         return view('livewire.prodi.manage-activities', ['activities' => $activities, 'headers' => $this->headers(),])->layout('layouts.app');
     }
 

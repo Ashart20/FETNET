@@ -22,6 +22,12 @@
             </x-slot:actions>
         </x-mary-header>
 
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:mb-0 xl:w-2/4">
+                <x-mary-input wire:model.live="searchActivities" label="Search activities"/>
+            </div>
+        </div>
+        <hr/>
         {{-- Tabel Data --}}
         <x-mary-table :headers="$headers" :rows="$activities" with-pagination>
             @scope('cell_subject_display', $activity)

@@ -82,6 +82,9 @@
                             <th rowspan="2">Kode</th>
                             <th rowspan="2">Nama Dosen</th>
                             <th colspan="{{ auth()->user()->prodi->cluster->prodis->count() ?? 1 }}" class="text-center border-x dark:border-gray-700">Beban Mengajar (SKS)</th>
+                            <th>
+
+                            </th>
                             <th rowspan="2" class="text-center">Total</th>
                         </tr>
                         <tr>
@@ -102,6 +105,21 @@
                                 <td>{{ $teacher->full_name }}</td>
 
                                 @php($totalSKS = 0)
+                                @if(auth()->user()->prodi?->cluster)
+                                    @foreach(auth()->user()->prodi->cluster->prodis as $prodi)
+                                        <td class="text-center border-x dark:border-gray-700">
+                                            @php($sksPerProdi = $teacher->activities->where('prodi_id', $prodi->id)->sum('subject.sks'))
+                                            {{ $sksPerProdi > 0 ? $sksPerProdi : '-' }}
+                                            @php($totalSKS += $sksPerProdi)
+                                        </td>
+                                    @endforeach
+                                @else
+                                    <td class="text-center border-x dark:border-gray-700">
+                                        @php($sksPerProdi = $teacher->activities->where('prodi_id', auth()->user()->prodi_id)->sum('subject.sks'))
+                                        {{ $sksPerProdi > 0 ? $sksPerProdi : '-' }}
+                                        @php($totalSKS += $sksPerProdi)
+                                    </td>
+                                @endif
                                 @if(auth()->user()->prodi?->cluster)
                                     @foreach(auth()->user()->prodi->cluster->prodis as $prodi)
                                         <td class="text-center border-x dark:border-gray-700">
