@@ -120,7 +120,9 @@ class ManageActivities extends Component
         $activities = Activity::join('subjects', 'subjects.id', '=', 'activities.subject_id')
             ->where('activities.prodi_id', auth()->user()->prodi_id)
             ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
+            ->orderBy('subjects.semester')
             ->orderBy('subjects.kode_matkul')
+            ->orderBy('subjects.nama_matkul')
             ->select('activities.*') // penting agar hanya data activities yang diambil
             ->paginate(10);
 
