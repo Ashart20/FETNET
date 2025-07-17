@@ -62,7 +62,9 @@ class ManageActivityPreferredRooms extends Component
         $activityType = $this->selectedActivity->activityTag?->name;
         if ($activityType) {
             $roomType = $activityType === 'PRAKTIKUM' ? 'LABORATORIUM' : 'KELAS_TEORI';
-            $this->allRooms = Room::query()->whereIn('tipe', [$roomType, 'UMUM'])->orderBy('tipe')->orderBy('nama_ruangan')->get()->groupBy('tipe')->toArray();
+            $this->allRooms = Room::query()
+                ->withCount('preferredByActivities')
+                ->whereIn('tipe', [$roomType, 'UMUM'])->orderBy('tipe')->orderBy('nama_ruangan')->get()->groupBy('tipe')->toArray();
         } else {
             $this->allRooms = [];
         }

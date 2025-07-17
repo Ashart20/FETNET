@@ -38,7 +38,7 @@ class ManageActivities extends Component
 
     // Properti untuk kontrol modal
     public bool $activityModal = false;
-    
+
     protected function rules(): array
     {
         return [

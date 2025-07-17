@@ -38,6 +38,7 @@ class MasterRuangan extends Model
         'tipe',
     ];
     protected $appends = ['name_with_capacity'];
+
     /**
      * Relasi ke model Building.
      */
@@ -45,15 +46,23 @@ class MasterRuangan extends Model
     {
         return $this->belongsTo(Building::class);
     }
+
     public function timeConstraints(): HasMany
     {
         return $this->hasMany(RoomTimeConstraint::class);
-    }    /**
+    }
+
+    /**
      * Relasi ke model User (Penanggung Jawab).
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function preferredByActivities(): BelongsToMany
+    {
+        return $this->belongsToMany(Activity::class, 'activity_preferred_room');
     }
 
     /**
@@ -63,10 +72,24 @@ class MasterRuangan extends Model
     {
         return $this->belongsToMany(Activity::class, 'activity_preferred_room');
     }
+
     protected function nameWithCapacity(): Attribute
     {
         return Attribute::make(
-            get: fn () => "{$this->nama_ruangan} (Kapasitas: {$this->kapasitas})",
+            get: function () {
+                // Teks label dasar
+                $label = "{$this->nama_ruangan} (Kapasitas: {$this->kapasitas})";
+
+                // Cek jika hasil hitungan (`withCount`) ada
+                if (isset($this->preferred_by_activities_count)) {
+                    $count = $this->preferred_by_activities_count;
+                    // Hanya tampilkan jika ada yang memilih
+                    if ($count > 0) {
+                        $label .= " - Dipilih oleh {$count} aktivitas";
+                    }
+                }
+                return $label;
+            }
         );
     }
 }
