@@ -25,8 +25,6 @@ class Activity extends Model
             ->withPivot('order') // Beritahu Eloquent untuk juga mengambil data 'order'
             ->orderBy('activity_teacher.order', 'asc');
     }
-
-
     /**
      * Relasi many-to-many ke MasterRuangan (untuk preferensi ruangan).
      */

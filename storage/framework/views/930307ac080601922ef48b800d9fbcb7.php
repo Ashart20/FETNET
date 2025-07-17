@@ -308,12 +308,16 @@
             <div>
                 <label class="label font-semibold" for="teachers-list">Pilih Dosen</label>
                 <?php
-                    if ($activityId && !empty($teacher_ids)) {
+                    // Kondisi diubah menjadi lebih sederhana.
+                    // Logika ini sekarang akan berjalan setiap kali ada dosen yang dipilih ($teacher_ids tidak kosong),
+                    // baik saat mode TAMBAH maupun EDIT.
+                    if (!empty($teacher_ids)) {
                         $orderedIds = $teacher_ids;
                         [$selected, $unselected] = $teachers->partition(fn($teacher) => in_array($teacher->id, $orderedIds));
                         $sortedSelected = $selected->sortBy(fn($teacher) => array_search($teacher->id, $orderedIds));
                         $displayTeachers = $sortedSelected->merge($unselected);
                     } else {
+                        // Jika tidak ada dosen yang dipilih, tampilkan daftar standar
                         $displayTeachers = $teachers;
                     }
                 ?>
