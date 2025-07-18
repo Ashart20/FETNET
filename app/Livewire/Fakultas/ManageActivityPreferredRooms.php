@@ -21,7 +21,7 @@ class ManageActivityPreferredRooms extends Component
     public $prodi_searchable_id = null;
     public $prodisSearchable;
     public string $selectedTag = 'SEMUA';
-
+    public $searchActivities  = null;
     public function mount(): void
     {
         $this->search('');
@@ -97,6 +97,24 @@ class ManageActivityPreferredRooms extends Component
                 $subQuery->where('name', $this->selectedTag);
             });
         })->orderBy('subject_id')->paginate(10);
+
+        if (!is_null($this->searchActivities)) {
+            $search = $this->searchActivities;
+
+            $activities = Activity::join('subjects', 'subjects.id', '=', 'activities.subject_id')
+                ->join('activity_teacher', 'activity_teacher.activity_id', '=', 'activities.id')
+                ->join('teachers', 'teachers.id', '=', 'activity_teacher.teacher_id')
+                ->where(function ($query) use ($search) {
+                    $query->where('subjects.nama_matkul', 'like', "%{$search}%")
+                        ->orWhere('teachers.nama_dosen', 'like', "%{$search}%");
+                })
+                ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
+                ->select('activities.*') // tetap pilih kolom activities saja
+                ->groupBy('activities.id') // ganti distinct dengan groupBy kolom unik
+                ->orderBy('subjects.kode_matkul')
+                ->paginate(10);
+                $this->resetPage();
+        }
         return view('livewire.fakultas.manage-activity-preferred-rooms', ['activities' => $activities,])->layout('layouts.app');
     }
 }

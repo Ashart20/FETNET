@@ -6,7 +6,7 @@
 
         x-data="{ show: true }" x-show="show"
     >
-        <!--[if BLOCK]><![endif]--><?php if($icon): ?>
+        <?php if($icon): ?>
             <?php if (isset($component)) { $__componentOriginalce0070e6ae017cca68172d0230e44821 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce0070e6ae017cca68172d0230e44821 = $attributes; } ?>
 <?php $component = Mary\View\Components\Icon::resolve(['name' => $icon] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -27,23 +27,23 @@
 <?php $component = $__componentOriginalce0070e6ae017cca68172d0230e44821; ?>
 <?php unset($__componentOriginalce0070e6ae017cca68172d0230e44821); ?>
 <?php endif; ?>
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?>
 
-        <!--[if BLOCK]><![endif]--><?php if($title): ?>
+        <?php if($title): ?>
             <div>
                 <div class="<?php echo \Illuminate\Support\Arr::toCssClasses(["font-bold" => $description]); ?>"><?php echo e($title); ?></div>
                 <div class="text-xs"><?php echo e($description); ?></div>
             </div>
         <?php else: ?>
             <span><?php echo e($slot); ?></span>
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?>
 
         <div class="flex items-center gap-3">
             <?php echo e($actions); ?>
 
         </div>
 
-        <!--[if BLOCK]><![endif]--><?php if($dismissible): ?>
+        <?php if($dismissible): ?>
             <?php if (isset($component)) { $__componentOriginal602b228a887fab12f0012a3179e5b533 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal602b228a887fab12f0012a3179e5b533 = $attributes; } ?>
 <?php $component = Mary\View\Components\Button::resolve(['icon' => 'o-x-mark'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -64,5 +64,5 @@
 <?php $component = $__componentOriginal602b228a887fab12f0012a3179e5b533; ?>
 <?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
 <?php endif; ?>
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+        <?php endif; ?>
     </div><?php /**PATH /Volumes/EXCHANGE/WebDev/NewFet/storage/framework/views/d59c58b0719840e6368af143f15091b8.blade.php ENDPATH**/ ?>
