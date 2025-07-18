@@ -173,8 +173,6 @@ class ManageActivities extends Component
 
         $activity = Activity::updateOrCreate(['id' => $this->activityId], $activityData);
 
-        // --- PERUBAHAN UTAMA DI SINI ---
-        // 1. Siapkan array kosong untuk data sinkronisasi.
         $syncData = [];
 
         // 2. Isi array tersebut dengan format [teacher_id => ['order' => urutan]]

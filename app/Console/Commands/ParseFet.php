@@ -45,11 +45,12 @@ class ParseFet extends Command
                 if (! $this->option('no-cleanup')) {
                     $this->cleanupOldSchedule();
                 }
+
+                // PERUBAHAN: Ubah cara memetakan timeSlots agar lebih mudah dicari secara berurutan
                 $daysMap = Day::all()->keyBy('name');
-                $timeSlotsMap = TimeSlot::all()->keyBy(fn ($slot) => date('H:i', strtotime($slot->start_time)));
+                $timeSlotsCollection = TimeSlot::orderBy('start_time')->get();
                 $roomsMap = MasterRuangan::all()->keyBy('nama_ruangan');
-                // PERUBAHAN UTAMA: Mengubah 'studentGroup' menjadi 'studentGroups'
-                $activitiesMap = Activity::with('teachers', 'subject', 'studentGroups')->get()->keyBy('id'); // Perubahan
+                $activitiesMap = Activity::with('teachers', 'subject', 'studentGroups')->get()->keyBy('id');
 
                 $timePlacements = $this->buildTimePlacements($xml);
                 $roomPlacements = $this->buildRoomPlacements($xml);
@@ -59,56 +60,65 @@ class ParseFet extends Command
                 $importedCount = 0;
                 $skippedCount = 0;
 
+                // --- PERULANGAN UTAMA DENGAN LOGIKA BARU ---
                 foreach ($xml->Activities_List->Activity ?? [] as $activityXml) {
                     $activityId = (int) $activityXml->Id;
-
-                    // Cari penempatan untuk aktivitas ini di peta yang sudah dibuat
                     $timeData = $timePlacements[$activityId] ?? null;
                     $roomName = $roomPlacements[$activityId] ?? null;
 
-                    // Jika aktivitas ini tidak memiliki penempatan waktu, lewati
-                    if (! $timeData) {
-                        continue;
-                    }
+                    if (!$timeData) continue;
 
-                    // Cocokkan semua data yang dibutuhkan
                     $activity = $activitiesMap->get($activityId);
                     $day = $daysMap->get($timeData['day']);
-                    $timeSlot = $timeSlotsMap->get($timeData['hour']);
 
-                    // Jika ruangan tidak ditemukan atau tidak ada, bisa lewati atau pakai default
-                    if (! $roomName || ! $roomsMap->has($roomName)) {
-                        Log::warning("ParseFet: Ruangan '{$roomName}' untuk Activity ID {$activityId} tidak ditemukan. Jadwal dilewati.");
+                    // Cari indeks dari slot waktu mulai
+                    $startingSlotIndex = $timeSlotsCollection->search(fn($slot) => date('H:i', strtotime($slot->start_time)) == $timeData['hour']);
+
+                    if (!$roomName || !$roomsMap->has($roomName)) {
+                        Log::warning("ParseFet: Ruangan '{$roomName}' untuk Activity ID {$activityId} tidak ditemukan.");
                         $skippedCount++;
-
                         continue;
                     }
                     $room = $roomsMap->get($roomName);
 
-                    // Validasi akhir sebelum menyimpan
-                    if ($activity && $day && $timeSlot && $room) {
-                        $schedule = Schedule::create([
-                            'activity_id' => $activity->id,
-                            'room_id' => $room->id,
-                            'time_slot_id' => $timeSlot->id,
-                            'day_id' => $day->id,
-                        ]);
+                    // Validasi awal
+                    if ($activity && $day && $startingSlotIndex !== false && $room) {
 
-                        if ($schedule && $activity->teachers->isNotEmpty()) {
-                            $schedule->teachers()->sync($activity->teachers->pluck('id'));
+                        // Ambil durasi SKS dari aktivitas (default 1 jika tidak ada)
+                        $duration = $activity->duration ?? 1;
+
+                        // Loop sebanyak durasi SKS untuk membuat jadwal berurutan
+                        for ($i = 0; $i < $duration; $i++) {
+                            // Ambil slot waktu yang benar berdasarkan indeks
+                            $currentSlot = $timeSlotsCollection->get($startingSlotIndex + $i);
+
+                            // Pastikan kita tidak keluar dari rentang slot waktu yang ada
+                            if (!$currentSlot) {
+                                Log::warning("ParseFet: Durasi untuk Activity ID {$activityId} melebihi slot waktu yang tersedia.");
+                                break; // Hentikan loop jika slot waktu habis
+                            }
+
+                            $schedule = Schedule::create([
+                                'activity_id'  => $activity->id,
+                                'room_id'      => $room->id,
+                                'time_slot_id' => $currentSlot->id, // Gunakan ID slot waktu saat ini
+                                'day_id'       => $day->id,
+                            ]);
+
+                            if ($schedule && $activity->teachers->isNotEmpty()) {
+                                $schedule->teachers()->sync($activity->teachers->pluck('id'));
+                            }
                         }
                         $importedCount++;
                     } else {
-                        Log::warning("ParseFet: Melewatkan jadwal untuk Activity ID {$activityId} karena data tidak lengkap.", [
-                            'activity_found' => (bool) $activity, 'day_found' => (bool) $day, 'timeslot_found' => (bool) $timeSlot, 'room_found' => (bool) $room,
-                        ]);
+                        Log::warning("ParseFet: Melewatkan jadwal untuk Activity ID {$activityId} karena data awal tidak lengkap.");
                         $skippedCount++;
                     }
                 }
 
-                $this->info("✅ Berhasil mengimpor {$importedCount} jadwal.");
+                $this->info("✅ Berhasil memproses {$importedCount} aktivitas jadwal.");
                 if ($skippedCount > 0) {
-                    $this->warn("{$skippedCount} jadwal dilewati karena data tidak lengkap atau ruangan tidak ditemukan.");
+                    $this->warn("{$skippedCount} aktivitas jadwal dilewati.");
                 }
             });
 

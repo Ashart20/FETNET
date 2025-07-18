@@ -411,7 +411,7 @@ class FetFileGeneratorService
                     if ($tagName === 'PRAKTIKUM') {
                         $preferredRooms = $labRooms;
                     }
-                    // PERBAIKAN DI SINI: Gunakan 'KELAS TEORI' dengan spasi
+
                     elseif ($tagName === 'KELAS TEORI') {
                         $preferredRooms = $theoryRooms;
                     }

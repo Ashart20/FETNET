@@ -12,7 +12,7 @@ class ActivityTagSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            // TUGAS 1: PERBAIKI DATA LAMA
+
             $kelasTeoriTag = ActivityTag::firstOrCreate(['name' => 'KELAS_TEORI']);
             $oldTagIds = ActivityTag::whereIn('name', ['GANJIL', 'GENAP'])->pluck('id');
 

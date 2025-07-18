@@ -78,6 +78,31 @@
 <?php unset($__componentOriginal6f99ffca722ef3c8789c4087c5ac9f0d); ?>
 <?php endif; ?>
 
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:mb-0 xl:w-2/4">
+                <?php if (isset($component)) { $__componentOriginalf51438a7488970badd535e5f203e0c1b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf51438a7488970badd535e5f203e0c1b = $attributes; } ?>
+<?php $component = Mary\View\Components\Input::resolve(['label' => 'Search activities'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('mary-input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Mary\View\Components\Input::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['wire:model.live' => 'searchActivities']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf51438a7488970badd535e5f203e0c1b)): ?>
+<?php $attributes = $__attributesOriginalf51438a7488970badd535e5f203e0c1b; ?>
+<?php unset($__attributesOriginalf51438a7488970badd535e5f203e0c1b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf51438a7488970badd535e5f203e0c1b)): ?>
+<?php $component = $__componentOriginalf51438a7488970badd535e5f203e0c1b; ?>
+<?php unset($__componentOriginalf51438a7488970badd535e5f203e0c1b); ?>
+<?php endif; ?>
+            </div>
+        </div>
+        <hr/>
         
         <?php if (isset($component)) { $__componentOriginal8fbd727209323874b055feef49197909 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal8fbd727209323874b055feef49197909 = $attributes; } ?>

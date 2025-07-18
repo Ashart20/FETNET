@@ -1,3 +1,14 @@
+@php
+    /**
+     * @var \Illuminate\Support\Collection $jadwal // Koleksi yang sudah digrupkan per hari
+     * @var array $daftarHari
+     * @var array $daftarDosen
+     * @var array $daftarMatkul
+     * @var array $daftarKelas
+     * @var array $daftarRuangan
+     */
+@endphp
+
 <div>
     <div class="p-4 sm:p-6 lg:p-8">
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Jadwal Perkuliahan</h1>
@@ -66,54 +77,53 @@
 
     {{-- Tabel Data Jadwal --}}
     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-                <thead class="bg-gray-50 dark:bg-gray-900/50 text-xs text-gray-500 dark:text-gray-300 uppercase">
-                <tr>
-                    <th scope="col" class="px-6 py-3 font-medium">Mata Kuliah</th>
-                    <th scope="col" class="px-6 py-3 font-medium">SKS</th>
-                    <th scope="col" class="px-6 py-3 font-medium">Dosen</th>
-                    <th scope="col" class="px-6 py-3 font-medium">Kelas</th>
-                    <th scope="col" class="px-6 py-3 font-medium">Hari</th>
-                    <th scope="col" class="px-6 py-3 font-medium">Jam</th>
-                    <th scope="col" class="px-6 py-3 font-medium">Ruangan</th>
-                </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                @forelse ($jadwal as $item)
-                    <tr wire:key="{{ $item->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white font-medium">
-                            {{ $item->activity->subject->nama_matkul ?? 'N/A' }}
-                            <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $item->activity->subject->kode_matkul ?? '' }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">{{ $item->activity->subject->sks ?? '-' }}</td>
-                        <td class="px-6 py-4 text-gray-900 dark:text-white">
-                            {!! $item->activity->teachers->pluck('full_name')->implode('<br>') !!}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">
-                            @forelse($item->activity->studentGroups as $studentGroup)
-                                <x-mary-badge :value="$studentGroup->nama_kelompok" class="badge-neutral mr-1 mb-1" />
-                            @empty
-                                <x-mary-badge value="N/A (Kelompok tidak ditemukan)" class="badge-error" />
-                            @endforelse
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">{{ $item->day->name ?? '-' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">{{ optional($item->timeSlot)->start_time ? \Carbon\Carbon::parse($item->timeSlot->start_time)->format('H:i') : '-' }} - {{ optional($item->timeSlot)->end_time ? \Carbon\Carbon::parse($item->timeSlot->end_time)->format('H:i') : '-' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{{ $item->room->nama_ruangan ?? '-' }}</td>
-                    </tr>
-                @empty
+        {{-- Perulangan utama sekarang berdasarkan hari dari data yang sudah diproses --}}
+        @forelse ($jadwal as $hari => $jadwalHarian)
+            <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $hari }}</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 dark:bg-gray-900/50 text-xs text-gray-500 dark:text-gray-300 uppercase">
                     <tr>
-                        <td colspan="7" class="text-center py-6 text-gray-500 dark:text-gray-400">Tidak ada data jadwal ditemukan yang sesuai dengan filter.</td>
+                        <th scope="col" class="px-6 py-3 font-medium">Jam</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Mata Kuliah</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Dosen</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Kelas</th>
+                        <th scope="col" class="px-6 py-3 font-medium">Ruangan</th>
                     </tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    {{-- Perulangan kedua untuk setiap jadwal yang sudah digabung di hari tersebut --}}
+                    @foreach ($jadwalHarian as $item)
+                        <tr wire:key="{{ $item->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400 font-mono">{{ optional($item->timeSlot)->start_time ? \Carbon\Carbon::parse($item->timeSlot->start_time)->format('H:i') : '-' }} - {{ optional($item->timeSlot)->end_time ? \Carbon\Carbon::parse($item->timeSlot->end_time)->format('H:i') : '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white font-medium">
+                                {{ $item->activity->subject->nama_matkul ?? 'N/A' }}
+                                <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $item->activity->subject->kode_matkul ?? '' }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-900 dark:text-white">
+                                {!! $item->activity->teachers->pluck('nama_dosen')->implode('<br>') !!}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400">
+                                @forelse($item->activity->studentGroups as $studentGroup)
+                                    <x-mary-badge :value="$studentGroup->nama_kelompok" class="badge-neutral mr-1 mb-1" />
+                                @empty
+                                    <x-mary-badge value="N/A (Kelompok tidak ditemukan)" class="badge-error" />
+                                @endforelse
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">{{ $item->room->nama_ruangan ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @empty
+            <div class="text-center py-10 text-gray-500 dark:text-gray-400">
+                <p>Tidak ada data jadwal ditemukan yang sesuai dengan filter.</p>
+            </div>
+        @endforelse
     </div>
 
-    @if ($jadwal->hasPages())
-        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-            {{ $jadwal->links() }}
-        </div>
-    @endif
+    {{-- Bagian pagination dihapus karena kita tidak lagi menggunakannya dengan logika penggabungan ini --}}
 </div>
