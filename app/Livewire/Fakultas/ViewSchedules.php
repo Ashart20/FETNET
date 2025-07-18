@@ -11,10 +11,7 @@ class ViewSchedules extends Component
 {
     use WithPagination;
 
-    // Aktifkan trait pagination
-
     public $prodis;
-
     public $selectedProdiId;
 
     public function mount()
@@ -30,52 +27,70 @@ class ViewSchedules extends Component
 
     public function render()
     {
-        $schedules = collect();
-        $mergedSchedules = collect();
+        $prodiId = $this->selectedProdiId;
+        $schedulesByDay = collect();
 
-        if ($this->selectedProdiId) {
-            $query = Schedule::query()
+        if ($prodiId) {
+            // 1. Ambil data jadwal dari database
+            $schedules = Schedule::query()
                 ->with(['activity.subject', 'activity.teachers', 'activity.studentGroups', 'day', 'timeSlot', 'room'])
-                ->whereHas('activity', function ($q) {
-                    $q->where('prodi_id', $this->selectedProdiId);
-                });
-
-            // --- PERUBAHAN UTAMA ADA DI `orderBy` DI BAWAH INI ---
-            $schedules = $query->join('days', 'schedules.day_id', '=', 'days.id')
+                ->whereHas('activity', function ($q) use ($prodiId) {
+                    $q->where('prodi_id', $prodiId);
+                })
+                ->join('days', 'schedules.day_id', '=', 'days.id')
                 ->join('time_slots', 'schedules.time_slot_id', '=', 'time_slots.id')
                 ->orderBy('days.id')
-                ->orderBy('schedules.activity_id') // Memastikan semua jadwal aktivitas yang sama berkumpul
-                ->orderBy('time_slots.start_time') // Baru diurutkan berdasarkan jam
+                ->orderBy('schedules.activity_id')
+                ->orderBy('time_slots.start_time')
                 ->select('schedules.*')
                 ->get();
-            // --- AKHIR PERUBAHAN ---
 
-            $schedulesByDay = $schedules->groupBy('day.name');
+            // 2. Kelompokkan berdasarkan hari
+            $rawSchedulesByDay = $schedules->groupBy('day.id');
 
-            foreach ($schedulesByDay as $day => $daySchedules) {
-                $mergedDaySchedules = $daySchedules->reduce(function ($carry, $schedule) {
-                    $lastSchedule = $carry->last();
+            // 3. Proses penggabungan dengan logika yang sudah diperbaiki
+            foreach ($rawSchedulesByDay as $dayId => $daySchedules) {
+                if ($daySchedules->isEmpty()) {
+                    continue;
+                }
 
+                $merged = [];
+                // Mulai blok pertama dengan membuat salinan (clone) yang dalam
+                $currentBlock = clone $daySchedules->first();
+                $currentBlock->setRelation('timeSlot', clone $currentBlock->timeSlot);
+
+                // Loop dari jadwal kedua dan seterusnya
+                for ($i = 1; $i < $daySchedules->count(); $i++) {
+                    $nextSchedule = $daySchedules[$i];
+
+                    // Cek jika jadwal berikutnya menyambung dengan blok saat ini
                     if (
-                        $lastSchedule &&
-                        $lastSchedule->activity_id == $schedule->activity_id &&
-                        $lastSchedule->room_id == $schedule->room_id &&
-                        strtotime($schedule->timeSlot->start_time) == strtotime($lastSchedule->timeSlot->end_time)
+                        $nextSchedule->activity_id == $currentBlock->activity_id &&
+                        $nextSchedule->room_id == $currentBlock->room_id &&
+                        strtotime($nextSchedule->timeSlot->start_time) == strtotime($currentBlock->timeSlot->end_time)
                     ) {
-                        $lastSchedule->timeSlot->end_time = $schedule->timeSlot->end_time;
+                        // Jika ya, cukup perpanjang jam selesai dari blok saat ini
+                        $currentBlock->timeSlot->end_time = $nextSchedule->timeSlot->end_time;
                     } else {
-                        $carry->push(clone $schedule);
+                        // Jika tidak, simpan blok saat ini ke hasil
+                        $merged[] = $currentBlock;
+
+                        // Dan mulai blok baru dengan membuat salinan (clone) yang dalam
+                        $currentBlock = clone $nextSchedule;
+                        $currentBlock->setRelation('timeSlot', clone $currentBlock->timeSlot);
                     }
+                }
 
-                    return $carry;
-                }, collect());
+                if ($currentBlock) {
+                    $merged[] = $currentBlock;
+                }
 
-                $mergedSchedules[$day] = $mergedDaySchedules;
+                $schedulesByDay[$daySchedules->first()->day->name] = collect($merged);
             }
         }
 
         return view('livewire.fakultas.view-schedules', [
-            'schedules' => $mergedSchedules,
+            'schedules' => $schedulesByDay,
         ])->layout('layouts.app');
     }
 }

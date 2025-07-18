@@ -24,10 +24,9 @@ class ParseFet extends Command
         $filePath = $this->argument('file');
         Log::info("ParseFet: Memulai proses parse untuk file hasil: {$filePath}");
 
-        if (! file_exists($filePath)) {
+        if (!file_exists($filePath)) {
             Log::error("ParseFet: File tidak ditemukan di path: {$filePath}");
             $this->error('File tidak ditemukan.');
-
             return;
         }
 
@@ -36,33 +35,37 @@ class ParseFet extends Command
             if ($xml === false) {
                 Log::error("ParseFet: Gagal membaca atau mem-parsing file XML: {$filePath}.");
                 $this->error('Gagal membaca file XML. Pastikan formatnya benar.');
-
                 return;
             }
 
             DB::transaction(function () use ($xml) {
-
-                if (! $this->option('no-cleanup')) {
+                if (!$this->option('no-cleanup')) {
                     $this->cleanupOldSchedule();
                 }
 
-                // PERUBAHAN: Ubah cara memetakan timeSlots agar lebih mudah dicari secara berurutan
+                // Siapkan data mapping dari database
                 $daysMap = Day::all()->keyBy('name');
                 $timeSlotsCollection = TimeSlot::orderBy('start_time')->get();
                 $roomsMap = MasterRuangan::all()->keyBy('nama_ruangan');
                 $activitiesMap = Activity::with('teachers', 'subject', 'studentGroups')->get()->keyBy('id');
 
+                // Bangun penempatan waktu dan ruangan dari constraint
                 $timePlacements = $this->buildTimePlacements($xml);
                 $roomPlacements = $this->buildRoomPlacements($xml);
 
-                $this->info(count($timePlacements).' penempatan jadwal ditemukan. Memulai proses impor...');
-
+                $this->info(count($timePlacements) . ' penempatan jadwal ditemukan. Memulai proses impor...');
                 $importedCount = 0;
                 $skippedCount = 0;
 
-                // --- PERULANGAN UTAMA DENGAN LOGIKA BARU ---
                 foreach ($xml->Activities_List->Activity ?? [] as $activityXml) {
                     $activityId = (int) $activityXml->Id;
+
+                    // Ambil durasi langsung dari file XML yang diparse
+                    $duration = (int) ($activityXml->Duration ?? 1);
+                    if ($duration <= 0) {
+                        $duration = 1;
+                    }
+
                     $timeData = $timePlacements[$activityId] ?? null;
                     $roomName = $roomPlacements[$activityId] ?? null;
 
@@ -70,42 +73,33 @@ class ParseFet extends Command
 
                     $activity = $activitiesMap->get($activityId);
                     $day = $daysMap->get($timeData['day']);
+                    $room = $roomName ? $roomsMap->get($roomName) : null;
 
-                    // Cari indeks dari slot waktu mulai
-                    $startingSlotIndex = $timeSlotsCollection->search(fn($slot) => date('H:i', strtotime($slot->start_time)) == $timeData['hour']);
-
-                    if (!$roomName || !$roomsMap->has($roomName)) {
-                        Log::warning("ParseFet: Ruangan '{$roomName}' untuk Activity ID {$activityId} tidak ditemukan.");
+                    if (!$room) {
+                        Log::warning("ParseFet: Ruangan '{$roomName}' untuk Activity ID {$activityId} tidak ditemukan. Jadwal dilewati.");
                         $skippedCount++;
                         continue;
                     }
-                    $room = $roomsMap->get($roomName);
 
-                    // Validasi awal
-                    if ($activity && $day && $startingSlotIndex !== false && $room) {
+                    $startingSlotIndex = $timeSlotsCollection->search(fn($slot) => date('H:i', strtotime($slot->start_time)) == $timeData['hour']);
 
-                        // Ambil durasi SKS dari aktivitas (default 1 jika tidak ada)
-                        $duration = $activity->duration ?? 1;
-
-                        // Loop sebanyak durasi SKS untuk membuat jadwal berurutan
+                    if ($activity && $day && $startingSlotIndex !== false) {
                         for ($i = 0; $i < $duration; $i++) {
-                            // Ambil slot waktu yang benar berdasarkan indeks
                             $currentSlot = $timeSlotsCollection->get($startingSlotIndex + $i);
 
-                            // Pastikan kita tidak keluar dari rentang slot waktu yang ada
                             if (!$currentSlot) {
-                                Log::warning("ParseFet: Durasi untuk Activity ID {$activityId} melebihi slot waktu yang tersedia.");
-                                break; // Hentikan loop jika slot waktu habis
+                                Log::warning("ParseFet: Durasi SKS ({$duration}) untuk Activity ID {$activityId} melebihi slot waktu yang tersedia.");
+                                break;
                             }
 
                             $schedule = Schedule::create([
                                 'activity_id'  => $activity->id,
                                 'room_id'      => $room->id,
-                                'time_slot_id' => $currentSlot->id, // Gunakan ID slot waktu saat ini
+                                'time_slot_id' => $currentSlot->id,
                                 'day_id'       => $day->id,
                             ]);
 
-                            if ($schedule && $activity->teachers->isNotEmpty()) {
+                            if ($i === 0 && $schedule && $activity->teachers->isNotEmpty()) {
                                 $schedule->teachers()->sync($activity->teachers->pluck('id'));
                             }
                         }
@@ -125,8 +119,8 @@ class ParseFet extends Command
             event(new ScheduleDataUpdatedEvent);
 
         } catch (Exception $e) {
-            $this->error('Terjadi kesalahan saat parsing: '.$e->getMessage());
-            Log::error('ParseFet Error: '.$e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
+            $this->error('Terjadi kesalahan saat parsing: ' . $e->getMessage());
+            Log::error('ParseFet Error: ' . $e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
         }
     }
 
