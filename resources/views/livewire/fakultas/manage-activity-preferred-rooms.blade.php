@@ -7,6 +7,10 @@
         <div class="w-full max-w-full px-10 mb-3 sm:w-1/3 sm:flex-none xl:mb-0 xl:w-1/3">
             <x-mary-select label="Pilih Prodi" wire:model.live="prodi_searchable_id" :options="$prodisSearchable" option-value="id" option-label="nama_prodi" placeholder="Pilih Prodi" searchable />
         </div>
+        <div class="w-full max-w-full px-10 mb-6 sm:w-1/3 sm:flex-none xl:mb-0 xl:w-1/3">
+            <x-mary-input wire:model.live="searchActivities" label="Search activities"/>
+        </div>
+
         <div class="w-full max-w-full px-10 mb-4 sm:w-3/3 sm:flex-none xl:mb-0 xl:w-3/3">
             <x-mary-tabs wire:model.live="selectedTag" label="Filter Tipe Aktivitas">
                 <x-mary-tab name="SEMUA" label="Semua" />

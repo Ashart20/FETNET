@@ -65,4 +65,8 @@
 <?php unset($__componentOriginal602b228a887fab12f0012a3179e5b533); ?>
 <?php endif; ?>
         <?php endif; ?>
+<<<<<<< HEAD:storage/framework/views/945ecfc1f43e95e2a953252fa1776876.php
     </div><?php /**PATH /home/ashart20/FETNET/storage/framework/views/d59c58b0719840e6368af143f15091b8.blade.php ENDPATH**/ ?>
+=======
+    </div><?php /**PATH /Volumes/EXCHANGE/WebDev/NewFet/storage/framework/views/d59c58b0719840e6368af143f15091b8.blade.php ENDPATH**/ ?>
+>>>>>>> 37932502ce1771fd5d973efa3d1d4af0ca2dafb8:storage/framework/views/09fceb36033e09c9236065a515ff2dec.php
