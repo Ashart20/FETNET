@@ -23,7 +23,7 @@
         </x-mary-header>
 
         <div class="flex flex-wrap -mx-3">
-            <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:mb-0 xl:w-2/4">
+            <div class="w-full max-w-full px-3 mb-6 sm:w-2/4 sm:flex-none xl:w-2/4">
                 <x-mary-input wire:model.live="searchActivities" label="Search activities"/>
             </div>
         </div>
@@ -95,16 +95,12 @@
             <div>
                 <label class="label font-semibold" for="teachers-list">Pilih Dosen</label>
                 @php
-                    // Kondisi diubah menjadi lebih sederhana.
-                    // Logika ini sekarang akan berjalan setiap kali ada dosen yang dipilih ($teacher_ids tidak kosong),
-                    // baik saat mode TAMBAH maupun EDIT.
                     if (!empty($teacher_ids)) {
                         $orderedIds = $teacher_ids;
                         [$selected, $unselected] = $teachers->partition(fn($teacher) => in_array($teacher->id, $orderedIds));
                         $sortedSelected = $selected->sortBy(fn($teacher) => array_search($teacher->id, $orderedIds));
                         $displayTeachers = $sortedSelected->merge($unselected);
                     } else {
-                        // Jika tidak ada dosen yang dipilih, tampilkan daftar standar
                         $displayTeachers = $teachers;
                     }
                 @endphp
@@ -144,6 +140,7 @@
             <x-mary-input
                 label="SKS Tambahan (Praktikum)"
                 wire:model="practicum_sks"
+                :value="$practicum_sks"
                 type="number"
             />
         </div>

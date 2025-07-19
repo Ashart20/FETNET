@@ -33,7 +33,7 @@ class ManageActivities extends Component
     public ?int $subject_id = null;
     public array $selectedStudentGroupIds = [];
     public ?int $activity_tag_id = null;
-    public ?int $practicum_sks = null;
+    public $practicum_sks = null;
     public ?string $name = null;
 
     // Properti untuk kontrol modal
@@ -41,7 +41,7 @@ class ManageActivities extends Component
 
     public $searchActivities = null;
 
-    // DITAMBAHKAN KEMBALI: Aturan validasi
+    // Aturan validasi
     protected function rules(): array
     {
         return [
@@ -56,7 +56,7 @@ class ManageActivities extends Component
         ];
     }
 
-    // DITAMBAHKAN KEMBALI: Pesan validasi kustom
+    // Pesan validasi kustom
     protected function messages(): array
     {
         return [
@@ -66,6 +66,7 @@ class ManageActivities extends Component
         ];
     }
 
+    // Inisialisasi komponen
     public function mount(): void
     {
         $prodi = auth()->user()->prodi;
@@ -101,6 +102,7 @@ class ManageActivities extends Component
         }
     }
 
+    // Mendefinisikan header tabel
     public function headers(): array
     {
         return [
@@ -115,82 +117,74 @@ class ManageActivities extends Component
         ];
     }
 
+    // Merender tampilan dan data
     public function render(): View
     {
         $activities = Activity::join('subjects', 'subjects.id', '=', 'activities.subject_id')
             ->where('activities.prodi_id', auth()->user()->prodi_id)
             ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
+            ->when($this->searchActivities, function ($query, $search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('subjects.nama_matkul', 'like', "%{$search}%")
+                        ->orWhere('teachers.nama_dosen', 'like', "%{$search}%");
+                });
+            })
+            ->select('activities.*')
+            ->groupBy('activities.id')
             ->orderBy('subjects.semester')
             ->orderBy('subjects.kode_matkul')
             ->orderBy('subjects.nama_matkul')
-            ->select('activities.*') // penting agar hanya data activities yang diambil
             ->paginate(10);
-
-        if (!is_null($this->searchActivities)) {
-            $search = $this->searchActivities;
-
-            $activities = Activity::join('subjects', 'subjects.id', '=', 'activities.subject_id')
-                ->join('activity_teacher', 'activity_teacher.activity_id', '=', 'activities.id')
-                ->join('teachers', 'teachers.id', '=', 'activity_teacher.teacher_id')
-                ->where('activities.prodi_id', auth()->user()->prodi_id)
-                ->where(function ($query) use ($search) {
-                    $query->where('subjects.nama_matkul', 'like', "%{$search}%")
-                        ->orWhere('teachers.nama_dosen', 'like', "%{$search}%");
-                })
-                ->with(['teachers', 'subject', 'studentGroups', 'activityTag'])
-                ->select('activities.*') // tetap pilih kolom activities saja
-                ->groupBy('activities.id') // ganti distinct dengan groupBy kolom unik
-                ->orderBy('subjects.kode_matkul')
-                ->paginate(10);
-            $this->resetPage();
-        }
-
-
 
         return view('livewire.prodi.manage-activities', ['activities' => $activities, 'headers' => $this->headers(),])->layout('layouts.app');
     }
 
+    // Membuka modal untuk membuat aktivitas baru
     public function create(): void
     {
         $this->resetInputFields();
         $this->activityModal = true;
     }
 
+    // Menyimpan data (baik baru maupun update)
     public function store(): void
     {
         $validatedData = $this->validate();
         $subject = Subject::find($validatedData['subject_id']);
-        $finalDuration = ($subject->sks ?? 0) + ($this->practicum_sks ?? 0);
+
+        // Logika "defensif" untuk memastikan SKS Praktikum dihitung dengan benar
+        $teori_sks = $subject->sks ?? 0;
+        $isPracticumSksEmpty = ($this->practicum_sks === '' || is_null($this->practicum_sks));
+        $praktikum_sks = $isPracticumSksEmpty ? 0 : (int) $this->practicum_sks;
+        $finalDuration = $teori_sks + $praktikum_sks;
+
         $activityData = [
             'subject_id'      => $validatedData['subject_id'],
             'activity_tag_id' => $validatedData['activity_tag_id'],
             'prodi_id'        => auth()->user()->prodi_id,
             'duration'        => $finalDuration,
-            'practicum_sks'   => $this->practicum_sks,
+            'practicum_sks'   => $isPracticumSksEmpty ? null : $praktikum_sks,
             'name'            => $validatedData['name'],
             'quantity'        => 1,
         ];
 
         $activity = Activity::updateOrCreate(['id' => $this->activityId], $activityData);
 
+        // Sinkronisasi dosen dengan urutan
         $syncData = [];
-
-        // 2. Isi array tersebut dengan format [teacher_id => ['order' => urutan]]
         if (!empty($this->teacher_ids)) {
             foreach ($this->teacher_ids as $index => $teacherId) {
                 $syncData[$teacherId] = ['order' => $index];
             }
         }
-
-        // 3. Gunakan sync() untuk menyimpan data dan urutannya secara bersamaan.
         $activity->teachers()->sync($syncData);
-        // --- AKHIR PERUBAHAN ---
-
         $activity->studentGroups()->sync($validatedData['selectedStudentGroupIds']);
+
         $this->toast(type: 'success', title: $this->activityId ? 'Aktivitas berhasil diperbarui.' : 'Aktivitas berhasil ditambahkan.');
         $this->closeModal();
     }
 
+    // Mengisi form dengan data untuk diedit
     public function edit(Activity $activity): void
     {
         if ($activity->prodi_id !== auth()->user()->prodi_id) {
@@ -203,11 +197,14 @@ class ManageActivities extends Component
         $this->subject_id = $activity->subject_id;
         $this->selectedStudentGroupIds = $activity->studentGroups->pluck('id')->map(fn($id) => (string) $id)->all();
         $this->activity_tag_id = $activity->activity_tag_id;
-        $this->practicum_sks = $activity->practicum_sks;
         $this->name = $activity->name;
+
+        $this->practicum_sks = $activity->practicum_sks > 0 ? $activity->practicum_sks : null;
+
         $this->activityModal = true;
     }
 
+    // Menghapus aktivitas
     public function delete(Activity $activity): void
     {
         if ($activity->prodi_id !== auth()->user()->prodi_id) {
@@ -218,12 +215,14 @@ class ManageActivities extends Component
         $this->toast(type: 'warning', title: 'Aktivitas berhasil dihapus.');
     }
 
+    // Menutup modal
     public function closeModal(): void
     {
         $this->activityModal = false;
         $this->resetInputFields();
     }
 
+    // Membersihkan input form
     private function resetInputFields(): void
     {
         $this->reset([
