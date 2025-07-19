@@ -431,7 +431,7 @@ class FetFileGeneratorService
 
             // Tambahkan constraint ke file XML
             $cNode = $spaceList->addChild('ConstraintActivityPreferredRooms');
-            $cNode->addChild('Weight_Percentage', '95');
+            $cNode->addChild('Weight_Percentage', '100');
             $cNode->addChild('Activity_Id', $activity->id);
             $cNode->addChild('Number_of_Preferred_Rooms', $preferredRooms->count());
             foreach ($preferredRooms as $room) {
